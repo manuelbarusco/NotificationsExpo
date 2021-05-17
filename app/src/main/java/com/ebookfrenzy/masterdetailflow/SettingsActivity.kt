@@ -7,7 +7,7 @@ import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 
 
-class MainActivity : AppCompatActivity() {
+class SettingsActivity : AppCompatActivity() {
 
     private lateinit var buttonGoSystemsSettings : Button
     private lateinit var buttonDeleteData : Button

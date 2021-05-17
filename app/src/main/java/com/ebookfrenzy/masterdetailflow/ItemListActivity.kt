@@ -3,9 +3,7 @@ package com.ebookfrenzy.masterdetailflow
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -60,6 +58,35 @@ class ItemListActivity : AppCompatActivity() {
         }
 
         setupRecyclerView(findViewById(R.id.item_list))
+    }
+
+    // Codice necessario per creare il menu
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.app_menu, menu)
+        return true
+    }
+
+    // Codice necessario per gestire i click nel menu
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle item selection
+        return when (item.itemId) {
+            R.id.istructions -> {
+                //TODO Aggiungere codice per activity istructions
+                true
+            }
+            R.id.settings -> {
+                //TODO Aggiungere codice per activity settings
+                val intent = Intent(this, SettingsActivity::class.java)
+                startActivity(intent)
+                true
+            }
+            R.id.credits -> {
+                //TODO Aggiungere codice per activity credits
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun setupRecyclerView(recyclerView: RecyclerView) {
