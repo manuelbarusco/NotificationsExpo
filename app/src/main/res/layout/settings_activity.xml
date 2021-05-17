@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingTop="30dp"
+    android:paddingLeft="30dp"
+    android:paddingRight="30dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cambia la modalità con cui l'app mostra le notifiche"
+        android:layout_gravity="center"/>
+    <Button
+        android:id="@+id/button_go_system_settings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Vai alle impostazioni di sitema"
+        android:layout_marginBottom="60dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Elimina i dati di questa app"
+        android:layout_gravity="center"/>
+
+    <Button
+        android:id="@+id/button_delete_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Elimina i dati di questa app"/>
+
+
+
+</LinearLayout>
