@@ -72,11 +72,11 @@ class ItemListActivity : AppCompatActivity() {
         // Handle item selection
         return when (item.itemId) {
             R.id.istructions -> {
-                //TODO Aggiungere codice per activity istructions
+                val intent = Intent(this, WelcomeActivity::class.java)
+                startActivity(intent)
                 true
             }
             R.id.settings -> {
-                //TODO Aggiungere codice per activity settings
                 val intent = Intent(this, SettingsActivity::class.java)
                 startActivity(intent)
                 true
