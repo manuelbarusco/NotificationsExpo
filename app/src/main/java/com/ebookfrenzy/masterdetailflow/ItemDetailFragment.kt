@@ -5,7 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
 import com.ebookfrenzy.masterdetailflow.dummy.DummyContent
+import com.ebookfrenzy.masterdetailflow.dummy.MessageDatasource
 
 /**
  * A fragment representing a single Item detail screen.
@@ -19,6 +21,7 @@ class ItemDetailFragment : Fragment() {
      * The dummy content this fragment is presenting.
      */
     private var item: DummyContent.DummyItem? = null
+    private lateinit var recyclerView: RecyclerView
     //private val d: DummyContent = DummyContent()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,8 +39,11 @@ class ItemDetailFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.item_detail, container, false)
-
+        val rootView = inflater.inflate(R.layout.chat_detail, container, false)
+        //TODO: risolvere problema action bar
+        val messages= MessageDatasource().getMessagesExample(20)
+        recyclerView=rootView.findViewById(R.id.recycler_chat)
+        recyclerView.adapter=MessageAdapter(messages)
         // Show the dummy content as text in a TextView.
         item?.let {
             //rootView.findViewById<TextView>(R.id.item_detail).text = it.details
