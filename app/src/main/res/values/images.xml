@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="immagini">
+        <item>@drawable/image_chat1</item>
+    </array>
+</resources>
