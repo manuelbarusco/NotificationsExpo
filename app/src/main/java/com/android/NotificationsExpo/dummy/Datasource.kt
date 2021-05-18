@@ -1,4 +1,4 @@
-package com.ebookfrenzy.masterdetailflow.dummy
+package com.android.NotificationsExpo.dummy
 
 //classe che fornisce alla ChatActivity i messaggi della chat desiderata
 class MessageDatasource(){

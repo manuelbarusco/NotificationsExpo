@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.ebookfrenzy.masterdetailflow">
+    package="com.android.NotificationsExpo">
 
     <application
         android:allowBackup="false"
@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MasterDetailFlow">
         <activity
-            android:name=".ItemListActivity"
+            android:name="com.android.NotificationsExpo.ItemListActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.MasterDetailFlow.NoActionBar">
             <intent-filter>
@@ -19,24 +19,24 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name="com.android.NotificationsExpo.SettingsActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.MasterDetailFlow">
         </activity>
         <activity
-            android:name=".WelcomeActivity"
+            android:name="com.android.NotificationsExpo.WelcomeActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.MasterDetailFlow">
         </activity>
         <activity
-            android:name=".ItemDetailActivity"
+            android:name="com.android.NotificationsExpo.ItemDetailActivity"
             android:label="@string/title_item_detail"
-            android:parentActivityName=".ItemListActivity"
+            android:parentActivityName="com.android.NotificationsExpo.ItemListActivity"
             android:theme="@style/Theme.MasterDetailFlow.NoActionBar">
             <!-- Serve per pulsante che torna indietro nella toolbar -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.ebookfrenzy.masterdetailflow.ItemListActivity" />
+                android:value="com.android.NotificationsExpo.ItemListActivity" />
         </activity>
     </application>
 

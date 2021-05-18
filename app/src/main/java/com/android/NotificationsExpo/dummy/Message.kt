@@ -1,4 +1,4 @@
-package com.ebookfrenzy.masterdetailflow.dummy
+package com.android.NotificationsExpo.dummy
 
 import java.lang.IllegalArgumentException
 

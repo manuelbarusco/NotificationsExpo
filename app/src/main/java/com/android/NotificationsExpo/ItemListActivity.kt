@@ -1,19 +1,15 @@
-package com.ebookfrenzy.masterdetailflow
+package com.android.NotificationsExpo
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.RecyclerView
-import com.ebookfrenzy.masterdetailflow.dummy.DummyContent
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
+import com.android.NotificationsExpo.dummy.DummyContent
 
 /**
  * An activity representing a list of Pings. This activity

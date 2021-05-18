@@ -1,11 +1,11 @@
-package com.ebookfrenzy.masterdetailflow
+package com.android.NotificationsExpo
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.ebookfrenzy.masterdetailflow.dummy.Message
+import com.android.NotificationsExpo.dummy.Message
 
 class MessageAdapter(val messageList: MutableList<Message>) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
 

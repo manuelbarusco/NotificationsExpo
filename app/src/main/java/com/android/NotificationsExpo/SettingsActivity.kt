@@ -1,4 +1,4 @@
-package com.ebookfrenzy.masterdetailflow
+package com.android.NotificationsExpo
 
 import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity

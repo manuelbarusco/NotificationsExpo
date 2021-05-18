@@ -1,7 +1,6 @@
-package com.ebookfrenzy.masterdetailflow
+package com.android.NotificationsExpo
 
-import android.content.res.Resources
-import com.ebookfrenzy.masterdetailflow.WelcomeFragments.*
+import com.android.NotificationsExpo.WelcomeFragments.*
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView

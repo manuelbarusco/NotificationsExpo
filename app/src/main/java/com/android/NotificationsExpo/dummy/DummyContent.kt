@@ -1,8 +1,6 @@
-package com.ebookfrenzy.masterdetailflow.dummy
+package com.android.NotificationsExpo.dummy
 
-import android.content.Context
-import android.util.Log
-import com.ebookfrenzy.masterdetailflow.R
+import com.android.NotificationsExpo.R
 import java.util.ArrayList
 import java.util.HashMap
 
