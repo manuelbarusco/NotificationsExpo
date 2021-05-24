@@ -34,9 +34,11 @@ class ItemListActivity : AppCompatActivity() {
      * device.
      */
     private var twoPane: Boolean = false
-    private val KEY_USER= "UtenteAPP"
     private lateinit var repository: NotificationExpoRepository
-    //private val d: DummyContent = DummyContent(this)
+
+    companion object{
+        const val KEY_USER= "UtenteAPP"
+    }
 
 
     // Broadcast receiver
@@ -94,41 +96,12 @@ class ItemListActivity : AppCompatActivity() {
 
     private fun updateUI(chat: List<ChatDAO.ChatUtente>){
         val recyclerView:RecyclerView= findViewById(R.id.item_list)
-        recyclerView.adapter = SimpleItemRecyclerViewAdapter(this, this , chat, twoPane)
+        recyclerView.adapter = SimpleItemRecyclerViewAdapter(this, chat, twoPane)
     }
 
-    // Codice necessario per creare il menu
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater: MenuInflater = menuInflater
-        inflater.inflate(R.menu.app_menu, menu)
-        return true
-    }
-
-    // Codice necessario per gestire i click nel menu
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle item selection
-        return when (item.itemId) {
-            R.id.istructions -> {
-                val intent = Intent(this, WelcomeActivity::class.java)
-                startActivity(intent)
-                true
-            }
-            R.id.settings -> {
-                val intent = Intent(this, SettingsActivity::class.java)
-                startActivity(intent)
-                true
-            }
-            R.id.credits -> {
-                //TODO Aggiungere codice per activity credits
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
 
     //classe adapter per la recycler view
     class SimpleItemRecyclerViewAdapter(private val parentActivity: ItemListActivity,
-                                        private val context: Context,
                                         private val values: List<ChatDAO.ChatUtente>,
                                         private val twoPane: Boolean) :
             RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>() {
@@ -141,16 +114,28 @@ class ItemListActivity : AppCompatActivity() {
                 if (twoPane) {
                     val fragment = ItemDetailFragment().apply {
                         arguments = Bundle().apply {
-                            putInt(ItemDetailFragment.CHAT_ID, item.idChat)      //passare id chat
+                            putInt(ItemDetailFragment.CHAT_ID, item.idChat)     //passati id chat, nome chat e immagine della chat
+                            putString(ItemDetailFragment.CHAT_NAME,item.nomeChat)
+                            if(item.nomeChat==null)
+                                putString(ItemDetailFragment.CHAT_NAME,item.nomeChatPrivata)
+                            putInt(ItemDetailFragment.CHAT_IMG,item.imgChatGruppo as Int)
+                            if(item.imgChatGruppo==null)
+                                putInt(ItemDetailFragment.CHAT_IMG,item.imgChatPrivata)
                         }
                     }
                     parentActivity.supportFragmentManager
                             .beginTransaction()
-                            .replace(R .id.item_detail_container, fragment)
+                            .replace(R.id.item_detail_container, fragment)
                             .commit()
                 } else {
                     val intent = Intent(v.context, ItemDetailActivity::class.java).apply {
-                        putExtra(ItemDetailFragment.CHAT_ID, item.idChat)      //passare id chat
+                        putExtra(ItemDetailFragment.CHAT_ID, item.idChat)       //passati id chat, nome chat e immagine della chat
+                        putExtra(ItemDetailFragment.CHAT_NAME,item.nomeChat)
+                        if(item.nomeChat==null)
+                            putExtra(ItemDetailFragment.CHAT_NAME,item.nomeChatPrivata)
+                        putExtra(ItemDetailFragment.CHAT_IMG,item.imgChatGruppo)
+                        if(item.imgChatGruppo==null)
+                            putExtra(ItemDetailFragment.CHAT_IMG,item.imgChatPrivata)
                     }
                     v.context.startActivity(intent)
                 }
@@ -193,6 +178,7 @@ class ItemListActivity : AppCompatActivity() {
         }
     }
 
+<<<<<<< Updated upstream
     override fun onResume() {
         super.onResume()
 
@@ -206,5 +192,34 @@ class ItemListActivity : AppCompatActivity() {
         this.unregisterReceiver(onShowNotification)
 
         super.onPause()
+=======
+    // Codice necessario per creare il menu
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.app_menu, menu)
+        return true
+    }
+
+    // Codice necessario per gestire i click nel menu
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle item selection
+        return when (item.itemId) {
+            R.id.istructions -> {
+                val intent = Intent(this, WelcomeActivity::class.java)
+                startActivity(intent)
+                true
+            }
+            R.id.settings -> {
+                val intent = Intent(this, SettingsActivity::class.java)
+                startActivity(intent)
+                true
+            }
+            R.id.credits -> {
+                //TODO Aggiungere codice per activity credits
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+>>>>>>> Stashed changes
     }
 }

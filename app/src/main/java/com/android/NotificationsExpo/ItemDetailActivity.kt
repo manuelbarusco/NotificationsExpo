@@ -56,6 +56,9 @@ class ItemDetailActivity : AppCompatActivity() {
             val fragment = ItemDetailFragment().apply {
                 arguments = Bundle().apply {
                     putInt(ItemDetailFragment.CHAT_ID, intent.getIntExtra(ItemDetailFragment.CHAT_ID,-1))
+                    putString(ItemDetailFragment.CHAT_NAME, intent.getStringExtra(ItemDetailFragment.CHAT_NAME))
+                    putString(ItemDetailFragment.CHAT_NAME,intent.getStringExtra(ItemDetailFragment.CHAT_NAME))
+                    putInt(ItemDetailFragment.CHAT_IMG,intent.getIntExtra(ItemDetailFragment.CHAT_IMG, -1) as Int)
                 }
             }
 

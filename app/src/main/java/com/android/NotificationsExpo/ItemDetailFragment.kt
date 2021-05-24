@@ -11,6 +11,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.android.NotificationsExpo.database.NotificationExpoRepository
@@ -27,6 +30,8 @@ import com.android.NotificationsExpo.database.entities.Messaggio
  */
 class ItemDetailFragment : Fragment() {
     private var chat_id:Int= -1
+    private var nome_chat:String?=null
+    private var img_chat:Int=-1
     private lateinit var repository: NotificationExpoRepository
 
     /**
@@ -39,18 +44,23 @@ class ItemDetailFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         arguments?.let {
-            if (it.containsKey(CHAT_ID)) {
+            if (it.containsKey(CHAT_ID))
                 chat_id=it.getInt(CHAT_ID)
-                // Load the dummy content specified by the fragment
-                // arguments. In a real-world scenario, use a Loader
-                // to load content from a content provider.
-            }
+            if(it.containsKey(CHAT_NAME))
+                nome_chat=it.getString(CHAT_NAME)
+            if(it.containsKey(CHAT_IMG))
+                img_chat=it.getInt(CHAT_IMG)
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.chat_detail, container, false)
+        val chat_name_view:TextView=rootView.findViewById(R.id.chat_name)
+        Log.i("Chat", "Ricevuti -> Chat name:"+nome_chat+" img:"+img_chat)
+        val chat_img_view:ImageView=rootView.findViewById(R.id.chat_image)
+        chat_name_view.text=nome_chat
+        chat_img_view.setImageResource(img_chat)
         //TODO: risolvere problema action bar
         //val messages= MessageDatasource().getMessagesExample(20)
         recyclerView=rootView.findViewById(R.id.recycler_chat)
@@ -66,7 +76,11 @@ class ItemDetailFragment : Fragment() {
 
         )
         val sendButton: Button= rootView.findViewById(R.id.button_chat_send)
+<<<<<<< Updated upstream
 
+=======
+        /*var alarmManager: AlarmManager
+>>>>>>> Stashed changes
         sendButton.setOnClickListener {
             val myNotificationType:String = "conversationNotification" //TODO Sostituire con il tipo di notifica a cui appartiene la chat (l'id nel database)
 
@@ -89,6 +103,7 @@ class ItemDetailFragment : Fragment() {
                     AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     SystemClock.elapsedRealtime() + 2 * 1000,
                     pendingIntent)
+<<<<<<< Updated upstream
 
             // Note sulla sicurezza:
             // 1) Essendo broadcast espliciti ho la certezza che non verrranno recapitati ad altri
@@ -96,6 +111,14 @@ class ItemDetailFragment : Fragment() {
             //    riceverà solo gli intent provenienti da questa app
             // https://developer.android.com/guide/components/broadcasts#security-and-best-practices
         }
+=======
+            /*
+            alarmManager?.set(
+                    AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    SystemClock.elapsedRealtime() + 5 * 1000,
+                    pendingIntent2)*/
+        }*/
+>>>>>>> Stashed changes
         return rootView
     }
 
@@ -104,7 +127,13 @@ class ItemDetailFragment : Fragment() {
          * The fragment argument representing the item ID that this fragment
          * represents.
          */
+<<<<<<< Updated upstream
         const val CHAT_ID = "item_id"
 
+=======
+        const val CHAT_ID = "Chat_id"
+        const val CHAT_NAME= "Nome_chat"
+        const val CHAT_IMG= "Img_chat"
+>>>>>>> Stashed changes
     }
 }

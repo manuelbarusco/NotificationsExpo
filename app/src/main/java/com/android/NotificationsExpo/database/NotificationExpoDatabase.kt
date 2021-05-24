@@ -69,11 +69,11 @@ abstract class NotificationExpoDatabase : RoomDatabase() {
 
         private fun populateDatabase(userDAO: UtenteDAO, chatDAO: ChatDAO, notificaDAO: NotificaDAO, messaggioDAO: MessaggioDAO, utentiChatDAO: UtentiChatDAO) {
             //popolamento iniziale del DB
-            var u=Utente("Alberto", "Alberto", "Da Re", R.drawable.image_chat1)
+            val u=Utente("Alberto", "Alberto", "Da Re", R.drawable.image_chat1) //utente predefinito
             userDAO.insert(u)
-            var u1=Utente("Manuel", "Manuel", "Barusco", R.drawable.image_chat2)
+            val u1=Utente("Manuel", "Manuel", "Barusco", R.drawable.image_chat2)
             userDAO.insert(u1)
-            var n=Notifica("Head's up notification", "Prova")
+            val n=Notifica("Head's up notification", "Prova")
             notificaDAO.insert(n)
             var chat=Chat(nome = null, notificaAssociata = "Head's up notification", imgChat = null)
             chatDAO.insert(chat)
