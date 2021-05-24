@@ -39,6 +39,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.android.NotificationsExpo.ItemListActivity" />
         </activity>
+        <receiver android:name=".AlarmManagerReceiver"/>
     </application>
 
 </manifest>

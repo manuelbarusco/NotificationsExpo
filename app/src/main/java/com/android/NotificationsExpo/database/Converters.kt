@@ -4,14 +4,14 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class Converters{
+    //room non implementa il tipo DateTime https://developer.android.com/training/data-storage/room/referencing-data
     @TypeConverter
-    fun dateFromString(date: String): Date {
-        val formatter = SimpleDateFormat("dd-MM-yyyy hh:mm:ss", Locale.ITALY)
-        return formatter.parse(date)
+    fun fromTimestamp(value: Long?): Date? {
+        return value?.let { Date(it) }
     }
 
     @TypeConverter
-    fun dateToString(date:Date): String {
-        return date.toString()
+    fun dateToTimestamp(date: Date?): Long? {
+        return date?.time?.toLong()
     }
 }

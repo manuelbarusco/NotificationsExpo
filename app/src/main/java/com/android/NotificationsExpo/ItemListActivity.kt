@@ -10,19 +10,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
-import com.android.NotificationsExpo.dummy.DummyContent
 import com.android.NotificationsExpo.database.*
 import com.android.NotificationsExpo.database.dao.ChatDAO
-import com.android.NotificationsExpo.database.entities.Utente
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import java.io.ObjectStreamException
+
 
 /**
  * An activity representing a list of Pings. This activity
@@ -39,12 +31,16 @@ class ItemListActivity : AppCompatActivity() {
      * device.
      */
     private var twoPane: Boolean = false
+    private val KEY_USER= "UtenteAPP"
     private lateinit var repository: NotificationExpoRepository
     //private val d: DummyContent = DummyContent(this)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val preferences= getPreferences(Context.MODE_PRIVATE)
+        preferences.edit().putString(KEY_USER, "Alberto").apply()
+        NotificationExpoRepository.initialize(this)
         /*val images_id: Int = resources.getIdentifier("image_chat1","drawable", "com.ebookfrenzy.masterdetailflow")
         Log.d("Debug","id immagine: $images_id invece di ${R.drawable.image_chat1}")*/
         setContentView(R.layout.activity_item_list)
@@ -65,7 +61,8 @@ class ItemListActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         repository= NotificationExpoRepository.get(this)
-        repository.getChat().observe(
+        val preferences= getPreferences(Context.MODE_PRIVATE)
+        repository.getChat(preferences.getString(KEY_USER,"") as String).observe(
             this,
             Observer {chat->
                 chat?.let{
@@ -126,7 +123,7 @@ class ItemListActivity : AppCompatActivity() {
                 if (twoPane) {
                     val fragment = ItemDetailFragment().apply {
                         arguments = Bundle().apply {
-                            //putInt(ItemDetailFragment.ARG_ITEM_ID, item.idChat)      //passare id chat
+                            putInt(ItemDetailFragment.CHAT_ID, item.idChat)      //passare id chat
                         }
                     }
                     parentActivity.supportFragmentManager
@@ -135,7 +132,7 @@ class ItemListActivity : AppCompatActivity() {
                             .commit()
                 } else {
                     val intent = Intent(v.context, ItemDetailActivity::class.java).apply {
-                        //putExtra(ItemDetailFragment.ARG_ITEM_ID, item.idChat)      //passare id chat
+                        putExtra(ItemDetailFragment.CHAT_ID, item.idChat)      //passare id chat
                     }
                     v.context.startActivity(intent)
                 }

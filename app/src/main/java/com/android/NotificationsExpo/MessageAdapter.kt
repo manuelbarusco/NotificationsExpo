@@ -7,22 +7,26 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.android.NotificationsExpo.database.entities.Messaggio
 import com.android.NotificationsExpo.dummy.Message
+import java.util.*
 
-class MessageAdapter(val messageList: List<Message>) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
+class MessageAdapter(val messageList: List<Messaggio>) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
 
     //classe MessageViewHolder per la gestione del singolo cassetto della RecyclerView che contiene un messaggio
     class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val messageText: TextView = itemView.findViewById(R.id.text_message)
-
-        fun bind(word: String) {
+        private val messageDate: TextView = itemView.findViewById(R.id.message_date)
+        fun bind(word: String, date: Date) {
             messageText.text = word
+            messageDate.text = date.toString()
         }
     }
 
     //metodo che verifica quale layout associare al cassetto che ospiterà il messaggio nella posizione $position
     //della lista di messaggi in base al tipo di messaggio (RECEIVED o SEND)
     override fun getItemViewType(position: Int): Int {
-        return messageList[position].type
+        if(messageList[position].mittente=="Alberto")
+            return Messaggio.CONST.MESSAGE_SEND
+        return Messaggio.CONST.MESSAGE_RECEIVED
     }
 
     //metodo che ritorna un nuovo view holder con layout coerente col tipo di messaggio dato. Il tipo di layout da inserire è specificato
@@ -43,6 +47,6 @@ class MessageAdapter(val messageList: List<Message>) : RecyclerView.Adapter<Mess
 
     //metodo che mostra i dati di un messaggio in una certa posizione
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
-        holder.bind(messageList[position].text)
+        holder.bind(messageList[position].testo, messageList[position].dateTime)
     }
 }

@@ -1,5 +1,6 @@
 package com.android.NotificationsExpo.database
 
+import android.app.Activity
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.Room
@@ -14,8 +15,7 @@ import kotlinx.coroutines.SupervisorJob
 class NotificationExpoRepository private constructor(context: Context) {
 
     private val database:NotificationExpoDatabase= NotificationExpoDatabase.getDatabase(context, CoroutineScope(SupervisorJob()))
-
-    private val chatDao= database.chatDAO()
+    private val chatDAO= database.chatDAO()
     private val messaggioDAO = database.messaggioDAO()
     private val notificaDAO = database.notificaDAO()
     private val utenteDAO = database.utenteDAO()
@@ -37,6 +37,6 @@ class NotificationExpoRepository private constructor(context: Context) {
         }
     }
 
-    fun getChat(): LiveData<List<ChatDAO.ChatUtente>> = chatDao.getChatUtente("Alberto")
+    fun getChat(user: String): LiveData<List<ChatDAO.ChatUtente>> = chatDAO.getChatUtente(user)
     fun getChatMessages(idChat: Int): LiveData<List<Messaggio>> = messaggioDAO.getChatMessages(idChat)
 }
