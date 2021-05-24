@@ -66,30 +66,35 @@ class ItemDetailFragment : Fragment() {
 
         )
         val sendButton: Button= rootView.findViewById(R.id.button_chat_send)
-        var alarmManager: AlarmManager
+
         sendButton.setOnClickListener {
-            //Creo AlarmManager
-            //https://developer.android.com/guide/components/broadcasts#security-and-best-practices
+            val myNotificationType:String = "conversationNotification" //TODO Sostituire con il tipo di notifica a cui appartiene la chat (l'id nel database)
+
+            // Impostiamo il timer e dopo un certo tempo verrà inviato un broadcast esplicito ad
+            // AlarmMangerReceiver
+
+            var alarmManager: AlarmManager
             alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            var alarmIntent = Intent(context, AlarmManagerReceiver::class.java)
-            alarmIntent.putExtra("Test","ValueReceived")
+            var alarmIntent = Intent(context, AlarmManagerReceiver::class.java) // intent esplicito
+            alarmIntent.putExtra("notificationType",myNotificationType)
 
-            /*
-            //la classe MyReceiver2 è uguale a MyReceiver
-            var alarmIntent2 = Intent(context, MyReceiver2::class.java)
-            alarmIntent2.putExtra("Test","ValueReceived")*/
+            // Genero un id da assegnare al broadcast per generare broadcast sempre diversi
+            // Se non lo faccio e genero più broadcast prima dello scadere del tempo non li vedrò
+            val boradcastId:Int = System.currentTimeMillis().toInt()
+            val pendingIntent = PendingIntent.getBroadcast(context, boradcastId, alarmIntent, 0)
 
-            val pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0)
-            //val pendingIntent2 = PendingIntent.getBroadcast(context, 0, alarmIntent2, 0)
-            alarmManager?.set(
+            // Nota: Sostituito con alarmManager?.set con alarmManager?.setExact per avere più precisione
+            // https://developer.android.com/reference/android/app/AlarmManager
+            alarmManager?.setExact(
                     AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                    SystemClock.elapsedRealtime() + 10 * 1000,
+                    SystemClock.elapsedRealtime() + 2 * 1000,
                     pendingIntent)
-            /*
-            alarmManager?.set(
-                    AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                    SystemClock.elapsedRealtime() + 5 * 1000,
-                    pendingIntent2)*/
+
+            // Note sulla sicurezza:
+            // 1) Essendo broadcast espliciti ho la certezza che non verrranno recapitati ad altri
+            // 2) Poichè AlarmManagerReceiver è dichiarato nel manifest con exported=false, esso
+            //    riceverà solo gli intent provenienti da questa app
+            // https://developer.android.com/guide/components/broadcasts#security-and-best-practices
         }
         return rootView
     }
@@ -100,5 +105,6 @@ class ItemDetailFragment : Fragment() {
          * represents.
          */
         const val CHAT_ID = "item_id"
+
     }
 }

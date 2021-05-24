@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.android.NotificationsExpo">
+
+
+    <!--Permission usata nel boradcast (più informazioni in fondo al file)-->
+    <permission
+        android:name="com.android.NotificationsExpo.PRIVATE"
+        android:protectionLevel="signature"/>
+    <!--Acquisisco la permission appena dichiarata-->
+    <uses-permission
+        android:name="com.android.NotificationsExpo.PRIVATE"/>
+
+
     <application
         android:name=".NotificationExpoApplication"
         android:allowBackup="false"
@@ -38,7 +49,62 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.android.NotificationsExpo.ItemListActivity" />
         </activity>
-        <receiver android:name=".AlarmManagerReceiver"/>
+
+
+
+        <!--
+        Aggiungo il BroadcastReceiver che si attiva quando l'AlarmManger termina.
+        Questo BoradcastReceiver, essendo dichiarato qui, sarà attivo anche ad app chiusa
+        -->
+        <receiver
+            android:name=".AlarmManagerReceiver"
+            android:exported="false"/>
+            <!--
+            L'attrivuto exported = false serve in quanto questro BroadcastReceiver potrebbe ricevere
+            intent espliciti da altre app e in questo modo ci proteggiamo accettando broadcast
+            provenienti solo dall'app.
+            https://developer.android.com/guide/components/broadcasts#security-and-best-practices
+            Nota: Il broadcast viene ricevuto anche se fatto partire da AlarmManager, purchè l'intent
+            sia stato creato dalla nostra app
+
+            Nota: Questo BoradcastReceiver viene chiamato solo con un intent esplicito.
+            Per gli intent espliciti (come nel nostro caso) l'intent è sempre recapitato,
+            indipendentemente dagli intent-filter
+            https://developer.android.com/guide/components/intents-filters.html#Receiving
+            -->
+
+
+        <!--
+        Aggiungo il BroadcastReceiver che permette all'app di aggiungere un messaggio al Database e
+        di visualizzare le notifiche.
+        Questo BoradcastReceiver, essendo dichiarato qui, sarà attivo anche ad app chiusa.
+        -->
+        <receiver
+            android:name=".AlarmManagerReceiverAlwaysOn"
+            android:permission="com.android.NotificationsExpo.PRIVATE"
+            android:exported="false">
+            <!--
+            L'attrivuto exported = false serve in quanto questro BroadcastReceiver potrebbe ricevere
+            intent espliciti da altre app e in questo modo ci proteggiamo accettando broadcast
+            provenienti solo dall'app.
+            https://developer.android.com/guide/components/broadcasts#security-and-best-practices
+            Nota: Il broadcast viene ricevuto anche se fatto partire da AlarmManager, purchè l'intent
+            sia stato creato dalla nostra app
+
+            Questo broadcast è in ascolto di intent implicti. Utilizziamo gli intent impliciti in quanto
+            con quelli espliciti possiamo notificare solo un BoradcastReceiver, mentre noi dobbiamo
+            notificarne o due o uno a seocnda dei casi (c'è un receiver attivo a runtime).
+            Per via delle restrizioni di Android ai broadcast impliciti, se dichiaramo il boradcast nel
+            manifest senza un adeguata permission, il broadcast non verrà recapitato.
+            Nello specifico, con il meccanismo delle permissions di livello "signature"
+            si possono riceve intent solo da app provenienti dallo stesso sviluppatore.
+            -->
+            <intent-filter android:priority="-999">
+                <!--Assegnamo la priorià più bassa possibile, in modo che in un ordereed broadcast
+                questo receiver sia l'ultimo ad essere chiamato-->
+                <action android:name="com.android.NotificationsExpo.SHOW_NOTIFICATION"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

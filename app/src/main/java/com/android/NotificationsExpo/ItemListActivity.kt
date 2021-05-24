@@ -1,7 +1,10 @@
 package com.android.NotificationsExpo
 
+import android.app.Activity
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -35,6 +38,21 @@ class ItemListActivity : AppCompatActivity() {
     private lateinit var repository: NotificationExpoRepository
     //private val d: DummyContent = DummyContent(this)
 
+
+    // Broadcast receiver
+    // Lo scopo di questo boradcast receiver, che viene chiamto sicuramente prima di
+    // AlarmManagerReceiverAlwaysOn (in quanto si usano gli ordered broadcast) è quello di
+    // intercettare il brodcast e usare il parametro resultCode per avvisare AlarmManagerReceiverAlwaysOn,
+    // che verrà chiamato appena dopo, di non visualizzare le notifiche (in quanto ad app aperta si
+    // è scelto di non visualizzare le notifiche)
+    private val onShowNotification = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            // Se viene eseguito questo codice vuol dire che l'activity è in foreground e quindi va
+            // disabilitata la visualizzazione delle notifiche
+            Log.d("MyRDinamicoDETAIL", "Devo disabilitare le notifiche")
+            resultCode = Activity.RESULT_CANCELED // Cambia il result code di questo ordered broadcast
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -173,5 +191,20 @@ class ItemListActivity : AppCompatActivity() {
             val time: TextView = view.findViewById(R.id.time)
             val image: ImageView = view.findViewById(R.id.image)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // Abilito il BroadcastReceiver a runtime
+        val filter = IntentFilter(AlarmManagerReceiver.ACTION_SHOW_NOTIFICATION)
+        this.registerReceiver(onShowNotification, filter, AlarmManagerReceiver.PERM_PRIVATE, null)
+    }
+
+    override fun onPause() {
+        // Disabilito il BroadcastReceiver a runtime
+        this.unregisterReceiver(onShowNotification)
+
+        super.onPause()
     }
 }
