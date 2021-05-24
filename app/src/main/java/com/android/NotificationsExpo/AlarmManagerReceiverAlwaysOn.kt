@@ -7,7 +7,7 @@ import android.util.Log
 
 //Va dichiarato nel manifest per ricevere l'intent
 // con <receiver android:name=".MyReceiver"/>
-class AlarmManagerReceiver: BroadcastReceiver() {
+class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         //Lancio la notifica e faccio altro
         val action = intent?.action
