@@ -5,9 +5,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.android.NotificationsExpo.database.entities.Messaggio
 import com.android.NotificationsExpo.dummy.Message
 
-class MessageAdapter(val messageList: MutableList<Message>) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
+class MessageAdapter(val messageList: List<Message>) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
 
     //classe MessageViewHolder per la gestione del singolo cassetto della RecyclerView che contiene un messaggio
     class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

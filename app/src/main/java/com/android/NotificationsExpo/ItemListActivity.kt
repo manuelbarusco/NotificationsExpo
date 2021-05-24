@@ -1,15 +1,28 @@
 package com.android.NotificationsExpo
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.android.NotificationsExpo.dummy.DummyContent
+import com.android.NotificationsExpo.database.*
+import com.android.NotificationsExpo.database.dao.ChatDAO
+import com.android.NotificationsExpo.database.entities.Utente
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import java.io.ObjectStreamException
 
 /**
  * An activity representing a list of Pings. This activity
@@ -26,13 +39,14 @@ class ItemListActivity : AppCompatActivity() {
      * device.
      */
     private var twoPane: Boolean = false
+    private lateinit var repository: NotificationExpoRepository
     //private val d: DummyContent = DummyContent(this)
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         /*val images_id: Int = resources.getIdentifier("image_chat1","drawable", "com.ebookfrenzy.masterdetailflow")
         Log.d("Debug","id immagine: $images_id invece di ${R.drawable.image_chat1}")*/
-
         setContentView(R.layout.activity_item_list)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -46,8 +60,26 @@ class ItemListActivity : AppCompatActivity() {
             // activity should be in two-pane mode.
             twoPane = true
         }
+    }
 
-        setupRecyclerView(findViewById(R.id.item_list))
+    override fun onStart() {
+        super.onStart()
+        repository= NotificationExpoRepository.get(this)
+        repository.getChat().observe(
+            this,
+            Observer {chat->
+                chat?.let{
+                    Log.i("Database",""+chat.size)
+                    updateUI(chat)
+                }
+
+            }
+        )
+    }
+
+    private fun updateUI(chat: List<ChatDAO.ChatUtente>){
+        val recyclerView:RecyclerView= findViewById(R.id.item_list)
+        recyclerView.adapter = SimpleItemRecyclerViewAdapter(this, this , chat, twoPane)
     }
 
     // Codice necessario per creare il menu
@@ -79,12 +111,10 @@ class ItemListActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupRecyclerView(recyclerView: RecyclerView) {
-        recyclerView.adapter = SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, twoPane)
-    }
-
+    //classe adapter per la recycler view
     class SimpleItemRecyclerViewAdapter(private val parentActivity: ItemListActivity,
-                                        private val values: List<DummyContent.DummyItem>,
+                                        private val context: Context,
+                                        private val values: List<ChatDAO.ChatUtente>,
                                         private val twoPane: Boolean) :
             RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>() {
 
@@ -92,11 +122,11 @@ class ItemListActivity : AppCompatActivity() {
         //click listener per l'elemento della lista
         init {
             onClickListener = View.OnClickListener { v ->
-                val item = v.tag as DummyContent.DummyItem
+                val item = v.tag as ChatDAO.ChatUtente
                 if (twoPane) {
                     val fragment = ItemDetailFragment().apply {
                         arguments = Bundle().apply {
-                            //putString(ItemDetailFragment.ARG_ITEM_ID, item.id)      //passare id chat
+                            //putInt(ItemDetailFragment.ARG_ITEM_ID, item.idChat)      //passare id chat
                         }
                     }
                     parentActivity.supportFragmentManager
@@ -105,7 +135,7 @@ class ItemListActivity : AppCompatActivity() {
                             .commit()
                 } else {
                     val intent = Intent(v.context, ItemDetailActivity::class.java).apply {
-                        //putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id)      //passare id chat
+                        //putExtra(ItemDetailFragment.ARG_ITEM_ID, item.idChat)      //passare id chat
                     }
                     v.context.startActivity(intent)
                 }
@@ -120,11 +150,16 @@ class ItemListActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = values[position]
-            val id_im = item.imageId
-            holder.image.setImageResource(id_im)
-            holder.name.text = item.name
-            holder.notification.text = item.notification
-            holder.time.text = item.time
+            if(item.imgChatGruppo!=null)
+                holder.image.setImageResource(item.imgChatGruppo)
+            else
+                holder.image.setImageResource(item.imgChatPrivata)
+            if(item.nomeChat!=null)
+                holder.name.text=item.nomeChat
+            else
+                holder.name.text=item.nomeChatPrivata
+            holder.notification.text = item.notificaAssociata
+            //holder.time.text = item.
 
             with(holder.itemView) {
                 tag = item
