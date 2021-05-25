@@ -1,8 +1,10 @@
 package com.android.NotificationsExpo
 
 import android.content.DialogInterface
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 
@@ -24,7 +26,10 @@ class SettingsActivity : AppCompatActivity() {
 
         // Set the action to be performed when the button is pressed
         buttonGoSystemsSettings.setOnClickListener { // Perform action on click
-            //TODO Rimandare alle impostazioni di distema
+            val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+            }
+            startActivity(intent)
         }
 
         // Set the action to be performed when the button is pressed

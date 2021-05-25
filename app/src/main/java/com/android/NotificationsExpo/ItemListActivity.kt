@@ -1,10 +1,13 @@
 package com.android.NotificationsExpo
 
 import android.app.Activity
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -38,6 +41,15 @@ class ItemListActivity : AppCompatActivity() {
 
     companion object{
         const val KEY_USER= "UtenteAPP"
+        //Constanti per i channel ID
+        const val MULTIPLE = "MultipleNotification"
+        const val CONVERSATION = "ConversationNotifications"
+        const val EXPANDABLE = "ExpandableNotification"
+        const val MEDIA = "MediaControl"
+        const val BUBBLES = "ChatBubbles"
+        const val SERVICE = "ProcessoBackground"
+        const val CUSTOM = "CustomNotification"
+        //mancano notifica con pulsanti, notifiche con immagini
     }
 
 
@@ -58,6 +70,7 @@ class ItemListActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        createNotificationChannels()
         val preferences= getPreferences(Context.MODE_PRIVATE)
         preferences.edit().putString(KEY_USER, "Alberto").apply()
         NotificationExpoRepository.initialize(this)
@@ -221,4 +234,36 @@ class ItemListActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
+
+    //Funzione che crea tutti i channel per le notifiche, uno per ogni tipo di notifica
+    private fun createNotificationChannels(){
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            var channel = NotificationChannel(MULTIPLE, getString(R.string.c_name_multiple), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.c_descr_multiple) }
+            // Register the channel with the system
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+
+            channel = NotificationChannel(CONVERSATION, getString(R.string.c_name_conversation), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.c_descr_conversation)}
+            notificationManager.createNotificationChannel(channel)
+
+            channel = NotificationChannel(EXPANDABLE, getString(R.string.c_name_expandable), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.c_descr_expandable) }
+            notificationManager.createNotificationChannel(channel)
+
+            channel = NotificationChannel(MEDIA, getString(R.string.c_name_media), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.c_descr_media) }
+            notificationManager.createNotificationChannel(channel)
+
+            channel = NotificationChannel(BUBBLES, getString(R.string.c_name_bubbles), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.c_descr_bubbles) }
+            notificationManager.createNotificationChannel(channel)
+
+            channel = NotificationChannel(SERVICE, getString(R.string.c_name_service), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.c_descr_service) }
+            notificationManager.createNotificationChannel(channel)
+
+            channel = NotificationChannel(CUSTOM, getString(R.string.c_name_custom), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.c_descr_custom) }
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
 }

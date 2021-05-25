@@ -4,4 +4,18 @@
     <string name="istructions">Istruzioni</string>
     <string name="settings">Impostazioni</string>
     <string name="credits">Crediti</string>
+    <string name="c_name_multiple">Multiple Notification</string>
+    <string name="c_descr_multiple">Questa è la descrizione del canale per le Multiple Notification</string>
+    <string name="c_name_conversation">Conversation Notifications</string>
+    <string name="c_descr_conversation">Questa è la descrizione del canale per le Conversation Notifications</string>
+    <string name="c_name_expandable">Expandable Notification</string>
+    <string name="c_descr_expandable">Questa è la descrizione del canale per le Expandable Notification</string>
+    <string name="c_name_media">Media Control</string>
+    <string name="c_descr_media">Questa è la descrizione del canale per i MediaControl</string>
+    <string name="c_name_bubbles">Chat Bubbles</string>
+    <string name="c_descr_bubbles">Questa è la descrizione del canale per le Chat Bubbles</string>
+    <string name="c_name_service">Processi in background</string>
+    <string name="c_descr_service">Questa è la descrizione del canale per i processi in background</string>
+    <string name="c_name_custom">Custom Notification</string>
+    <string name="c_descr_custom">Questa è la descrizione del canale per le Custom Notification</string>
 </resources>
