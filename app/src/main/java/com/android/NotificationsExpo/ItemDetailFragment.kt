@@ -76,9 +76,6 @@ class ItemDetailFragment : Fragment() {
 
         )
         val sendButton: Button= rootView.findViewById(R.id.button_chat_send)
-<<<<<<< Updated upstream
-
-=======
         /*var alarmManager: AlarmManager
 >>>>>>> Stashed changes
         sendButton.setOnClickListener {
@@ -111,14 +108,12 @@ class ItemDetailFragment : Fragment() {
             //    riceverà solo gli intent provenienti da questa app
             // https://developer.android.com/guide/components/broadcasts#security-and-best-practices
         }
-=======
             /*
             alarmManager?.set(
                     AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     SystemClock.elapsedRealtime() + 5 * 1000,
                     pendingIntent2)*/
         }*/
->>>>>>> Stashed changes
         return rootView
     }
 
@@ -127,13 +122,8 @@ class ItemDetailFragment : Fragment() {
          * The fragment argument representing the item ID that this fragment
          * represents.
          */
-<<<<<<< Updated upstream
-        const val CHAT_ID = "item_id"
-
-=======
         const val CHAT_ID = "Chat_id"
         const val CHAT_NAME= "Nome_chat"
         const val CHAT_IMG= "Img_chat"
->>>>>>> Stashed changes
     }
 }

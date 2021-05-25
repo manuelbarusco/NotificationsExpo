@@ -178,7 +178,6 @@ class ItemListActivity : AppCompatActivity() {
         }
     }
 
-<<<<<<< Updated upstream
     override fun onResume() {
         super.onResume()
 
@@ -192,7 +191,8 @@ class ItemListActivity : AppCompatActivity() {
         this.unregisterReceiver(onShowNotification)
 
         super.onPause()
-=======
+    }
+
     // Codice necessario per creare il menu
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater: MenuInflater = menuInflater
@@ -220,6 +220,5 @@ class ItemListActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
->>>>>>> Stashed changes
     }
 }
