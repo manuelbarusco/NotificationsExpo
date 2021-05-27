@@ -76,8 +76,8 @@ class ItemDetailFragment : Fragment() {
 
         )
         val sendButton: Button= rootView.findViewById(R.id.button_chat_send)
-        /*var alarmManager: AlarmManager
->>>>>>> Stashed changes
+        var alarmManager: AlarmManager
+
         sendButton.setOnClickListener {
             val myNotificationType:String = "conversationNotification" //TODO Sostituire con il tipo di notifica a cui appartiene la chat (l'id nel database)
 
@@ -100,20 +100,20 @@ class ItemDetailFragment : Fragment() {
                     AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     SystemClock.elapsedRealtime() + 2 * 1000,
                     pendingIntent)
-<<<<<<< Updated upstream
+
 
             // Note sulla sicurezza:
             // 1) Essendo broadcast espliciti ho la certezza che non verrranno recapitati ad altri
             // 2) Poichè AlarmManagerReceiver è dichiarato nel manifest con exported=false, esso
             //    riceverà solo gli intent provenienti da questa app
             // https://developer.android.com/guide/components/broadcasts#security-and-best-practices
-        }
+
             /*
             alarmManager?.set(
                     AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     SystemClock.elapsedRealtime() + 5 * 1000,
                     pendingIntent2)*/
-        }*/
+        }
         return rootView
     }
 

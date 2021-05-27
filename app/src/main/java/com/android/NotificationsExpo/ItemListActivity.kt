@@ -70,6 +70,7 @@ class ItemListActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //TODO: Controllare se quando canali esistono già vengono ricreati
         createNotificationChannels()
         val preferences= getPreferences(Context.MODE_PRIVATE)
         preferences.edit().putString(KEY_USER, "Alberto").apply()
@@ -255,7 +256,7 @@ class ItemListActivity : AppCompatActivity() {
             channel = NotificationChannel(MEDIA, getString(R.string.c_name_media), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.c_descr_media) }
             notificationManager.createNotificationChannel(channel)
 
-            channel = NotificationChannel(BUBBLES, getString(R.string.c_name_bubbles), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.c_descr_bubbles) }
+            channel = NotificationChannel(BUBBLES, getString(R.string.c_name_bubbles), NotificationManager.IMPORTANCE_HIGH).apply { description = getString(R.string.c_descr_bubbles) }
             notificationManager.createNotificationChannel(channel)
 
             channel = NotificationChannel(SERVICE, getString(R.string.c_name_service), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.c_descr_service) }
