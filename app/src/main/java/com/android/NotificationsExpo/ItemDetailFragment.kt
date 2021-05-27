@@ -87,10 +87,7 @@ class ItemDetailFragment : Fragment() {
         )
         val userText: EditText=rootView.findViewById(R.id.user_text)
         val sendButton: Button= rootView.findViewById(R.id.button_chat_send)
-<<<<<<< Updated upstream
         var alarmManager: AlarmManager
-=======
->>>>>>> Stashed changes
 
         sendButton.setOnClickListener {
             val mex: Messaggio=Messaggio(testo = userText.text.toString(), mittente = user, media = null, chat=chat_id)
@@ -119,29 +116,19 @@ class ItemDetailFragment : Fragment() {
                     AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     SystemClock.elapsedRealtime() + 2 * 1000,
                     pendingIntent)
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
 
             // Note sulla sicurezza:
             // 1) Essendo broadcast espliciti ho la certezza che non verrranno recapitati ad altri
             // 2) Poichè AlarmManagerReceiver è dichiarato nel manifest con exported=false, esso
             //    riceverà solo gli intent provenienti da questa app
             // https://developer.android.com/guide/components/broadcasts#security-and-best-practices
-<<<<<<< Updated upstream
-
             /*
             alarmManager?.set(
                     AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     SystemClock.elapsedRealtime() + 5 * 1000,
                     pendingIntent2)*/
         }
-=======
-        }
 
-
->>>>>>> Stashed changes
         return rootView
     }
 
