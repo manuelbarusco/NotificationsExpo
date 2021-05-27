@@ -11,6 +11,7 @@ import com.android.NotificationsExpo.database.entities.Messaggio
 import com.android.NotificationsExpo.database.entities.Utente
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import java.util.concurrent.Executors
 
 class NotificationExpoRepository private constructor(context: Context) {
 
@@ -20,6 +21,7 @@ class NotificationExpoRepository private constructor(context: Context) {
     private val notificaDAO = database.notificaDAO()
     private val utenteDAO = database.utenteDAO()
     private val utentiChatDAO = database.utentiChatDAO()
+    private val executor = Executors.newSingleThreadExecutor()
 
     companion object{
         private var INSTANCE: NotificationExpoRepository? = null
@@ -38,5 +40,12 @@ class NotificationExpoRepository private constructor(context: Context) {
     }
 
     fun getChat(user: String): LiveData<List<ChatDAO.ChatUtente>> = chatDAO.getChatUtente(user)
-    fun getChatMessages(idChat: Int): LiveData<List<Messaggio>> = messaggioDAO.getChatMessages(idChat)
+
+    fun getChatMessages(idChat: Int): LiveData<MutableList<Messaggio>> = messaggioDAO.getChatMessages(idChat)
+
+    fun addMessage(messaggio: Messaggio){
+        executor.execute{
+            messaggioDAO.insert(messaggio)
+        }
+    }
 }

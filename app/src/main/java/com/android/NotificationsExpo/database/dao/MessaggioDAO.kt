@@ -13,5 +13,5 @@ interface MessaggioDAO {
     fun delete(messaggio: Messaggio)
 
     @Query("SELECT * FROM MESSAGGIO AS M WHERE M.Chat = :idChat")
-    fun getChatMessages(idChat: Int):LiveData<List<Messaggio>>
+    fun getChatMessages(idChat: Int):LiveData<MutableList<Messaggio>>
 }

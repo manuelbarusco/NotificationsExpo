@@ -65,6 +65,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="16dp"
+        app:stackFromEnd="true"
         app:layoutManager="LinearLayoutManager"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@+id/layout_chat_chatbox"
@@ -82,7 +83,7 @@
 
         <EditText
             android:layout_marginStart="16dp"
-            android:id="@+id/edit_chat_message"
+            android:id="@+id/user_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"

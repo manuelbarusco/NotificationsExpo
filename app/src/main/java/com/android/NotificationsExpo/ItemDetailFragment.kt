@@ -6,15 +6,18 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
+import android.preference.PreferenceManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.android.NotificationsExpo.database.NotificationExpoRepository
 import com.android.NotificationsExpo.dummy.DummyContent
@@ -32,7 +35,11 @@ class ItemDetailFragment : Fragment() {
     private var chat_id:Int= -1
     private var nome_chat:String?=null
     private var img_chat:Int=-1
+    private var notifica_chat:String?=null
+    private lateinit var user:String
     private lateinit var repository: NotificationExpoRepository
+    private lateinit var messaggi: MutableList<Messaggio>
+
 
     /**
      * The dummy content this fragment is presenting.
@@ -42,7 +49,8 @@ class ItemDetailFragment : Fragment() {
     //private val d: DummyContent = DummyContent()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        val preferences= activity?.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+        user=preferences?.getString(ItemListActivity.KEY_USER,"") as String
         arguments?.let {
             if (it.containsKey(CHAT_ID))
                 chat_id=it.getInt(CHAT_ID)
@@ -50,6 +58,8 @@ class ItemDetailFragment : Fragment() {
                 nome_chat=it.getString(CHAT_NAME)
             if(it.containsKey(CHAT_IMG))
                 img_chat=it.getInt(CHAT_IMG)
+            if(it.containsKey(NOTIFICATION))
+                notifica_chat=it.getString(NOTIFICATION)
         }
     }
 
@@ -70,24 +80,33 @@ class ItemDetailFragment : Fragment() {
                 viewLifecycleOwner,
                 androidx.lifecycle.Observer {messaggi->
                     messaggi?.let{
+                        this.messaggi=messaggi
                         recyclerView.adapter=MessageAdapter(messaggi)
                     }
                 }
-
         )
+        val userText: EditText=rootView.findViewById(R.id.user_text)
         val sendButton: Button= rootView.findViewById(R.id.button_chat_send)
+<<<<<<< Updated upstream
         var alarmManager: AlarmManager
+=======
+>>>>>>> Stashed changes
 
         sendButton.setOnClickListener {
-            val myNotificationType:String = "conversationNotification" //TODO Sostituire con il tipo di notifica a cui appartiene la chat (l'id nel database)
+            val mex: Messaggio=Messaggio(testo = userText.text.toString(), mittente = user, media = null, chat=chat_id)
+            Log.d("Dio",mex.toString())
+            repository.addMessage(mex)
+            messaggi.add(mex)
+            recyclerView.adapter?.notifyItemInserted(messaggi.size)
+            userText.text.clear()
+            //val myNotificationType:String = "conversationNotification" //TODO Sostituire con il tipo di notifica a cui appartiene la chat (l'id nel database)
 
             // Impostiamo il timer e dopo un certo tempo verrà inviato un broadcast esplicito ad
             // AlarmMangerReceiver
 
-            var alarmManager: AlarmManager
-            alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val alarmManager: AlarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             var alarmIntent = Intent(context, AlarmManagerReceiver::class.java) // intent esplicito
-            alarmIntent.putExtra("notificationType",myNotificationType)
+            alarmIntent.putExtra("notificationType",notifica_chat)
 
             // Genero un id da assegnare al broadcast per generare broadcast sempre diversi
             // Se non lo faccio e genero più broadcast prima dello scadere del tempo non li vedrò
@@ -100,13 +119,17 @@ class ItemDetailFragment : Fragment() {
                     AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     SystemClock.elapsedRealtime() + 2 * 1000,
                     pendingIntent)
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 
             // Note sulla sicurezza:
             // 1) Essendo broadcast espliciti ho la certezza che non verrranno recapitati ad altri
             // 2) Poichè AlarmManagerReceiver è dichiarato nel manifest con exported=false, esso
             //    riceverà solo gli intent provenienti da questa app
             // https://developer.android.com/guide/components/broadcasts#security-and-best-practices
+<<<<<<< Updated upstream
 
             /*
             alarmManager?.set(
@@ -114,6 +137,11 @@ class ItemDetailFragment : Fragment() {
                     SystemClock.elapsedRealtime() + 5 * 1000,
                     pendingIntent2)*/
         }
+=======
+        }
+
+
+>>>>>>> Stashed changes
         return rootView
     }
 
@@ -125,5 +153,6 @@ class ItemDetailFragment : Fragment() {
         const val CHAT_ID = "Chat_id"
         const val CHAT_NAME= "Nome_chat"
         const val CHAT_IMG= "Img_chat"
+        const val NOTIFICATION= "Notification_chat"
     }
 }

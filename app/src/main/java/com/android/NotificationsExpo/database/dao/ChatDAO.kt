@@ -3,6 +3,7 @@ package com.android.NotificationsExpo.database.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.android.NotificationsExpo.database.entities.Chat
+import java.util.*
 
 @Dao
 interface ChatDAO {
@@ -14,15 +15,16 @@ interface ChatDAO {
 
     //query che elenca le chat di un utente in ordine cronologico
     @Query(
-        "SELECT DISTINCT C.ID AS idChat, C.Nome AS nomeChat, C.NotificaAssociata AS notificaAssociata, C.ImgChat AS imgChatGruppo , U.Nickname AS nomeChatPrivata, U.ImgProfilo AS imgChatPrivata " +
-                "FROM UTENTICHAT AS UC JOIN CHAT AS C ON UC.Chat=C.ID "+
-                "JOIN MESSAGGIO AS M ON M.Chat=C.ID "+
+        "SELECT C.ID AS idChat, C.Nome AS nomeChat, C.NotificaAssociata AS notificaAssociata, C.ImgChat AS imgChatGruppo , U.Nickname AS nomeChatPrivata, U.ImgProfilo AS imgChatPrivata, MAX(M.DateTime) as lastMessageDateTime " +
+                "FROM (SELECT * FROM MESSAGGIO AS M ORDER BY M.DateTime DESC) AS M JOIN CHAT AS C ON M.Chat=C.ID " +
+                "JOIN UTENTICHAT AS UC ON UC.Chat=C.ID "+
                 "JOIN UTENTE AS U ON U.Nickname=UC.Utente "+
                 "WHERE UC.Utente!= :uNickname AND C.ID IN "+
                                                 "(SELECT C.ID " +
                                                 "FROM UTENTICHAT AS UC JOIN CHAT AS C ON UC.Chat=C.ID "+
-                                                "WHERE UC.Utente=:uNickname) "+
-                "ORDER BY M.DateTime"
+                                                "WHERE UC.Utente=:uNickname) " +
+                "GROUP BY C.ID, C.Nome, C.NotificaAssociata, C.ImgChat, U.Nickname, U.ImgProfilo "+
+                "ORDER BY lastMessageDateTime DESC"
     )
     fun getChatUtente(uNickname: String): LiveData<List<ChatUtente>>
 
@@ -32,7 +34,8 @@ interface ChatDAO {
             val notificaAssociata: String,
             val imgChatGruppo: Int?,
             val nomeChatPrivata: String,
-            val imgChatPrivata:Int
+            val imgChatPrivata:Int,
+            val lastMessageDateTime: Date
     )
 
 }

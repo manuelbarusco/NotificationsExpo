@@ -18,8 +18,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
-import com.android.NotificationsExpo.database.*
+import com.android.NotificationsExpo.database.NotificationExpoRepository
 import com.android.NotificationsExpo.database.dao.ChatDAO
+import java.text.SimpleDateFormat
 
 
 /**
@@ -72,7 +73,7 @@ class ItemListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         //TODO: Controllare se quando canali esistono già vengono ricreati
         createNotificationChannels()
-        val preferences= getPreferences(Context.MODE_PRIVATE)
+        val preferences= getSharedPreferences("Preferences", Context.MODE_PRIVATE)
         preferences.edit().putString(KEY_USER, "Alberto").apply()
         NotificationExpoRepository.initialize(this)
         /*val images_id: Int = resources.getIdentifier("image_chat1","drawable", "com.ebookfrenzy.masterdetailflow")
@@ -92,20 +93,22 @@ class ItemListActivity : AppCompatActivity() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
+    override fun onResume() {
+        super.onResume()
         repository= NotificationExpoRepository.get(this)
-        val preferences= getPreferences(Context.MODE_PRIVATE)
+        val preferences= getSharedPreferences("Preferences", Context.MODE_PRIVATE)
         repository.getChat(preferences.getString(KEY_USER,"") as String).observe(
-            this,
-            Observer {chat->
-                chat?.let{
-                    Log.i("Database",""+chat.size)
-                    updateUI(chat)
+                this,
+                Observer {chat->
+                    chat?.let{
+                        Log.i("Database",""+chat.size)
+                        updateUI(chat)
+                    }
                 }
-
-            }
         )
+        // Abilito il BroadcastReceiver a runtime
+        val filter = IntentFilter(AlarmManagerReceiver.ACTION_SHOW_NOTIFICATION)
+        this.registerReceiver(onShowNotification, filter, AlarmManagerReceiver.PERM_PRIVATE, null)
     }
 
     private fun updateUI(chat: List<ChatDAO.ChatUtente>){
@@ -128,13 +131,14 @@ class ItemListActivity : AppCompatActivity() {
                 if (twoPane) {
                     val fragment = ItemDetailFragment().apply {
                         arguments = Bundle().apply {
-                            putInt(ItemDetailFragment.CHAT_ID, item.idChat)     //passati id chat, nome chat e immagine della chat
+                            putInt(ItemDetailFragment.CHAT_ID, item.idChat)     //passati id chat, nome chat, immagine della chat e notifica associata alla chat
                             putString(ItemDetailFragment.CHAT_NAME,item.nomeChat)
                             if(item.nomeChat==null)
                                 putString(ItemDetailFragment.CHAT_NAME,item.nomeChatPrivata)
                             putInt(ItemDetailFragment.CHAT_IMG,item.imgChatGruppo as Int)
                             if(item.imgChatGruppo==null)
                                 putInt(ItemDetailFragment.CHAT_IMG,item.imgChatPrivata)
+                            putString(ItemDetailFragment.NOTIFICATION,item.notificaAssociata)
                         }
                     }
                     parentActivity.supportFragmentManager
@@ -143,13 +147,14 @@ class ItemListActivity : AppCompatActivity() {
                             .commit()
                 } else {
                     val intent = Intent(v.context, ItemDetailActivity::class.java).apply {
-                        putExtra(ItemDetailFragment.CHAT_ID, item.idChat)       //passati id chat, nome chat e immagine della chat
+                        putExtra(ItemDetailFragment.CHAT_ID, item.idChat)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
                         putExtra(ItemDetailFragment.CHAT_NAME,item.nomeChat)
                         if(item.nomeChat==null)
                             putExtra(ItemDetailFragment.CHAT_NAME,item.nomeChatPrivata)
                         putExtra(ItemDetailFragment.CHAT_IMG,item.imgChatGruppo)
                         if(item.imgChatGruppo==null)
                             putExtra(ItemDetailFragment.CHAT_IMG,item.imgChatPrivata)
+                        putExtra(ItemDetailFragment.NOTIFICATION,item.notificaAssociata)
                     }
                     v.context.startActivity(intent)
                 }
@@ -173,7 +178,7 @@ class ItemListActivity : AppCompatActivity() {
             else
                 holder.name.text=item.nomeChatPrivata
             holder.notification.text = item.notificaAssociata
-            //holder.time.text = item.
+            //holder.time.text = item.lastMessageDateTime.time.toString()
 
             with(holder.itemView) {
                 tag = item
@@ -187,17 +192,9 @@ class ItemListActivity : AppCompatActivity() {
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val name: TextView = view.findViewById(R.id.name)
             val notification: TextView = view.findViewById(R.id.notication)
-            val time: TextView = view.findViewById(R.id.time)
+            val time: TextView = view.findViewById(R.id.chat_time)
             val image: ImageView = view.findViewById(R.id.image)
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        // Abilito il BroadcastReceiver a runtime
-        val filter = IntentFilter(AlarmManagerReceiver.ACTION_SHOW_NOTIFICATION)
-        this.registerReceiver(onShowNotification, filter, AlarmManagerReceiver.PERM_PRIVATE, null)
     }
 
     override fun onPause() {
