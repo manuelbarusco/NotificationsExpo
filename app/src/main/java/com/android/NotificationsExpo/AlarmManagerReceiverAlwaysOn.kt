@@ -7,9 +7,15 @@ import android.content.Intent
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
+import android.os.Message
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.getSystemService
+import com.android.NotificationsExpo.database.NotificationExpoRepository
+import com.android.NotificationsExpo.database.entities.Messaggio
+import com.android.NotificationsExpo.database.entities.Utente
+import java.util.concurrent.Executors
+import kotlin.random.Random
 
 // Questo BroadcastReceiver entrerà in funzione anche quando l'app non è in eseguzione in quanto viene
 // registrato direttamente nel manifest
@@ -22,19 +28,50 @@ import androidx.core.content.getSystemService
 //   dell'app in foreground, viene garantita l'eseguzione di quel BoradcastReceiver prima di questo)
 
 class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
+    private lateinit var repository: NotificationExpoRepository
+    private var executor = Executors.newSingleThreadExecutor()
+
     override fun onReceive(context: Context, intent: Intent) {
-
         Log.d("MyReceiver_ALWAYSON","${System.currentTimeMillis().toString()} ${intent?.action}") //Mostriamo una riga con un testo sempre nuovo (altrimenti Logcat scrive che ci sono altre n righe simili)
+        repository= NotificationExpoRepository.get(context)
 
+        //ottengo l'utente che sta usando l'app
+        val preferences= context.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+        val user= preferences.getString(ItemListActivity.KEY_USER, "")
 
+        //ottengo id chat
+        val chat_id= intent.getIntExtra(ItemDetailFragment.CHAT_ID,-1)
 
-        // TODO Generare un messaggio e scriverlo nel Database (l'UI verrà aggiornata tramite LiveData)
+        //ottengo nome della chat
+        val chat_name= intent.getStringExtra(ItemDetailFragment.CHAT_NAME)
+
+        //ottengo immagine della chat
+        val chat_img= intent.getIntExtra(ItemDetailFragment.CHAT_IMG,-1)
+
+        //recupero i messaggi "standard" e ne sceglo uno a caso
+        val messages: Array<String> = context.getResources().getStringArray(R.array.dummy_messages)
+        val iM= Random.nextInt(0, messages.size-1)
+
+        //recupero utenti della chat
+        val utenti:List<Utente> = repository.getChatUtenti(chat_id, user as String)
+
+        Log.d("MyReceiver_ALWAYSON","sono qui")
+        var mittente=""
+        //sceglo a caso un utente (escluso utente predefinito) come mittente del messaggio in caso di chat di gruppo
+        if(utenti.size>1){
+            val i= Random.nextInt(0, utenti.size-1)
+            mittente=utenti[i].nickname
+        } else
+            mittente=utenti[0].nickname
+
+        //genero il messaggio e lo aggiungo al database
+        val m= Messaggio(testo= messages[iM], chat = chat_id, media = null, mittente = mittente)
+        repository.addMessage(m)
+
         // Devo generare uno o più messaggi sulla base del tipo di notifica associata alla chat (ad
         // esempio per una notifica conversation genererò 10 messaggi)
-        val notificationType:String = intent.getStringExtra("notificationType") as String
+        val notificationType:String = intent.getStringExtra(ItemDetailFragment.NOTIFICATION) as String
         Log.d("MyR_Tipo di notifica: ", notificationType)
-
-
 
 
         // Se è intervenuto prima l'altro BroadcastReceiver non mostro nemmeno la notifica
@@ -52,14 +89,17 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
 
         //******************* CHAT BUBBLE E CONVERSATION *************
         val target = Intent(context, ItemDetailActivity::class.java)
-                .setAction("bubble")
+            .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+            .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+            .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+            .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+            .setAction("bubble")
         val bubbleIntent = PendingIntent.getActivity(context, 0, target, 0)
 
         /*Oggetto Person può essere riutilizzato su altre API per una migliore integrazione
         * setImortant per indicare gli utenti che interagiscono frequentemente con l'utente*/
-        //TODO: Riempire con i dati del mittente reale (testo e immagini)
         val person = Person.Builder()
-                .setName("Luca")
+                .setName(chat_name)
                 .setImportant(true)
                 .build()
 
@@ -74,9 +114,9 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
         * gli shortcut e per fornire suggerimenti per la condivisione.*/
         val shortcut = ShortcutInfo.Builder(context, conversationShortcutID)
                 .setLongLived(true)
-                .setIcon(Icon.createWithResource(context,R.drawable.image_chat1))
-                .setShortLabel("Short label")
-                .setLongLabel("Long label")
+                .setIcon(Icon.createWithResource(context,chat_img))
+                .setShortLabel(chat_name as CharSequence)
+                .setLongLabel(chat_name)
                 .setIntent(target)
                 .setPerson(person)
                 .build()
@@ -85,13 +125,6 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
         * imposto da android degli shortcuts che si possono pubblicare e permette aggiornare uno shortcut se ha lo stesso id*/
         val shortcutManager: ShortcutManager = context.getSystemService(AppCompatActivity.SHORTCUT_SERVICE) as ShortcutManager
         shortcutManager.pushDynamicShortcut(shortcut)
-
-        /*val bubbleData = Notification.BubbleMetadata.Builder(bubbleIntent,
-                Icon.createWithResource(context, R.drawable.image_chat1))
-                .setDesiredHeight(600)
-                .setAutoExpandBubble(false)
-                .setSuppressNotification(false)
-                .build()*/
 
         //Invece di fare come sopra (commento) posso riutilizzare i dati dello shortcut passando il suo id
         /*setDesiredHeight(600) --> imposta la lunghezza della bubble espansa (in dp)
@@ -110,12 +143,8 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
          should have a locus id set that matches a locus id set on the */
 
         //Secondo parametro è di tipo Long e serve per la data del messaggio nella notifica
-        var message1 = Notification.MessagingStyle.Message("messaggio 1",
+        var message1 = Notification.MessagingStyle.Message(messages[iM],
                 System.currentTimeMillis(),
-                person)
-
-        var message2 = Notification.MessagingStyle.Message("messaggio 2 vecchio",
-                System.currentTimeMillis()-5*1000,
                 person)
 
         /*Per fare in modo che una notifica sia una notifica conversation serve impostare anche un MessagingSyle*/
@@ -126,7 +155,6 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
                 .setSmallIcon(R.drawable.ic_launcher_foreground) //TODO: mettere immagine migliore
                 .setStyle(Notification.MessagingStyle(person)
                         .addMessage(message1)
-                        .addHistoricMessage(message2)    //non succede niente (?)
                 )
                 .setShortcutId(conversationShortcutID)
                 .build()

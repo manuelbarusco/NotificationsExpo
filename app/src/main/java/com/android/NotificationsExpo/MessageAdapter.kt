@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.android.NotificationsExpo.database.entities.Messaggio
-import com.android.NotificationsExpo.dummy.Message
 import java.util.*
 
 class MessageAdapter(val messageList: List<Messaggio>) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
@@ -33,7 +32,7 @@ class MessageAdapter(val messageList: List<Messaggio>) : RecyclerView.Adapter<Me
     //dal parametro $viewType
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
         var idLayout=R.layout.message_item
-        if(viewType==Message.CONST.MESSAGE_RECEIVED)
+        if(viewType==Messaggio.CONST.MESSAGE_RECEIVED)
             idLayout=R.layout.message_from_item
         val view = LayoutInflater.from(parent.context)
                 .inflate(idLayout, parent, false)

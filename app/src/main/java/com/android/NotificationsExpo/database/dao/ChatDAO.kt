@@ -3,6 +3,7 @@ package com.android.NotificationsExpo.database.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.android.NotificationsExpo.database.entities.Chat
+import com.android.NotificationsExpo.database.entities.Utente
 import java.util.*
 
 @Dao
@@ -38,5 +39,7 @@ interface ChatDAO {
             val lastMessageDateTime: Date
     )
 
+    @Query("SELECT  U.*  FROM UTENTICHAT AS UC  JOIN UTENTE AS U ON UC.Utente=U.Nickname WHERE UC.Chat=:chatID AND UC.Utente!=:utentePredefinito")
+    fun getChatUtenti(chatID: Int, utentePredefinito: String): List<Utente>
 }
 

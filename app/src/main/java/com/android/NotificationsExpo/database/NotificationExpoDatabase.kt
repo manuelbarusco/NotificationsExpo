@@ -49,7 +49,7 @@ abstract class NotificationExpoDatabase : RoomDatabase() {
             }
         }
     }
-    //@TODO verificare inner class
+
     private class NotificationExpoDatabaseCallback(private val scope: CoroutineScope) : RoomDatabase.Callback() {
 
         override fun onCreate(db: SupportSQLiteDatabase) {

@@ -18,4 +18,10 @@
     <string name="c_descr_service">Questa è la descrizione del canale per i processi in background</string>
     <string name="c_name_custom">Custom Notification</string>
     <string name="c_descr_custom">Questa è la descrizione del canale per le Custom Notification</string>
+
+    <string-array name="dummy_messages">
+        <item>Prova invio messaggio</item>
+        <item>Prova 1</item>
+        <item>Prova 2</item>
+    </string-array>
 </resources>

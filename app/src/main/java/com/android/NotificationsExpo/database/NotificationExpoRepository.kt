@@ -1,17 +1,15 @@
 package com.android.NotificationsExpo.database
 
-import android.app.Activity
 import android.content.Context
 import androidx.lifecycle.LiveData
-import androidx.room.Room
 import com.android.NotificationsExpo.database.dao.ChatDAO
-import com.android.NotificationsExpo.database.dao.UtenteDAO
-import com.android.NotificationsExpo.database.entities.Chat
 import com.android.NotificationsExpo.database.entities.Messaggio
 import com.android.NotificationsExpo.database.entities.Utente
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+
 
 class NotificationExpoRepository private constructor(context: Context) {
 
@@ -21,7 +19,6 @@ class NotificationExpoRepository private constructor(context: Context) {
     private val notificaDAO = database.notificaDAO()
     private val utenteDAO = database.utenteDAO()
     private val utentiChatDAO = database.utentiChatDAO()
-    private val executor = Executors.newSingleThreadExecutor()
 
     companion object{
         private var INSTANCE: NotificationExpoRepository? = null
@@ -43,7 +40,24 @@ class NotificationExpoRepository private constructor(context: Context) {
 
     fun getChatMessages(idChat: Int): LiveData<MutableList<Messaggio>> = messaggioDAO.getChatMessages(idChat)
 
+    fun getChatUtenti(chatID: Int, utentePredefinito: String): List<Utente> {
+        val executor = Executors.newSingleThreadExecutor()
+        var result: List<Utente> ?= null
+        executor.execute{
+            result=chatDAO.getChatUtenti(chatID, utentePredefinito)
+        }
+        //il thread viene eseguito ma aspetto la fine della sua esecuzione perchè ho bisogno dei suoi dati per proseguire nel receiver
+        try {
+            executor.shutdown()
+            while (!executor.awaitTermination(24L, TimeUnit.HOURS)) { }
+        } catch (e: InterruptedException) {
+            e.printStackTrace()
+        }
+        return result as List<Utente>
+    }
+
     fun addMessage(messaggio: Messaggio){
+        val executor = Executors.newSingleThreadExecutor()
         executor.execute{
             messaggioDAO.insert(messaggio)
         }

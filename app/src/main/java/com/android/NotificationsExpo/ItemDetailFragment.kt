@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
-import android.preference.PreferenceManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -15,14 +14,9 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.android.NotificationsExpo.database.NotificationExpoRepository
-import com.android.NotificationsExpo.dummy.DummyContent
-import com.android.NotificationsExpo.dummy.MessageDatasource
-import androidx.lifecycle.Observer
 import com.android.NotificationsExpo.database.entities.Messaggio
 
 /**
@@ -44,7 +38,6 @@ class ItemDetailFragment : Fragment() {
     /**
      * The dummy content this fragment is presenting.
      */
-    private var item: DummyContent.DummyItem? = null
     private lateinit var recyclerView: RecyclerView
     //private val d: DummyContent = DummyContent()
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,23 +80,23 @@ class ItemDetailFragment : Fragment() {
         )
         val userText: EditText=rootView.findViewById(R.id.user_text)
         val sendButton: Button= rootView.findViewById(R.id.button_chat_send)
-        var alarmManager: AlarmManager
 
         sendButton.setOnClickListener {
             val mex: Messaggio=Messaggio(testo = userText.text.toString(), mittente = user, media = null, chat=chat_id)
-            Log.d("Dio",mex.toString())
             repository.addMessage(mex)
             messaggi.add(mex)
             recyclerView.adapter?.notifyItemInserted(messaggi.size)
             userText.text.clear()
-            //val myNotificationType:String = "conversationNotification" //TODO Sostituire con il tipo di notifica a cui appartiene la chat (l'id nel database)
 
             // Impostiamo il timer e dopo un certo tempo verrà inviato un broadcast esplicito ad
             // AlarmMangerReceiver
 
             val alarmManager: AlarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             var alarmIntent = Intent(context, AlarmManagerReceiver::class.java) // intent esplicito
-            alarmIntent.putExtra("notificationType",notifica_chat)
+            alarmIntent.putExtra(NOTIFICATION,notifica_chat)
+            alarmIntent.putExtra(CHAT_ID,chat_id)
+            alarmIntent.putExtra(CHAT_NAME,nome_chat)
+            alarmIntent.putExtra(CHAT_IMG,img_chat)
 
             // Genero un id da assegnare al broadcast per generare broadcast sempre diversi
             // Se non lo faccio e genero più broadcast prima dello scadere del tempo non li vedrò

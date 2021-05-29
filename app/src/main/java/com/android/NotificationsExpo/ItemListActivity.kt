@@ -20,6 +20,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.android.NotificationsExpo.database.NotificationExpoRepository
 import com.android.NotificationsExpo.database.dao.ChatDAO
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 
 
@@ -42,6 +43,7 @@ class ItemListActivity : AppCompatActivity() {
 
     companion object{
         const val KEY_USER= "UtenteAPP"
+
         //Constanti per i channel ID
         const val MULTIPLE = "MultipleNotification"
         const val CONVERSATION = "ConversationNotifications"
@@ -101,11 +103,11 @@ class ItemListActivity : AppCompatActivity() {
                 this,
                 Observer {chat->
                     chat?.let{
-                        Log.i("Database",""+chat.size)
                         updateUI(chat)
                     }
                 }
         )
+        Log.i("Prova", "Lanciato")
         // Abilito il BroadcastReceiver a runtime
         val filter = IntentFilter(AlarmManagerReceiver.ACTION_SHOW_NOTIFICATION)
         this.registerReceiver(onShowNotification, filter, AlarmManagerReceiver.PERM_PRIVATE, null)
@@ -132,12 +134,14 @@ class ItemListActivity : AppCompatActivity() {
                     val fragment = ItemDetailFragment().apply {
                         arguments = Bundle().apply {
                             putInt(ItemDetailFragment.CHAT_ID, item.idChat)     //passati id chat, nome chat, immagine della chat e notifica associata alla chat
-                            putString(ItemDetailFragment.CHAT_NAME,item.nomeChat)
                             if(item.nomeChat==null)
                                 putString(ItemDetailFragment.CHAT_NAME,item.nomeChatPrivata)
-                            putInt(ItemDetailFragment.CHAT_IMG,item.imgChatGruppo as Int)
+                            else
+                                putString(ItemDetailFragment.CHAT_NAME,item.nomeChat)
                             if(item.imgChatGruppo==null)
                                 putInt(ItemDetailFragment.CHAT_IMG,item.imgChatPrivata)
+                            else
+                                putInt(ItemDetailFragment.CHAT_IMG,item.imgChatGruppo)
                             putString(ItemDetailFragment.NOTIFICATION,item.notificaAssociata)
                         }
                     }
@@ -148,12 +152,14 @@ class ItemListActivity : AppCompatActivity() {
                 } else {
                     val intent = Intent(v.context, ItemDetailActivity::class.java).apply {
                         putExtra(ItemDetailFragment.CHAT_ID, item.idChat)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
-                        putExtra(ItemDetailFragment.CHAT_NAME,item.nomeChat)
                         if(item.nomeChat==null)
                             putExtra(ItemDetailFragment.CHAT_NAME,item.nomeChatPrivata)
-                        putExtra(ItemDetailFragment.CHAT_IMG,item.imgChatGruppo)
+                        else
+                            putExtra(ItemDetailFragment.CHAT_NAME,item.nomeChat)
                         if(item.imgChatGruppo==null)
                             putExtra(ItemDetailFragment.CHAT_IMG,item.imgChatPrivata)
+                        else
+                            putExtra(ItemDetailFragment.CHAT_IMG,item.imgChatGruppo)
                         putExtra(ItemDetailFragment.NOTIFICATION,item.notificaAssociata)
                     }
                     v.context.startActivity(intent)
@@ -178,7 +184,9 @@ class ItemListActivity : AppCompatActivity() {
             else
                 holder.name.text=item.nomeChatPrivata
             holder.notification.text = item.notificaAssociata
-            //holder.time.text = item.lastMessageDateTime.time.toString()
+            val dateFormat: DateFormat = SimpleDateFormat("hh:mm")
+            val strDate: String = dateFormat.format(item.lastMessageDateTime)
+            holder.time.text = strDate
 
             with(holder.itemView) {
                 tag = item

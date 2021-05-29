@@ -17,10 +17,17 @@ class AlarmManagerReceiver: BroadcastReceiver() {
 
         Log.d("MyReceiver_BASE","${System.currentTimeMillis().toString()} ${intent.action}") //Mostriamo una riga con un testo sempre nuovo (altrimenti Logcat scrive che ci sono altre n righe simili)
 
+        Log.d("MyReceiver_BASE", ""+intent.getStringExtra(ItemDetailFragment.NOTIFICATION))
+        Log.d("MyReceiver_BASE", ""+intent.getIntExtra(ItemDetailFragment.CHAT_ID,-1))
+        Log.d("MyReceiver_BASE", ""+intent.getStringExtra(ItemDetailFragment.CHAT_NAME))
 
         // Invio il broadcast per mostrare la notifica (a meno che l'app non sia in background)
         val myIntent = Intent(ACTION_SHOW_NOTIFICATION) // Qui se vuoi puo aggiungere dei putExtra
-        myIntent.putExtra("notificationType",intent.getStringExtra("notificationType"))
+        myIntent.putExtra(ItemDetailFragment.NOTIFICATION,intent.getStringExtra(ItemDetailFragment.NOTIFICATION))
+        myIntent.putExtra(ItemDetailFragment.CHAT_ID,intent.getIntExtra(ItemDetailFragment.CHAT_ID,-1))
+        myIntent.putExtra(ItemDetailFragment.CHAT_NAME,intent.getStringExtra(ItemDetailFragment.CHAT_NAME))
+        myIntent.putExtra(ItemDetailFragment.CHAT_IMG,intent.getIntExtra(ItemDetailFragment.CHAT_IMG,-1))
+
         // Ritrasmetto (anche questa volta) il tipo di notifica associato alla chat
         context.sendOrderedBroadcast(myIntent,PERM_PRIVATE)
         // Creiamo un intent implicito e lo mandiamo come Ordered Broadcast

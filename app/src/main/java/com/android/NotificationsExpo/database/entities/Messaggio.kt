@@ -47,7 +47,7 @@ data class Messaggio(
 
     @NotNull
     @ColumnInfo(name = "DateTime")
-    val dateTime: Date = Date(),
+    val dateTime: Date = Date()
 ){
     object CONST{
         const val MESSAGE_SEND:Int  = 0
