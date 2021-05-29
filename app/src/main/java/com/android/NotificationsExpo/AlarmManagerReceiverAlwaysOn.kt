@@ -112,11 +112,11 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
         * features delle conversazioni). Inoltre è consigliato (non obbligatorio) impostare anche un oggetto Person
         * che serve al S.O. per "conoscere" di più del contesto della conversazione ed utile ad es. per classificare
         * gli shortcut e per fornire suggerimenti per la condivisione.*/
-        val shortcut = ShortcutInfo.Builder(context, conversationShortcutID)
+        val shortcut = ShortcutInfo.Builder(context, chat_id.toString())
                 .setLongLived(true)
                 .setIcon(Icon.createWithResource(context,chat_img))
                 .setShortLabel(chat_name as CharSequence)
-                .setLongLabel(chat_name)
+                .setLongLabel(chat_name as CharSequence)
                 .setIntent(target)
                 .setPerson(person)
                 .build()
@@ -131,7 +131,7 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
         * setAutoExpandBubble(true) --> bubble espansa in automatico (solo se l'app è in foreground) default = false
         * .setSuppressNotification()--> imposta se la bubble verrà pubblicato senza la notifica associata nell'area apposita default = false.*/
 
-        val bubbleData = Notification.BubbleMetadata.Builder(conversationShortcutID)
+        val bubbleData = Notification.BubbleMetadata.Builder(chat_id.toString())
                 .setDesiredHeight(600)
                 .setAutoExpandBubble(false)
                 .setSuppressNotification(false)
@@ -156,18 +156,15 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
                 .setStyle(Notification.MessagingStyle(person)
                         .addMessage(message1)
                 )
-                .setShortcutId(conversationShortcutID)
+                .setShortcutId(chat_id.toString())
                 .build()
 
 
         val notificationManager: NotificationManager? = context.getSystemService()
 
         if (notificationManager != null) {
-            notificationManager.notify(100,notification)
+            notificationManager.notify(chat_id,notification)
         }
     }
 
-    companion object{
-        const val conversationShortcutID = "shortcut1"
-    }
 }
