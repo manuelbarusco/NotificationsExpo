@@ -92,7 +92,7 @@ abstract class NotificationExpoDatabase : RoomDatabase() {
 
 
             //inserisco i vari tipi di notifica individuati @TODO aggiornare le descrizioni delle notifiche
-            var n=Notifica("Notifica ticker", "Prova")
+            var n=Notifica("Notifica espandibile", "Prova")
             notificaDAO.insert(n)
             n=Notifica("Notifiche multiple", "Prova")
             notificaDAO.insert(n)
@@ -112,7 +112,7 @@ abstract class NotificationExpoDatabase : RoomDatabase() {
             notificaDAO.insert(n)
 
             //inserisco una chat privata tra Alberto e altri utenti per tutte le notifiche ad eccezione delle notifiche multiple
-            var chat=Chat(nome = null, notificaAssociata = "Notifica ticker", imgChat = null)
+            var chat=Chat(nome = null, notificaAssociata = "Notifica espandibile", imgChat = null)
             chatDAO.insert(chat)
             var utentiChat=UtentiChat(1,u.nickname)
             utentiChatDAO.insert(utentiChat)
@@ -179,7 +179,7 @@ abstract class NotificationExpoDatabase : RoomDatabase() {
             utentiChatDAO.insert(utentiChat)
             utentiChat= UtentiChat(9, u3.nickname)
             utentiChatDAO.insert(utentiChat)
-            utentiChat= UtentiChat(9, u4.nickname)
+            utentiChat= UtentiChat(9, u8.nickname)
             utentiChatDAO.insert(utentiChat)
 
 

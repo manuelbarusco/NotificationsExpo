@@ -3,6 +3,7 @@ package com.android.NotificationsExpo
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.android.NotificationsExpo.database.entities.Messaggio
@@ -20,18 +21,23 @@ class MessageAdapter(val messageList: List<Messaggio>, val chat_type: Int) : Rec
         private val messageText: TextView = itemView.findViewById(R.id.text_message)
         private val messageDate: TextView = itemView.findViewById(R.id.message_date)
         private var messageSender: TextView? = null
+        private var imgMessage: ImageView? = null
 
         init{
             if(viewType == Messaggio.MESSAGE_RECEIVED && chat_type == GROUP_CHAT)
                 messageSender = itemView.findViewById(R.id.message_sender)
+            if(viewType == Messaggio.MESSAGE_RECEIVED_IMG)
+                imgMessage = itemView.findViewById(R.id.message_img)
         }
 
-        fun bind(word: String, date: Date, sender:String?) {
-            messageText.text = word
-            messageDate.text = date.toString()
+        fun bind(messaggio: Messaggio) {
+            messageText.text = messaggio.testo
+            messageDate.text = messaggio.dateTime.toString()
             if (messageSender != null){
-                (messageSender as TextView).text= sender
+                (messageSender as TextView).text= messaggio.mittente
             }
+            if(imgMessage != null)
+                (imgMessage as ImageView).setImageResource(messaggio.media as Int)
         }
     }
     //TODO recuperare utente dalle shared
@@ -40,6 +46,10 @@ class MessageAdapter(val messageList: List<Messaggio>, val chat_type: Int) : Rec
     override fun getItemViewType(position: Int): Int {
         if(messageList[position].mittente=="Alberto")
             return Messaggio.MESSAGE_SEND
+        else {
+            if(messageList[position].media!= null)
+                return Messaggio.MESSAGE_RECEIVED_IMG
+        }
         return Messaggio.MESSAGE_RECEIVED
     }
 
@@ -53,6 +63,8 @@ class MessageAdapter(val messageList: List<Messaggio>, val chat_type: Int) : Rec
             else
                 idLayout = R.layout.message_from_item_group
         }
+        if (viewType == Messaggio.MESSAGE_RECEIVED_IMG)
+            idLayout = R.layout.message_from_item_img
         val view = LayoutInflater.from(parent.context)
                 .inflate(idLayout, parent, false)
         return MessageViewHolder(view, viewType)
@@ -65,6 +77,6 @@ class MessageAdapter(val messageList: List<Messaggio>, val chat_type: Int) : Rec
 
     //metodo che mostra i dati di un messaggio in una certa posizione
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
-        holder.bind(messageList[position].testo, messageList[position].dateTime, messageList[position].mittente)
+        holder.bind(messageList[position])
     }
 }

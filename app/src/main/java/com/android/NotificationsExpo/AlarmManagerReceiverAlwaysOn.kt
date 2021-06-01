@@ -39,7 +39,7 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
     private lateinit var notificationType: String
     private val messagesToSend: MutableList<MittenteMessaggio> = mutableListOf()
 
-    private data class MittenteMessaggio(val utente: Utente, val testo: String)
+    private data class MittenteMessaggio(val mittente: Utente, val messaggio: Messaggio)
 
     override fun onReceive(context: Context, intent: Intent) {
         Log.d("MyReceiver_ALWAYSON","${System.currentTimeMillis().toString()} ${intent?.action}") //Mostriamo una riga con un testo sempre nuovo (altrimenti Logcat scrive che ci sono altre n righe simili)
@@ -64,7 +64,9 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
         Log.d("MyR_Tipo di notifica: ", notificationType)
 
         when(notificationType){
-            "Notifica chat bubble" -> generateSingleMessage(context)
+            "Notifica immagine" -> generateImageMessage(context)
+            "Notifica espandibile" -> generateSingleMessage(context, true)
+            "Notifica chat bubble" -> generateSingleMessage(context, false)
             "Notifiche multiple" -> generateMultipleMessages(context)
         }
 
@@ -77,9 +79,23 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
         Log.d("MyR", "Eravamo in background")
 
         when(notificationType){
+            "Notifica espandibile" -> launchExpandableNotification(context)
+            "Notifica immagine" -> launchImageNotification(context)
             "Notifica chat bubble" -> launchBubbleNotification(context)
             "Notifiche multiple" -> launchMultipleNotifications(context)
         }
+    }
+    
+    private fun generateImageMessage(context: Context){
+        //recupero utenti della chat
+        val utenti:List<Utente> = repository.getChatUtenti(chat_id, user as String)
+
+        //genero il messaggio e lo aggiungo al database
+        val mex1= Messaggio(testo= "Ecco la programmazione dei film di oggi", chat = chat_id, media = R.drawable.programmazione , mittente = utenti[0].nickname)
+        repository.addMessage(mex1)
+
+        val mittenteMessaggio= MittenteMessaggio(utenti[0], mex1)
+        messagesToSend.add(mittenteMessaggio)
     }
 
     private fun generateMultipleMessages(context: Context){
@@ -109,30 +125,93 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
         repository.addMessage(mex3)
         repository.addMessage(mex4)
 
-        var mittenteMessaggio= MittenteMessaggio(utenti[u1], messages[m1])
+        var mittenteMessaggio= MittenteMessaggio(utenti[u1], mex1)
         messagesToSend.add(mittenteMessaggio)
-        mittenteMessaggio= MittenteMessaggio(utenti[u2], messages[m2])
+        mittenteMessaggio= MittenteMessaggio(utenti[u2], mex2)
         messagesToSend.add(mittenteMessaggio)
-        mittenteMessaggio= MittenteMessaggio(utenti[u3], messages[m3])
+        mittenteMessaggio= MittenteMessaggio(utenti[u3], mex3)
         messagesToSend.add(mittenteMessaggio)
-        mittenteMessaggio= MittenteMessaggio(utenti[u4], messages[m4])
+        mittenteMessaggio= MittenteMessaggio(utenti[u4], mex4)
         messagesToSend.add(mittenteMessaggio)
     }
 
-    private fun generateSingleMessage(context: Context){
-        //recupero i messaggi "standard" e ne sceglo uno a caso
+    private fun generateSingleMessage(context: Context, long: Boolean){
+        //recupero i messaggi "standard" e ne sceglo uno a caso se il messaggio è corto, altrimenti quello lungo se il messaggio comparirà in una notifica espandibile
         val messages: Array<String> = context.getResources().getStringArray(R.array.dummy_messages)
-        val iM= Random.nextInt(0, messages.size-1)
+        var iM=3 //TODO scegliere il messaggio lungo
+        if(!long)
+            iM = Random.nextInt(0, messages.size - 1)
 
         //recupero utenti della chat
         val utenti:List<Utente> = repository.getChatUtenti(chat_id, user as String)
 
         //genero il messaggio e lo aggiungo al database
-        val m= Messaggio(testo= messages[iM], chat = chat_id, media = null, mittente = utenti[0].nickname)
-        repository.addMessage(m)
+        val mex= Messaggio(testo= messages[iM], chat = chat_id, media = null, mittente = utenti[0].nickname)
+        repository.addMessage(mex)
 
-        val mittenteMessaggio= MittenteMessaggio(utenti[0], messages[iM])
+        val mittenteMessaggio= MittenteMessaggio(utenti[0], mex)
         messagesToSend.add(mittenteMessaggio)
+    }
+
+    private fun launchImageNotification(context: Context){
+        val target = Intent(context, ItemDetailActivity::class.java)
+                .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+                .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+
+        target.apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+
+        val notificationManager: NotificationManager? = context.getSystemService()
+
+        val notification = NotificationCompat.Builder(context, ItemListActivity.IMG)
+                .setSmallIcon(messagesToSend[0].mittente.imgProfilo)
+                .setContentTitle(chat_name)
+                .setContentText(messagesToSend[0].messaggio.testo)
+                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[0].messaggio.media as Int))
+                .setStyle(NotificationCompat.BigPictureStyle()
+                        .bigPicture(BitmapFactory.decodeResource(context.resources, messagesToSend[0].messaggio.media as Int))
+                        .bigLargeIcon(null))
+                .setContentIntent(pendingIntent)
+                .build()
+
+        if (notificationManager != null) {
+            notificationManager.notify(chat_id,notification)
+        }
+    }
+
+    private fun launchExpandableNotification(context: Context){
+        val target = Intent(context, ItemDetailActivity::class.java)
+                .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+                .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+
+        target.apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+
+        val notificationManager: NotificationManager? = context.getSystemService()
+
+        var notification = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle(chat_name)
+                .setContentText(messagesToSend[0].messaggio.testo.substring(0,10))
+                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[0].mittente.imgProfilo))
+                .setStyle(NotificationCompat.BigTextStyle()
+                        .bigText(messagesToSend[0].messaggio.testo))
+                .setContentIntent(pendingIntent)
+                .build()
+
+        if (notificationManager != null) {
+            notificationManager.notify(chat_id,notification)
+        }
     }
 
     private fun launchMultipleNotifications(context: Context){
@@ -142,33 +221,33 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
 
         val newMessageNotification1 = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
                 .setSmallIcon(R.drawable.group)
-                .setContentTitle(messagesToSend[0].utente.nickname)
-                .setContentText(messagesToSend[0].testo)
-                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[0].utente.imgProfilo))
+                .setContentTitle(messagesToSend[0].mittente.nickname)
+                .setContentText(messagesToSend[0].messaggio.testo)
+                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[0].mittente.imgProfilo))
                 .setGroup(GROUP_KEY_WORK_EMAIL)
                 .build()
 
         val newMessageNotification2 = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
                 .setSmallIcon(R.drawable.group)
-                .setContentTitle(messagesToSend[1].utente.nickname)
-                .setContentText(messagesToSend[1].testo)
-                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[1].utente.imgProfilo))
+                .setContentTitle(messagesToSend[1].mittente.nickname)
+                .setContentText(messagesToSend[1].messaggio.testo)
+                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[1].mittente.imgProfilo))
                 .setGroup(GROUP_KEY_WORK_EMAIL)
                 .build()
 
         val newMessageNotification3 = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
                 .setSmallIcon(R.drawable.group)
-                .setContentTitle(messagesToSend[2].utente.nickname)
-                .setContentText(messagesToSend[2].testo)
-                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[2].utente.imgProfilo))
+                .setContentTitle(messagesToSend[2].mittente.nickname)
+                .setContentText(messagesToSend[2].messaggio.testo)
+                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[2].mittente.imgProfilo))
                 .setGroup(GROUP_KEY_WORK_EMAIL)
                 .build()
 
         val newMessageNotification4 = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
                 .setSmallIcon(R.drawable.group)
-                .setContentTitle(messagesToSend[3].utente.nickname)
-                .setContentText(messagesToSend[3].testo)
-                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[3].utente.imgProfilo))
+                .setContentTitle(messagesToSend[3].mittente.nickname)
+                .setContentText(messagesToSend[3].messaggio.testo)
+                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[3].mittente.imgProfilo))
                 .setGroup(GROUP_KEY_WORK_EMAIL)
                 .build()
 
@@ -182,7 +261,7 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
 
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, target, 0)
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
 
         val summaryNotification = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
                 .setContentTitle(chat_name)
@@ -191,8 +270,8 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
                 .setSmallIcon(chat_img)
                 //build summary info into InboxStyle template
                 .setStyle(NotificationCompat.InboxStyle()
-                        .addLine(""+messagesToSend[0].utente+" "+messagesToSend[0].testo)
-                        .addLine(""+messagesToSend[1].utente+" "+messagesToSend[0].testo)
+                        .addLine(""+messagesToSend[0].mittente.nickname+" "+messagesToSend[0].messaggio.testo)
+                        .addLine(""+messagesToSend[1].mittente.nickname+" "+messagesToSend[0].messaggio.testo)
                         .setBigContentTitle("Altri due messaggi"))
                 //specify which group this notification belongs to
                 .setGroup(GROUP_KEY_WORK_EMAIL)
@@ -272,7 +351,7 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
          should have a locus id set that matches a locus id set on the */
 
         //Secondo parametro è di tipo Long e serve per la data del messaggio nella notifica
-        val message1 = Notification.MessagingStyle.Message(messagesToSend[0].testo,
+        val message1 = Notification.MessagingStyle.Message(messagesToSend[0].messaggio.testo,
                 System.currentTimeMillis(),
                 person)
 

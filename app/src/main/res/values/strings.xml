@@ -4,6 +4,8 @@
     <string name="istructions">Istruzioni</string>
     <string name="settings">Impostazioni</string>
     <string name="credits">Crediti</string>
+    <string name="c_name_img">Notifica Immagine</string>
+    <string name="c_descr_img">Questa è la descrizione del canale per le notifiche con immagine</string>
     <string name="c_name_multiple">Multiple Notification</string>
     <string name="c_descr_multiple">Questa è la descrizione del canale per le Multiple Notification</string>
     <string name="c_name_conversation">Conversation Notifications</string>

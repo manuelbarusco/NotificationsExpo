@@ -52,6 +52,7 @@ class ItemListActivity : AppCompatActivity() {
         const val BUBBLES = "ChatBubbles"
         const val SERVICE = "ProcessoBackground"
         const val CUSTOM = "CustomNotification"
+        const val IMG = "NotificaImmagine"
         //mancano notifica con pulsanti, notifiche con immagini
     }
 
@@ -250,6 +251,9 @@ class ItemListActivity : AppCompatActivity() {
             notificationManager.createNotificationChannel(channel)
 
             channel = NotificationChannel(CUSTOM, getString(R.string.c_name_custom), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.c_descr_custom) }
+            notificationManager.createNotificationChannel(channel)
+
+            channel = NotificationChannel(IMG, getString(R.string.c_name_img), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.c_descr_img) }
             notificationManager.createNotificationChannel(channel)
         }
     }

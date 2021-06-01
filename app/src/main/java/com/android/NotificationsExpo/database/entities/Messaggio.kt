@@ -35,7 +35,7 @@ data class Messaggio(
     val testo:String,
 
     @ColumnInfo(name = "Media")
-    val media: String?, //può valere null in caso il messaggio non contenga dei media
+    val media: Int?, //può valere null in caso il messaggio non contenga dei media
 
     @NotNull
     @ColumnInfo(name = "Chat")
@@ -51,7 +51,8 @@ data class Messaggio(
 ){
     companion object{
         const val MESSAGE_SEND:Int  = 0
-        const val MESSAGE_RECEIVED: Int= 1
+        const val MESSAGE_RECEIVED: Int = 1
+        const val MESSAGE_RECEIVED_IMG: Int = 2
     }
 }
 
