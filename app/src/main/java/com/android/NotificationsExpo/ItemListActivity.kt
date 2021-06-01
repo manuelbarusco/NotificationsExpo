@@ -134,14 +134,8 @@ class ItemListActivity : AppCompatActivity() {
                     val fragment = ItemDetailFragment().apply {
                         arguments = Bundle().apply {
                             putInt(ItemDetailFragment.CHAT_ID, item.idChat)     //passati id chat, nome chat, immagine della chat e notifica associata alla chat
-                            if(item.nomeChat==null)
-                                putString(ItemDetailFragment.CHAT_NAME,item.nomeChatPrivata)
-                            else
-                                putString(ItemDetailFragment.CHAT_NAME,item.nomeChat)
-                            if(item.imgChatGruppo==null)
-                                putInt(ItemDetailFragment.CHAT_IMG,item.imgChatPrivata)
-                            else
-                                putInt(ItemDetailFragment.CHAT_IMG,item.imgChatGruppo)
+                            putString(ItemDetailFragment.CHAT_NAME,item.nomeChat)
+                            putInt(ItemDetailFragment.CHAT_IMG,item.imgChat)
                             putString(ItemDetailFragment.NOTIFICATION,item.notificaAssociata)
                         }
                     }
@@ -152,14 +146,8 @@ class ItemListActivity : AppCompatActivity() {
                 } else {
                     val intent = Intent(v.context, ItemDetailActivity::class.java).apply {
                         putExtra(ItemDetailFragment.CHAT_ID, item.idChat)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
-                        if(item.nomeChat==null)
-                            putExtra(ItemDetailFragment.CHAT_NAME,item.nomeChatPrivata)
-                        else
-                            putExtra(ItemDetailFragment.CHAT_NAME,item.nomeChat)
-                        if(item.imgChatGruppo==null)
-                            putExtra(ItemDetailFragment.CHAT_IMG,item.imgChatPrivata)
-                        else
-                            putExtra(ItemDetailFragment.CHAT_IMG,item.imgChatGruppo)
+                        putExtra(ItemDetailFragment.CHAT_NAME,item.nomeChat)
+                        putExtra(ItemDetailFragment.CHAT_IMG,item.imgChat)
                         putExtra(ItemDetailFragment.NOTIFICATION,item.notificaAssociata)
                     }
                     v.context.startActivity(intent)
@@ -175,14 +163,8 @@ class ItemListActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = values[position]
-            if(item.imgChatGruppo!=null)
-                holder.image.setImageResource(item.imgChatGruppo)
-            else
-                holder.image.setImageResource(item.imgChatPrivata)
-            if(item.nomeChat!=null)
-                holder.name.text=item.nomeChat
-            else
-                holder.name.text=item.nomeChatPrivata
+            holder.image.setImageResource(item.imgChat)
+            holder.name.text=item.nomeChat
             holder.notification.text = item.notificaAssociata
             val dateFormat: DateFormat = SimpleDateFormat("hh:mm")
             val strDate: String = dateFormat.format(item.lastMessageDateTime)

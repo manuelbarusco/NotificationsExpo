@@ -6,10 +6,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
+import android.graphics.BitmapFactory
 import android.graphics.drawable.Icon
 import android.os.Message
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.getSystemService
 import com.android.NotificationsExpo.database.NotificationExpoRepository
 import com.android.NotificationsExpo.database.entities.Messaggio
@@ -29,7 +32,14 @@ import kotlin.random.Random
 
 class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
     private lateinit var repository: NotificationExpoRepository
-    private var executor = Executors.newSingleThreadExecutor()
+    private lateinit var user: String
+    private var chat_id: Int=-1
+    private lateinit var chat_name: String
+    private var chat_img: Int=-1
+    private lateinit var notificationType: String
+    private val messagesToSend: MutableList<MittenteMessaggio> = mutableListOf()
+
+    private data class MittenteMessaggio(val utente: Utente, val testo: String)
 
     override fun onReceive(context: Context, intent: Intent) {
         Log.d("MyReceiver_ALWAYSON","${System.currentTimeMillis().toString()} ${intent?.action}") //Mostriamo una riga con un testo sempre nuovo (altrimenti Logcat scrive che ci sono altre n righe simili)
@@ -37,42 +47,26 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
 
         //ottengo l'utente che sta usando l'app
         val preferences= context.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
-        val user= preferences.getString(ItemListActivity.KEY_USER, "")
+        user= preferences.getString(ItemListActivity.KEY_USER, "") as String
 
         //ottengo id chat
-        val chat_id= intent.getIntExtra(ItemDetailFragment.CHAT_ID,-1)
+        chat_id= intent.getIntExtra(ItemDetailFragment.CHAT_ID,-1)
 
         //ottengo nome della chat
-        val chat_name= intent.getStringExtra(ItemDetailFragment.CHAT_NAME)
+        chat_name= intent.getStringExtra(ItemDetailFragment.CHAT_NAME) as String
 
         //ottengo immagine della chat
-        val chat_img= intent.getIntExtra(ItemDetailFragment.CHAT_IMG,-1)
-
-        //recupero i messaggi "standard" e ne sceglo uno a caso
-        val messages: Array<String> = context.getResources().getStringArray(R.array.dummy_messages)
-        val iM= Random.nextInt(0, messages.size-1)
-
-        //recupero utenti della chat
-        val utenti:List<Utente> = repository.getChatUtenti(chat_id, user as String)
-
-        Log.d("MyReceiver_ALWAYSON","sono qui")
-        var mittente=""
-        //sceglo a caso un utente (escluso utente predefinito) come mittente del messaggio in caso di chat di gruppo
-        if(utenti.size>1){
-            val i= Random.nextInt(0, utenti.size-1)
-            mittente=utenti[i].nickname
-        } else
-            mittente=utenti[0].nickname
-
-        //genero il messaggio e lo aggiungo al database
-        val m= Messaggio(testo= messages[iM], chat = chat_id, media = null, mittente = mittente)
-        repository.addMessage(m)
+        chat_img= intent.getIntExtra(ItemDetailFragment.CHAT_IMG,-1)
 
         // Devo generare uno o più messaggi sulla base del tipo di notifica associata alla chat (ad
         // esempio per una notifica conversation genererò 10 messaggi)
-        val notificationType:String = intent.getStringExtra(ItemDetailFragment.NOTIFICATION) as String
+        notificationType= intent.getStringExtra(ItemDetailFragment.NOTIFICATION) as String
         Log.d("MyR_Tipo di notifica: ", notificationType)
 
+        when(notificationType){
+            "Notifica chat bubble" -> generateSingleMessage(context)
+            "Notifiche multiple" -> generateMultipleMessages(context)
+        }
 
         // Se è intervenuto prima l'altro BroadcastReceiver non mostro nemmeno la notifica
         if (resultCode != Activity.RESULT_OK){
@@ -81,19 +75,154 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
             return
         }
         Log.d("MyR", "Eravamo in background")
-         // ottengo eventuali valori dall'intent extra
 
-        // TODO Mostro la notifica
+        when(notificationType){
+            "Notifica chat bubble" -> launchBubbleNotification(context)
+            "Notifiche multiple" -> launchMultipleNotifications(context)
+        }
+    }
 
-        //TODO: selezionare tipo di notifica
+    private fun generateMultipleMessages(context: Context){
+        //recupero i messaggi "standard" e ne scelgo 4 a caso
+        val messages: Array<String> = context.getResources().getStringArray(R.array.dummy_messages)
+        val m1= Random.nextInt(0, messages.size)
+        val m2= Random.nextInt(0, messages.size)
+        val m3= Random.nextInt(0, messages.size)
+        val m4= Random.nextInt(0, messages.size)
+
+        //recupero utenti della chat
+        val utenti:List<Utente> = repository.getChatUtenti(chat_id, user as String)
+
+        //scelgo a caso 4 mittenti per i 4 messaggio
+        val u1= Random.nextInt(0, messages.size)
+        val u2= Random.nextInt(0, messages.size)
+        val u3= Random.nextInt(0, messages.size)
+        val u4= Random.nextInt(0, messages.size)
+
+        //genero il messaggio e lo aggiungo al database
+        val mex1= Messaggio(testo= messages[m1], chat = chat_id, media = null, mittente = utenti[u1].nickname)
+        val mex2= Messaggio(testo= messages[m2], chat = chat_id, media = null, mittente = utenti[u2].nickname)
+        val mex3= Messaggio(testo= messages[m3], chat = chat_id, media = null, mittente = utenti[u3].nickname)
+        val mex4= Messaggio(testo= messages[m4], chat = chat_id, media = null, mittente = utenti[u4].nickname)
+        repository.addMessage(mex1)
+        repository.addMessage(mex2)
+        repository.addMessage(mex3)
+        repository.addMessage(mex4)
+
+        var mittenteMessaggio= MittenteMessaggio(utenti[u1], messages[m1])
+        messagesToSend.add(mittenteMessaggio)
+        mittenteMessaggio= MittenteMessaggio(utenti[u2], messages[m2])
+        messagesToSend.add(mittenteMessaggio)
+        mittenteMessaggio= MittenteMessaggio(utenti[u3], messages[m3])
+        messagesToSend.add(mittenteMessaggio)
+        mittenteMessaggio= MittenteMessaggio(utenti[u4], messages[m4])
+        messagesToSend.add(mittenteMessaggio)
+    }
+
+    private fun generateSingleMessage(context: Context){
+        //recupero i messaggi "standard" e ne sceglo uno a caso
+        val messages: Array<String> = context.getResources().getStringArray(R.array.dummy_messages)
+        val iM= Random.nextInt(0, messages.size-1)
+
+        //recupero utenti della chat
+        val utenti:List<Utente> = repository.getChatUtenti(chat_id, user as String)
+
+        //genero il messaggio e lo aggiungo al database
+        val m= Messaggio(testo= messages[iM], chat = chat_id, media = null, mittente = utenti[0].nickname)
+        repository.addMessage(m)
+
+        val mittenteMessaggio= MittenteMessaggio(utenti[0], messages[iM])
+        messagesToSend.add(mittenteMessaggio)
+    }
+
+    private fun launchMultipleNotifications(context: Context){
+        //use constant ID for notification used as group summary
+        val SUMMARY_ID = 0
+        val GROUP_KEY_WORK_EMAIL = "com.android.NotificationExpo.MULTIPLE_MESSAGES"
+
+        val newMessageNotification1 = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
+                .setSmallIcon(R.drawable.group)
+                .setContentTitle(messagesToSend[0].utente.nickname)
+                .setContentText(messagesToSend[0].testo)
+                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[0].utente.imgProfilo))
+                .setGroup(GROUP_KEY_WORK_EMAIL)
+                .build()
+
+        val newMessageNotification2 = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
+                .setSmallIcon(R.drawable.group)
+                .setContentTitle(messagesToSend[1].utente.nickname)
+                .setContentText(messagesToSend[1].testo)
+                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[1].utente.imgProfilo))
+                .setGroup(GROUP_KEY_WORK_EMAIL)
+                .build()
+
+        val newMessageNotification3 = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
+                .setSmallIcon(R.drawable.group)
+                .setContentTitle(messagesToSend[2].utente.nickname)
+                .setContentText(messagesToSend[2].testo)
+                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[2].utente.imgProfilo))
+                .setGroup(GROUP_KEY_WORK_EMAIL)
+                .build()
+
+        val newMessageNotification4 = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
+                .setSmallIcon(R.drawable.group)
+                .setContentTitle(messagesToSend[3].utente.nickname)
+                .setContentText(messagesToSend[3].testo)
+                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[3].utente.imgProfilo))
+                .setGroup(GROUP_KEY_WORK_EMAIL)
+                .build()
+
+        val target = Intent(context, ItemDetailActivity::class.java)
+                .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+                .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+
+        target.apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, target, 0)
+
+        val summaryNotification = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
+                .setContentTitle(chat_name)
+                //set content text to support devices running API level < 24
+                .setContentText("4 Nuovi Messaggi")
+                .setSmallIcon(chat_img)
+                //build summary info into InboxStyle template
+                .setStyle(NotificationCompat.InboxStyle()
+                        .addLine(""+messagesToSend[0].utente+" "+messagesToSend[0].testo)
+                        .addLine(""+messagesToSend[1].utente+" "+messagesToSend[0].testo)
+                        .setBigContentTitle("Altri due messaggi"))
+                //specify which group this notification belongs to
+                .setGroup(GROUP_KEY_WORK_EMAIL)
+                //set this notification as the summary for the group
+                .setContentIntent(pendingIntent)
+                .setGroupSummary(true)
+                .build()
+
+        val notificationManager: NotificationManager? = context.getSystemService()
+
+        if (notificationManager != null) {
+            notificationManager.apply {
+                notify(chat_id, newMessageNotification1)
+                notify(chat_id+1, newMessageNotification2)
+                notify(chat_id+2, newMessageNotification3)
+                notify(chat_id+3, newMessageNotification4)
+                notify(SUMMARY_ID, summaryNotification)
+            }
+        }
+    }
+
+    private fun launchBubbleNotification(context: Context){
 
         //******************* CHAT BUBBLE E CONVERSATION *************
         val target = Intent(context, ItemDetailActivity::class.java)
-            .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
-            .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
-            .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
-            .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
-            .setAction("bubble")
+                .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+                .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+                .setAction("bubble")
         val bubbleIntent = PendingIntent.getActivity(context, 0, target, 0)
 
         /*Oggetto Person può essere riutilizzato su altre API per una migliore integrazione
@@ -143,7 +272,7 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
          should have a locus id set that matches a locus id set on the */
 
         //Secondo parametro è di tipo Long e serve per la data del messaggio nella notifica
-        var message1 = Notification.MessagingStyle.Message(messages[iM],
+        val message1 = Notification.MessagingStyle.Message(messagesToSend[0].testo,
                 System.currentTimeMillis(),
                 person)
 

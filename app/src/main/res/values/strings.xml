@@ -23,5 +23,6 @@
         <item>Prova invio messaggio</item>
         <item>Prova 1</item>
         <item>Prova 2</item>
+        <item>Questo è un messaggio molto lungo, il quale non ci sta all\'interno di una notifica collapsed, infatti per visualizzare interamente il suo contenuto c\'è bisogno di una notifica espandibile, sul quale l\'utente può effetturare uno swipe per espanderla</item>
     </string-array>
 </resources>

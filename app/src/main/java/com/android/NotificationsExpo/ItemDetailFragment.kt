@@ -33,13 +33,8 @@ class ItemDetailFragment : Fragment() {
     private lateinit var user:String
     private lateinit var repository: NotificationExpoRepository
     private lateinit var messaggi: MutableList<Messaggio>
-
-
-    /**
-     * The dummy content this fragment is presenting.
-     */
     private lateinit var recyclerView: RecyclerView
-    //private val d: DummyContent = DummyContent()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val preferences= activity?.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
@@ -56,25 +51,25 @@ class ItemDetailFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.chat_detail, container, false)
         val chat_name_view:TextView=rootView.findViewById(R.id.chat_name)
-        Log.i("Chat", "Ricevuti -> Chat name:"+nome_chat+" img:"+img_chat)
         val chat_img_view:ImageView=rootView.findViewById(R.id.chat_image)
         chat_name_view.text=nome_chat
         chat_img_view.setImageResource(img_chat)
         //TODO: risolvere problema action bar
-        //val messages= MessageDatasource().getMessagesExample(20)
         recyclerView=rootView.findViewById(R.id.recycler_chat)
         if(context!=null)
             repository= NotificationExpoRepository.get(context as Context)
+        var chat_type= MessageAdapter.PRIVATE_CHAT
+        if(repository.getChatUtenti(chat_id, user).size>1)
+            chat_type=MessageAdapter.GROUP_CHAT
         repository.getChatMessages(chat_id).observe(
                 viewLifecycleOwner,
                 androidx.lifecycle.Observer {messaggi->
                     messaggi?.let{
                         this.messaggi=messaggi
-                        recyclerView.adapter=MessageAdapter(messaggi)
+                        recyclerView.adapter=MessageAdapter(messaggi, chat_type)
                     }
                 }
         )

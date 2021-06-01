@@ -49,7 +49,7 @@ data class Messaggio(
     @ColumnInfo(name = "DateTime")
     val dateTime: Date = Date()
 ){
-    object CONST{
+    companion object{
         const val MESSAGE_SEND:Int  = 0
         const val MESSAGE_RECEIVED: Int= 1
     }

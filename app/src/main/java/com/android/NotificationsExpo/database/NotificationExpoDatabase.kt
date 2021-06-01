@@ -169,7 +169,7 @@ abstract class NotificationExpoDatabase : RoomDatabase() {
             utentiChatDAO.insert(utentiChat)
 
             //aggiungo chat di gruppo
-            chat=Chat(nome = "Cinema stasera?", notificaAssociata = "Notifiche multiple", imgChat = null)
+            chat=Chat(nome = "Cinema stasera?", notificaAssociata = "Notifiche multiple", imgChat = R.drawable.group)
             chatDAO.insert(chat)
             utentiChat=UtentiChat(9,u.nickname)
             utentiChatDAO.insert(utentiChat)
@@ -177,6 +177,11 @@ abstract class NotificationExpoDatabase : RoomDatabase() {
             utentiChatDAO.insert(utentiChat)
             utentiChat= UtentiChat(9, u2.nickname)
             utentiChatDAO.insert(utentiChat)
+            utentiChat= UtentiChat(9, u3.nickname)
+            utentiChatDAO.insert(utentiChat)
+            utentiChat= UtentiChat(9, u4.nickname)
+            utentiChatDAO.insert(utentiChat)
+
 
             //aggiungo un messaggio di benvenuto ad ogni chat
             var msg=Messaggio(testo = "Ciao Alberto", media = null, chat = 1, mittente = u1.nickname)
@@ -194,6 +199,8 @@ abstract class NotificationExpoDatabase : RoomDatabase() {
             msg=Messaggio(testo = "Ciao Alberto", media = null, chat = 7, mittente = u7.nickname)
             messaggioDAO.insert(msg)
             msg=Messaggio(testo = "Ciao Alberto", media = null, chat = 8, mittente = u8.nickname)
+            messaggioDAO.insert(msg)
+            msg=Messaggio(testo = "Ciao Alberto", media = null, chat = 9, mittente = u1.nickname)
             messaggioDAO.insert(msg)
         }
     }
