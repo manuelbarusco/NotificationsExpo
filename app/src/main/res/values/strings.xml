@@ -20,6 +20,15 @@
     <string name="c_descr_service">Questa è la descrizione del canale per i processi in background</string>
     <string name="c_name_custom">Custom Notification</string>
     <string name="c_descr_custom">Questa è la descrizione del canale per le Custom Notification</string>
+    <string name="e_notification_content">Seleziona una risposta rapida:</string>
+    <string name="e_notification_content_no_selection">Seleziona una risposta rapida oppure tocca ANNULLA:</string>
+    <string name="c_notication_info"> Espandi per dettagli</string>
+    <string name="text_cb_1">Ciao!</string>
+    <string name="text_cb_2">Come stai?</string>
+    <string name="text_cb_3">Sono impegnato non disturbarmi!</string>
+    <string name="text_cb_4">Sto arrivando!</string>
+    <string name="b_invia">INVIA</string>
+    <string name="b_annulla">ANNULLA</string>
 
     <string-array name="dummy_messages">
         <item>Prova invio messaggio</item>

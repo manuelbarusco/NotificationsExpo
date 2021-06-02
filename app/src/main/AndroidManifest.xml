@@ -105,6 +105,7 @@
                 <action android:name="com.android.NotificationsExpo.SHOW_NOTIFICATION"/>
             </intent-filter>
         </receiver>
+        <receiver android:name=".CustomNotificationReceiver" />
     </application>
 
 </manifest>

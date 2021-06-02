@@ -235,7 +235,7 @@ class ItemListActivity : AppCompatActivity() {
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
 
-            channel = NotificationChannel(CONVERSATION, getString(R.string.c_name_conversation), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.c_descr_conversation)}
+            channel = NotificationChannel(CONVERSATION, getString(R.string.c_name_conversation), NotificationManager.IMPORTANCE_HIGH).apply { description = getString(R.string.c_descr_conversation)}
             notificationManager.createNotificationChannel(channel)
 
             channel = NotificationChannel(EXPANDABLE, getString(R.string.c_name_expandable), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.c_descr_expandable) }
@@ -250,7 +250,7 @@ class ItemListActivity : AppCompatActivity() {
             channel = NotificationChannel(SERVICE, getString(R.string.c_name_service), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.c_descr_service) }
             notificationManager.createNotificationChannel(channel)
 
-            channel = NotificationChannel(CUSTOM, getString(R.string.c_name_custom), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.c_descr_custom) }
+            channel = NotificationChannel(CUSTOM, getString(R.string.c_name_custom), NotificationManager.IMPORTANCE_HIGH).apply { description = getString(R.string.c_descr_custom) }
             notificationManager.createNotificationChannel(channel)
 
             channel = NotificationChannel(IMG, getString(R.string.c_name_img), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.c_descr_img) }
