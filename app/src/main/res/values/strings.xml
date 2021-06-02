@@ -36,4 +36,7 @@
         <item>Prova 2</item>
         <item>Questo è un messaggio molto lungo, il quale non ci sta all\'interno di una notifica collapsed, infatti per visualizzare interamente il suo contenuto c\'è bisogno di una notifica espandibile, sul quale l\'utente può effetturare uno swipe per espanderla</item>
     </string-array>
+
+    <string name="channel_audio_notifications_name">Player service</string>
+    <string name="channel_audio_notifications_name_description">Info about songs</string>
 </resources>

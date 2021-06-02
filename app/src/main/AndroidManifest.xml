@@ -12,6 +12,30 @@
         android:name="com.android.NotificationsExpo.PRIVATE"/>
 
 
+
+    <!--
+    Since API level 28, apps wanting to use foreground services must request the
+    FOREGROUND_SERVICE permission.
+    This is a normal permission, so the system automatically grants it.
+    https://developer.android.com/about/versions/pie/android-9.0-migration#tya
+    -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!--
+    La permission FOREGROUND_SERVICE serve per indicare all'OS che terminare il processo avrebbe
+    un effetto negativo per l'utente. Va chiamato anche il metodo startForeground.
+    Permission necessaria da API level >= 28
+    -->
+
+
+    <!--Per evitare, dopo aver chiamato l'opportuno metodo, che il gestore del risparmio energetico
+    tolga la CPU e interrompa la musica-->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!--TODO serve??-->
+    <permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />
+
+
+
     <application
         android:name=".NotificationExpoApplication"
         android:allowBackup="false"
@@ -106,6 +130,27 @@
             </intent-filter>
         </receiver>
         <receiver android:name=".CustomNotificationReceiver" />
+
+
+
+
+        <!-- Il service per il player audio in background-->
+        <service
+            android:name=".PlayerService"
+            android:enabled="true"
+            android:exported="false" />
+
+
+        <!-- Per ricevere i broadcast dai pulsanti mostrati nella notifica del player audio-->
+        <receiver android:name=".AudioNotificationReceiver">
+            <intent-filter>
+                <action android:name="RESUME_ACTION"/>
+                <action android:name="STOP_ACTION"/>
+                <action android:name="CANCEL_ACTION"/>
+            </intent-filter>
+        </receiver>
+
+
     </application>
 
 </manifest>

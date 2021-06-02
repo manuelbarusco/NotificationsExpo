@@ -53,6 +53,7 @@ data class Messaggio(
         const val MESSAGE_SEND:Int  = 0
         const val MESSAGE_RECEIVED: Int = 1
         const val MESSAGE_RECEIVED_IMG: Int = 2
+        const val MESSAGE_RECEIVED_AUDIO: Int = 3
     }
 }
 

@@ -69,7 +69,7 @@ class ItemDetailFragment : Fragment() {
                 androidx.lifecycle.Observer {messaggi->
                     messaggi?.let{
                         this.messaggi=messaggi
-                        recyclerView.adapter=MessageAdapter(messaggi, chat_type)
+                        recyclerView.adapter=MessageAdapter(messaggi, chat_type, context)
                     }
                 }
         )

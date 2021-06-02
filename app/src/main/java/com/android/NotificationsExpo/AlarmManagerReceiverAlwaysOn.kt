@@ -72,6 +72,7 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
             "Notifiche multiple" -> generateMultipleMessages(context)
             "Notifica custom template" -> generateSingleMessage(context,false)
             "Notifica conversation"-> generateSingleMessage(context,false)
+            "Notifica media control" -> generateMediaControlMessage(context)
         }
 
         // Se è intervenuto prima l'altro BroadcastReceiver non mostro nemmeno la notifica
@@ -89,6 +90,7 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
             "Notifiche multiple" -> launchMultipleNotifications(context)
             "Notifica custom template" -> launchCustomNotifications(context)
             "Notifica conversation"-> launchConversationNotifications(context)
+            "Notifica media control" -> launchMediaControlNotification(context)
         }
     }
     
@@ -156,6 +158,18 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
         repository.addMessage(mex)
 
         val mittenteMessaggio= MittenteMessaggio(utenti[0], mex)
+        messagesToSend.add(mittenteMessaggio)
+    }
+
+    private fun generateMediaControlMessage(context: Context){
+        //recupero utenti della chat
+        val utenti:List<Utente> = repository.getChatUtenti(chat_id, user as String)
+
+        //genero il messaggio e lo aggiungo al database
+        val mex1= Messaggio(testo= "Audio", chat = chat_id, media = R.raw.doowackadoo , mittente = utenti[0].nickname)
+        repository.addMessage(mex1)
+
+        val mittenteMessaggio= MittenteMessaggio(utenti[0], mex1) //TODO Perchè?
         messagesToSend.add(mittenteMessaggio)
     }
 
@@ -501,6 +515,47 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
                 .build()
 
         val notificationManager: NotificationManager? = context.getSystemService()
+
+        if (notificationManager != null) {
+            notificationManager.notify(chat_id,notification)
+        }
+    }
+
+    private fun launchMediaControlNotification(context: Context){
+        val target = Intent(context, ItemDetailActivity::class.java)
+            .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+            .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+            .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+            .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+
+        target.apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+
+        val notificationManager: NotificationManager? = context.getSystemService()
+
+        val person = Person.Builder()
+            .setName(chat_name)
+            .setImportant(true)
+            .build()
+
+        val message1 = Notification.MessagingStyle.Message(messagesToSend[0].messaggio.testo,
+            System.currentTimeMillis(),
+            person)
+
+        val notification = Notification.Builder(context, ItemListActivity.MEDIA)
+            .setSmallIcon(messagesToSend[0].mittente.imgProfilo)
+            .setContentTitle(chat_name)
+            .setContentText(messagesToSend[0].messaggio.testo)
+            .setLargeIcon(BitmapFactory.decodeResource(context.resources, chat_img as Int))
+            .setStyle(Notification.MessagingStyle(person)
+                .addMessage(message1)
+            )
+            .setContentIntent(pendingIntent)
+            .build()
+
 
         if (notificationManager != null) {
             notificationManager.notify(chat_id,notification)
