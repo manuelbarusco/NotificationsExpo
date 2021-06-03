@@ -111,7 +111,7 @@ abstract class NotificationExpoDatabase : RoomDatabase() {
             n=Notifica("Notifica immagine", "Prova")
             notificaDAO.insert(n)
 
-            //inserisco una chat privata tra Alberto e altri utenti per tutte le notifiche ad eccezione delle notifiche multiple
+            //inserisco una chat privata tra Alberto e altri utenti per tutte le notifiche
             var chat=Chat(nome = null, notificaAssociata = "Notifica espandibile", imgChat = null)
             chatDAO.insert(chat)
             var utentiChat=UtentiChat(1,u.nickname)

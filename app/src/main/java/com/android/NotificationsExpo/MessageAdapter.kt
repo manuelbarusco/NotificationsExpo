@@ -16,7 +16,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
 
-class MessageAdapter(val messageList: List<Messaggio>, val chat_type: Int, val adapterContext: Context?) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
+class MessageAdapter(val messageList: List<Messaggio>, val imgChat: Int, val chat_type: Int, val adapterContext: Context?) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
 
     companion object {
         const val PRIVATE_CHAT = 0
@@ -75,7 +75,7 @@ class MessageAdapter(val messageList: List<Messaggio>, val chat_type: Int, val a
                 myAudioResource=messaggio.media as Int
 
             userName = messaggio.mittente
-            userImageResource = R.drawable.image_chat9 //TODO Al posto di questa istruzione ho bisogno di prendere l'id (Int) dell'immagine(risorsa) dell'utente che ha inviato il messaggio (es. messaggio.idImmagine). Questo valore verrà passato al Player musicale per visualizzare l'immagine dell'utente nel player (nell'onClickListerner definito sopra)
+            userImageResource = imgChat
 
         }
     }

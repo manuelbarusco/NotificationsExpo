@@ -247,7 +247,7 @@ class ItemListActivity : AppCompatActivity() {
             channel = NotificationChannel(BUBBLES, getString(R.string.c_name_bubbles), NotificationManager.IMPORTANCE_HIGH).apply { description = getString(R.string.c_descr_bubbles) }
             notificationManager.createNotificationChannel(channel)
 
-            channel = NotificationChannel(SERVICE, getString(R.string.c_name_service), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.c_descr_service) }
+            channel = NotificationChannel(SERVICE, getString(R.string.c_name_service), NotificationManager.IMPORTANCE_LOW).apply { description = getString(R.string.c_descr_service) }
             notificationManager.createNotificationChannel(channel)
 
             channel = NotificationChannel(CUSTOM, getString(R.string.c_name_custom), NotificationManager.IMPORTANCE_HIGH).apply { description = getString(R.string.c_descr_custom) }

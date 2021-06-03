@@ -46,7 +46,7 @@ class NotificationExpoRepository private constructor(context: Context) {
         executor.execute{
             result=chatDAO.getChatUtenti(chatID, utentePredefinito)
         }
-        //il thread viene eseguito ma aspetto la fine della sua esecuzione perchè ho bisogno dei suoi dati per proseguire nel receiver
+        //il thread viene eseguito ma aspetto la fine della sua esecuzione perchè ho bisogno dei suoi dati per proseguire
         try {
             executor.shutdown()
             while (!executor.awaitTermination(24L, TimeUnit.HOURS)) { }

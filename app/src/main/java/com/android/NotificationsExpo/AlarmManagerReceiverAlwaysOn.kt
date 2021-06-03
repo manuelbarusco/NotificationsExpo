@@ -8,19 +8,16 @@ import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Icon
-import android.os.Bundle
-import android.os.Message
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.getSystemService
 import com.android.NotificationsExpo.database.NotificationExpoRepository
 import com.android.NotificationsExpo.database.entities.Messaggio
 import com.android.NotificationsExpo.database.entities.Utente
-import java.util.concurrent.Executors
 import kotlin.random.Random
+
 
 // Questo BroadcastReceiver entrerà in funzione anche quando l'app non è in eseguzione in quanto viene
 // registrato direttamente nel manifest
@@ -66,13 +63,14 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
         Log.d("MyR_Tipo di notifica: ", notificationType)
 
         when(notificationType){
-            "Notifica immagine" -> generateImageMessage(context)
+            "Notifica immagine" -> generateImageMessage()
             "Notifica espandibile" -> generateSingleMessage(context, true)
             "Notifica chat bubble" -> generateSingleMessage(context, false)
             "Notifiche multiple" -> generateMultipleMessages(context)
             "Notifica custom template" -> generateSingleMessage(context,false)
             "Notifica conversation"-> generateSingleMessage(context,false)
             "Notifica media control" -> generateMediaControlMessage(context)
+            "Notifica processo in background" -> generateBackgroundMessage()
         }
 
         // Se è intervenuto prima l'altro BroadcastReceiver non mostro nemmeno la notifica
@@ -91,10 +89,11 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
             "Notifica custom template" -> launchCustomNotifications(context)
             "Notifica conversation"-> launchConversationNotifications(context)
             "Notifica media control" -> launchMediaControlNotification(context)
+            "Notifica processo in background" -> launchBackgroundProcessNotification(context)
         }
     }
     
-    private fun generateImageMessage(context: Context){
+    private fun generateImageMessage(){
         //recupero utenti della chat
         val utenti:List<Utente> = repository.getChatUtenti(chat_id, user as String)
 
@@ -173,7 +172,60 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
         messagesToSend.add(mittenteMessaggio)
     }
 
-    private fun launchImageNotification(context: Context){
+    private fun generateBackgroundMessage(){
+        //recupero utenti della chat
+        val utenti:List<Utente> = repository.getChatUtenti(chat_id, user as String)
+
+        //genero il messaggio e lo aggiungo al database
+        val mex1= Messaggio(testo= "Ti invio una foto della giornata di oggi", chat = chat_id, media = null , mittente = utenti[0].nickname)
+        repository.addMessage(mex1)
+
+        val mittenteMessaggio= MittenteMessaggio(utenti[0], mex1)
+        messagesToSend.add(mittenteMessaggio)
+    }
+
+    private fun launchBackgroundProcessNotification(context: Context, notification_id: Int = chat_id){
+
+        launchConversationNotifications(context)
+
+        val notificationManager: NotificationManager? = context.getSystemService()
+
+        val builder = NotificationCompat.Builder(context, ItemListActivity.SERVICE).apply {
+            setContentTitle("Download di una foto")
+            setContentText("Download in corso")
+            setSmallIcon(chat_img)
+        }
+        val PROGRESS_MAX = 100
+        var PROGRESS_CURRENT = 0
+
+        if(notificationManager!=null){
+            // imposto la notifica iniziale con progress bar a 0
+            builder.setProgress(PROGRESS_MAX, PROGRESS_CURRENT, false)
+            notificationManager.notify(notification_id+1, builder.build())
+            //simulo il download di un'immagine
+            Thread(Runnable {
+                while (PROGRESS_CURRENT < PROGRESS_MAX) {
+                    try {
+                        Thread.sleep(1000)
+                        PROGRESS_CURRENT+=25
+                        builder.setProgress(PROGRESS_MAX, PROGRESS_CURRENT, false)
+                        notificationManager.notify(notification_id+1, builder.build())
+                    } catch (e: InterruptedException) {
+                        e.printStackTrace()
+                    }
+                }
+                builder.setContentText("Download completato")
+                        .setProgress(0, 0, false)
+                builder.setProgress(PROGRESS_MAX, PROGRESS_CURRENT, false);
+                notificationManager.notify(notification_id+1, builder.build());
+                generateImageMessage()
+                launchImageNotification(context, notification_id+1)
+            }).start()
+        }
+
+    }
+
+    private fun launchImageNotification(context: Context, notification_id: Int = chat_id){
         val target = Intent(context, ItemDetailActivity::class.java)
                 .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
                 .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
@@ -192,19 +244,19 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
                 .setSmallIcon(messagesToSend[0].mittente.imgProfilo)
                 .setContentTitle(chat_name)
                 .setContentText(messagesToSend[0].messaggio.testo)
-                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[0].messaggio.media as Int))
+                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend.last().messaggio.media as Int))
                 .setStyle(NotificationCompat.BigPictureStyle()
-                        .bigPicture(BitmapFactory.decodeResource(context.resources, messagesToSend[0].messaggio.media as Int))
+                        .bigPicture(BitmapFactory.decodeResource(context.resources, messagesToSend.last().messaggio.media as Int))
                         .bigLargeIcon(null))
                 .setContentIntent(pendingIntent)
                 .build()
 
         if (notificationManager != null) {
-            notificationManager.notify(chat_id,notification)
+            notificationManager.notify(notification_id,notification)
         }
     }
 
-    private fun launchExpandableNotification(context: Context){
+    private fun launchExpandableNotification(context: Context, notification_id: Int = chat_id){
         val target = Intent(context, ItemDetailActivity::class.java)
                 .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
                 .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
@@ -230,14 +282,16 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
                 .build()
 
         if (notificationManager != null) {
-            notificationManager.notify(chat_id,notification)
+            notificationManager.notify(notification_id,notification)
         }
     }
 
-    private fun launchMultipleNotifications(context: Context){
+    private fun launchMultipleNotifications(context: Context, notification_id: Int = chat_id){
         //use constant ID for notification used as group summary
         val SUMMARY_ID = 0
         val GROUP_KEY_WORK_EMAIL = "com.android.NotificationExpo.MULTIPLE_MESSAGES"
+
+        //TODO aggiungere intent ad ogni notifica singola
 
         val newMessageNotification1 = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
                 .setSmallIcon(R.drawable.group)
@@ -304,16 +358,16 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
 
         if (notificationManager != null) {
             notificationManager.apply {
-                notify(chat_id, newMessageNotification1)
-                notify(chat_id+1, newMessageNotification2)
-                notify(chat_id+2, newMessageNotification3)
-                notify(chat_id+3, newMessageNotification4)
+                notify(notification_id, newMessageNotification1)
+                notify(notification_id+1, newMessageNotification2)
+                notify(notification_id+2, newMessageNotification3)
+                notify(notification_id+3, newMessageNotification4)
                 notify(SUMMARY_ID, summaryNotification)
             }
         }
     }
 
-    private fun launchBubbleNotification(context: Context){
+    private fun launchBubbleNotification(context: Context, notification_id: Int = chat_id){
 
         val target = Intent(context, ItemDetailActivity::class.java)
                 .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
@@ -338,7 +392,7 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
         * features delle conversazioni). Inoltre è consigliato (non obbligatorio) impostare anche un oggetto Person
         * che serve al S.O. per "conoscere" di più del contesto della conversazione ed utile ad es. per classificare
         * gli shortcut e per fornire suggerimenti per la condivisione.*/
-        val shortcut = ShortcutInfo.Builder(context, chat_id.toString())
+        val shortcut = ShortcutInfo.Builder(context, notification_id.toString())
                 .setLongLived(true)
                 .setIcon(Icon.createWithResource(context,chat_img))
                 .setShortLabel(chat_name as CharSequence)
@@ -357,7 +411,7 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
         * setAutoExpandBubble(true) --> bubble espansa in automatico (solo se l'app è in foreground) default = false
         * .setSuppressNotification()--> imposta se la bubble verrà pubblicato senza la notifica associata nell'area apposita default = false.*/
 
-        val bubbleData = Notification.BubbleMetadata.Builder(chat_id.toString())
+        val bubbleData = Notification.BubbleMetadata.Builder(notification_id.toString())
                 .setDesiredHeight(600)
                 .setAutoExpandBubble(false)
                 .setSuppressNotification(false)
@@ -382,18 +436,18 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
                 .setStyle(Notification.MessagingStyle(person)
                         .addMessage(message1)
                 )
-                .setShortcutId(chat_id.toString())
+                .setShortcutId(notification_id.toString())
                 .build()
 
 
         val notificationManager: NotificationManager? = context.getSystemService()
 
         if (notificationManager != null) {
-            notificationManager.notify(chat_id,notification)
+            notificationManager.notify(notification_id,notification)
         }
     }
 
-    private fun launchCustomNotifications(context: Context){
+    private fun launchCustomNotifications(context: Context, notification_id: Int = chat_id){
         //Crea una notifica custom con 2 layout 1 per la notifica stantard e l'altro per la notifica espansa
         val message = messagesToSend[0].messaggio.testo
         val notificationLayout = RemoteViews(context.packageName, R.layout.notification_collapsed)
@@ -453,13 +507,13 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
         val notificationManager: NotificationManager? = context.getSystemService()
 
         if (notificationManager != null) {
-            notificationManager.notify(chat_id,notification.build())
+            notificationManager.notify(notification_id,notification.build())
 
         }
 
     }
 
-    private fun launchConversationNotifications(context: Context){
+    private fun launchConversationNotifications(context: Context, notification_id: Int = chat_id){
         val target = Intent(context, ItemDetailActivity::class.java)
                 .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
                 .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
@@ -484,7 +538,7 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
         * features delle conversazioni). Inoltre è consigliato (non obbligatorio) impostare anche un oggetto Person
         * che serve al S.O. per "conoscere" di più del contesto della conversazione ed utile ad es. per classificare
         * gli shortcut e per fornire suggerimenti per la condivisione.*/
-        val shortcut = ShortcutInfo.Builder(context, chat_id.toString())
+        val shortcut = ShortcutInfo.Builder(context, notification_id.toString())
                 .setLongLived(true)
                 .setIcon(Icon.createWithResource(context,chat_img))
                 .setShortLabel(chat_name as CharSequence)
@@ -510,18 +564,18 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
                 .setStyle(Notification.MessagingStyle(person)
                         .addMessage(message1)
                 )
-                .setShortcutId(chat_id.toString())
+                .setShortcutId(notification_id.toString())
                 .setContentIntent(pendingIntent)
                 .build()
 
         val notificationManager: NotificationManager? = context.getSystemService()
 
         if (notificationManager != null) {
-            notificationManager.notify(chat_id,notification)
+            notificationManager.notify(notification_id,notification)
         }
     }
 
-    private fun launchMediaControlNotification(context: Context){
+    private fun launchMediaControlNotification(context: Context, notification_id: Int = chat_id){
         val target = Intent(context, ItemDetailActivity::class.java)
             .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
             .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
@@ -558,7 +612,7 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
 
 
         if (notificationManager != null) {
-            notificationManager.notify(chat_id,notification)
+            notificationManager.notify(notification_id,notification)
         }
     }
 
