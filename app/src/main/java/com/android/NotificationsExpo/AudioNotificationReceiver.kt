@@ -13,7 +13,6 @@ class AudioNotificationReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent) {
         val action = intent.action
-        Log.e("action", action as String) // TODO In caso di problemi rimuovere questa riga
         if (intent.action != null) {
             if (intent.action == RESUME_ACTION){
                 var playerIntent = Intent(context, PlayerService::class.java) // intent esplicito

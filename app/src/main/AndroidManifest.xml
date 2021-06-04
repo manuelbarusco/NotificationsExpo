@@ -143,7 +143,9 @@
 
 
         <!-- Per ricevere i broadcast dai pulsanti mostrati nella notifica del player audio-->
-        <receiver android:name=".AudioNotificationReceiver">
+        <receiver
+            android:name=".AudioNotificationReceiver"
+            android:exported="false">
             <intent-filter>
                 <action android:name="RESUME_ACTION"/>
                 <action android:name="STOP_ACTION"/>

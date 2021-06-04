@@ -172,7 +172,7 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
         val mex1= Messaggio(testo= "Audio", chat = chat_id, media = R.raw.doowackadoo , mittente = utenti[0].nickname)
         repository.addMessage(mex1)
 
-        val mittenteMessaggio= MittenteMessaggio(utenti[0], mex1) //TODO Perchè?
+        val mittenteMessaggio= MittenteMessaggio(utenti[0], mex1)
         messagesToSend.add(mittenteMessaggio)
     }
 

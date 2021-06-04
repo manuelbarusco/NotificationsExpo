@@ -29,7 +29,6 @@ class WelcomeActivity : FragmentActivity() { // TODO Mettere FragmentActivity di
     private lateinit var welcomeButtonNext : Button
     private lateinit var welcomeViewPager: ViewPager2   // Il widget ViewPager2 che gestisce le animazioni e premette lo scroll orizzonatle fra i fragment
 
-    // TODO Aggiungere i riferimenti nel file delle stringhe
 
     // TODO Nota: usando ViewPager2 viene gestita dalla classe il salvataggio dell'istanza per la transazione da portrait a landscape ma la cosa non viene scritta bene nella documentazione
 
@@ -70,7 +69,6 @@ class WelcomeActivity : FragmentActivity() { // TODO Mettere FragmentActivity di
            Ulteriore docimentazione a riguardo delle inner class anonime:
            https://kotlinlang.org/docs/nested-classes.html#anonymous-inner-classes
            https://kotlinlang.org/docs/object-declarations.html#inheriting-anonymous-objects-from-supertypes
-           TODO: Una cosa simile è stata fatta anche nell'esempio SavePersistentState fatto in classe
         */
         welcomeViewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
 

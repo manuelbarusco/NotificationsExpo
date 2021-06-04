@@ -22,8 +22,6 @@ import android.os.PowerManager
 //import android.support.v4.content.ContextCompat;
 //import android.support.v4.media.app.NotificationCompat.MediaStyle;
 
-// TODO scrivere tutto nel file delle stringhe
-
 //ATTENZIONE AL FILE GRADLE E AGLI IMPORT CORRETTI
 
 // QUESTA E' LA VERSIONE DELL'APP SENZA LE VERSIONI "COMPAT" (DI COMPATIBILITA')
@@ -213,7 +211,7 @@ class PlayerService : Service()
 
         // Specify any actions which your users can perform, such as pausing and skipping to the next track.
         // Preparo l'intent per il Broadcast receiver del pulsante di pausa
-        val audioPausePlayIntent = Intent(getApplicationContext(), AudioNotificationReceiver::class.java) //TODO Perchè getApplicationContext()?
+        val audioPausePlayIntent = Intent(getApplicationContext(), AudioNotificationReceiver::class.java)
         audioPausePlayIntent.action = AudioNotificationReceiver.RESUME_ACTION
         val audioPausePlaypendingIntent: PendingIntent = PendingIntent.getBroadcast(this, AudioNotificationReceiver.REQUEST_CODE_NOTIFICATION, audioPausePlayIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
