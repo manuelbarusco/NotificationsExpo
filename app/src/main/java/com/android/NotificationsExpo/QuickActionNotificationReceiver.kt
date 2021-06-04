@@ -6,14 +6,11 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.Icon
-import android.os.SystemClock
-import android.util.Log
-import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
-import androidx.core.graphics.drawable.IconCompat
 import com.android.NotificationsExpo.database.NotificationExpoRepository
 import com.android.NotificationsExpo.database.entities.Messaggio
 import com.android.NotificationsExpo.database.entities.Utente
+import java.util.concurrent.Executors
 import kotlin.random.Random
 
 class QuickActionNotificationReceiver: BroadcastReceiver() {
@@ -44,13 +41,21 @@ class QuickActionNotificationReceiver: BroadcastReceiver() {
         //prelevo il nome dell'utente dalle SharedPreferences
         val preferences= context.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
         user = preferences?.getString(ItemListActivity.KEY_USER,"") as String
-        updateNotification(context)
+        val executor = Executors.newSingleThreadExecutor()
+        if(size%2==0){
+            updateNotification(context,false)
+            executor.execute {
+                Thread.sleep(2000L)
+                updateNotification(context,true)
+            }
+        }
+
     }
 
     private fun getMessageText(intent: Intent): CharSequence? {
         return RemoteInput.getResultsFromIntent(intent).getCharSequence(AlarmManagerReceiverAlwaysOn.KEY_TEXT_REPLY)
     }
-    private fun updateNotification(context: Context){
+    private fun updateNotification(context: Context, answer: Boolean){
         val person = Person.Builder()
                 .setName(chatName)
                 .setIcon(Icon.createWithResource(context,chat_img))
@@ -61,7 +66,7 @@ class QuickActionNotificationReceiver: BroadcastReceiver() {
                 .build()
 
         val messagingStyle: Notification.MessagingStyle = Notification.MessagingStyle(person)
-        if(size%2==0) {
+        if(answer) {
             val t = generateMessage(context)
             messaggi.add(t)
         }
@@ -79,8 +84,10 @@ class QuickActionNotificationReceiver: BroadcastReceiver() {
 
         }
         //aggiungo nel DB messaggio che viene scritto nella notifica
-        val m = Messaggio(testo = message, chat = chat_id, media = null, mittente = user)
-        repository.addMessage(m)
+        if(!answer){
+            val m = Messaggio(testo = message, chat = chat_id, media = null, mittente = user)
+            repository.addMessage(m)
+        }
 
         val replayText: String = context.getString(R.string.reply_text)
         val remoteInput: RemoteInput = RemoteInput.Builder(AlarmManagerReceiverAlwaysOn.KEY_TEXT_REPLY)
@@ -123,7 +130,6 @@ class QuickActionNotificationReceiver: BroadcastReceiver() {
         notificationManager?.notify(chat_id,notification)
 
     }
-
     private  fun generateMessage(context: Context): String{
         val messages: Array<String> = context.getResources().getStringArray(R.array.dummy_messages)
 

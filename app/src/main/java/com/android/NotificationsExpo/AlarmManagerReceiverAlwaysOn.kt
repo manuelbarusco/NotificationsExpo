@@ -236,9 +236,6 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
                 .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                 .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
 
-        target.apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
 
         val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
 
@@ -266,10 +263,6 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
                 .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
                 .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                 .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
-
-        target.apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
 
         val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
 
@@ -335,9 +328,6 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
                 .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                 .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
 
-        target.apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
 
         val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
 
@@ -594,10 +584,6 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
             .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
             .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
             .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
-
-        target.apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
 
         val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
 
