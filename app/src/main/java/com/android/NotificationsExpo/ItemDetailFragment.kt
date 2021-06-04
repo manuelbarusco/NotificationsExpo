@@ -110,11 +110,7 @@ class ItemDetailFragment : Fragment() {
             // 2) Poichè AlarmManagerReceiver è dichiarato nel manifest con exported=false, esso
             //    riceverà solo gli intent provenienti da questa app
             // https://developer.android.com/guide/components/broadcasts#security-and-best-practices
-            /*
-            alarmManager?.set(
-                    AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                    SystemClock.elapsedRealtime() + 5 * 1000,
-                    pendingIntent2)*/
+
         }
 
         return rootView

@@ -67,6 +67,7 @@
             android:name="com.android.NotificationsExpo.ItemDetailActivity"
             android:label="@string/title_item_detail"
             android:parentActivityName="com.android.NotificationsExpo.ItemListActivity"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.MasterDetailFlow.NoActionBar">
             <!-- Serve per pulsante che torna indietro nella toolbar -->
             <meta-data
@@ -130,7 +131,7 @@
             </intent-filter>
         </receiver>
         <receiver android:name=".CustomNotificationReceiver" />
-
+        <receiver android:name=".QuickActionNotificationReceiver" />
 
 
 

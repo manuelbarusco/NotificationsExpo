@@ -29,6 +29,8 @@
     <string name="text_cb_4">Sto arrivando!</string>
     <string name="b_invia">INVIA</string>
     <string name="b_annulla">ANNULLA</string>
+    <string name="reply_text">Scrivi la tua risposta...</string>
+    <string name="reply_button_text">RISPONDI</string>
 
     <string-array name="dummy_messages">
         <item>Prova invio messaggio</item>
