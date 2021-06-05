@@ -101,6 +101,7 @@ class ItemDetailFragment : Fragment() {
             alarmIntent.putExtra(CHAT_ID,chat_id)
             alarmIntent.putExtra(CHAT_NAME,nome_chat)
             alarmIntent.putExtra(CHAT_IMG,img_chat)
+            alarmIntent.putExtra(TWO_PANE,twopane)
 
             // Genero un id da assegnare al broadcast per generare broadcast sempre diversi
             // Se non lo faccio e genero più broadcast prima dello scadere del tempo non li vedrò

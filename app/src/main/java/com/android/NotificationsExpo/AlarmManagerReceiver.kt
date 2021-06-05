@@ -27,6 +27,7 @@ class AlarmManagerReceiver: BroadcastReceiver() {
         myIntent.putExtra(ItemDetailFragment.CHAT_ID,intent.getIntExtra(ItemDetailFragment.CHAT_ID,-1))
         myIntent.putExtra(ItemDetailFragment.CHAT_NAME,intent.getStringExtra(ItemDetailFragment.CHAT_NAME))
         myIntent.putExtra(ItemDetailFragment.CHAT_IMG,intent.getIntExtra(ItemDetailFragment.CHAT_IMG,-1))
+        myIntent.putExtra(ItemDetailFragment.TWO_PANE,intent.getBooleanExtra(ItemDetailFragment.TWO_PANE,false))
 
         // Ritrasmetto (anche questa volta) il tipo di notifica associato alla chat
         context.sendOrderedBroadcast(myIntent,PERM_PRIVATE)

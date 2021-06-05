@@ -38,8 +38,8 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
     private lateinit var chat_name: String
     private var chat_img: Int=-1
     private lateinit var notificationType: String
+    private var twopane: Boolean = false
     private val messagesToSend: MutableList<MittenteMessaggio> = mutableListOf()
-
     private data class MittenteMessaggio(val mittente: Utente, val messaggio: Messaggio)
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -58,6 +58,9 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
 
         //ottengo immagine della chat
         chat_img= intent.getIntExtra(ItemDetailFragment.CHAT_IMG,-1)
+
+        //ottengo variabile twopane
+        twopane = intent.getBooleanExtra(ItemDetailFragment.TWO_PANE,true)
 
         // Devo generare uno o più messaggi sulla base del tipo di notifica associata alla chat (ad
         // esempio per una notifica conversation genererò 10 messaggi)
@@ -522,14 +525,31 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
 
     }
 
-    private fun launchConversationNotifications(context: Context, notification_id: Int = chat_id){
-        val target = Intent(context, ItemDetailActivity::class.java)
-                .putExtra(ItemDetailFragment.CHAT_ID, notification_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
-                .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
-                .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
-                .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
-                .setAction("com.android.NotificationsExpo.CONVERSATION")
-        val pendingIntent = PendingIntent.getActivity(context,0,target,PendingIntent.FLAG_CANCEL_CURRENT)
+    private fun launchConversationNotifications(context: Context, notification_id: Int = chat_id) {
+        val notificationManager: NotificationManager? = context.getSystemService()
+        val shortcutManager: ShortcutManager = context.getSystemService(AppCompatActivity.SHORTCUT_SERVICE) as ShortcutManager
+        var target: Intent
+        var pendingIntent: PendingIntent
+        /*Creo l'intent ed il PendingIntent per la notifica a seconda se sono table o smartphone*/
+        if (!twopane) {
+            target = Intent(context, ItemDetailActivity::class.java)
+                    .putExtra(ItemDetailFragment.CHAT_ID, notification_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+                    .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                    .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+                    .setAction("com.android.NotificationsExpo.CONVERSATION")
+            pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+        }
+        else{
+            target = Intent(context, ItemListActivity::class.java)
+                    .putExtra(ItemDetailFragment.CHAT_ID, notification_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+                    .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                    .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+                    .putExtra(UPDATE_FRAGMENT,true)
+                    .setAction("com.android.NotificationsExpo.CONVERSATION")
+            pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+        }
 
         /*Oggetto Person può essere riutilizzato su altre API per una migliore integrazione
         * setImortant per indicare gli utenti che interagiscono frequentemente con l'utente*/
@@ -549,7 +569,7 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
         * gli shortcut e per fornire suggerimenti per la condivisione.*/
         val shortcut = ShortcutInfo.Builder(context, notification_id.toString())
                 .setLongLived(true)
-                .setIcon(Icon.createWithResource(context,chat_img))
+                .setIcon(Icon.createWithResource(context, chat_img))
                 .setShortLabel(chat_name as CharSequence)
                 .setLongLabel(chat_name as CharSequence)
                 .setIntent(target)
@@ -558,7 +578,7 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
 
         /*pubblico lo shortcut come dinamico tramite pushDynamicShortcut che in automatico gestisce il limite
         * imposto da android degli shortcuts che si possono pubblicare e permette aggiornare uno shortcut se ha lo stesso id*/
-        val shortcutManager: ShortcutManager = context.getSystemService(AppCompatActivity.SHORTCUT_SERVICE) as ShortcutManager
+
         shortcutManager.pushDynamicShortcut(shortcut)
 
         //Secondo parametro è di tipo Long e serve per la data del messaggio nella notifica
@@ -577,11 +597,10 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
                 .setContentIntent(pendingIntent)
                 .build()
 
-        val notificationManager: NotificationManager? = context.getSystemService()
-
         if (notificationManager != null) {
             notificationManager.notify(notification_id,notification)
         }
+
     }
 
     private fun launchMediaControlNotification(context: Context, notification_id: Int = chat_id){
@@ -685,5 +704,6 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
         const val ARRAY_MESSAGES_QA = "array_messages_quick_action"
         const val MESSAGE = "message"
         const val SELECTED_CB = "selected_cb"
+        const val UPDATE_FRAGMENT = "update_fragment"
     }
 }

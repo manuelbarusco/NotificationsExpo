@@ -90,7 +90,6 @@ class ItemListActivity : AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         toolbar.title = title
-
         if (findViewById<FrameLayout>(R.id.item_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
@@ -98,6 +97,11 @@ class ItemListActivity : AppCompatActivity() {
             // activity should be in two-pane mode.
             twoPane = true
         }
+
+        if (twoPane && intent.getBooleanExtra(AlarmManagerReceiverAlwaysOn.UPDATE_FRAGMENT,false))
+            updateDetailFragment(intent, this)
+
+
     }
 
     override fun onResume() {
@@ -275,4 +279,19 @@ class ItemListActivity : AppCompatActivity() {
         }
     }
 
+    private fun updateDetailFragment(intent: Intent, parentActivity: ItemListActivity){
+        val fragment = ItemDetailFragment().apply {
+            arguments = Bundle().apply {
+                putInt(ItemDetailFragment.CHAT_ID, intent.getIntExtra(ItemDetailFragment.CHAT_ID,-1))     //passati id chat, nome chat, immagine della chat e notifica associata alla chat
+                putString(ItemDetailFragment.CHAT_NAME,intent.getStringExtra(ItemDetailFragment.CHAT_NAME))
+                putInt(ItemDetailFragment.CHAT_IMG,intent.getIntExtra(ItemDetailFragment.CHAT_IMG,-1))
+                putString(ItemDetailFragment.NOTIFICATION,intent.getStringExtra(ItemDetailFragment.NOTIFICATION))
+                putBoolean(ItemDetailFragment.TWO_PANE,twoPane)
+            }
+        }
+        parentActivity.supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.item_detail_container, fragment)
+                .commit()
+    }
 }

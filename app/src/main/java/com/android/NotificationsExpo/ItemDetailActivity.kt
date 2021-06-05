@@ -59,6 +59,7 @@ class ItemDetailActivity : AppCompatActivity() {
                     putString(ItemDetailFragment.CHAT_NAME, intent.getStringExtra(ItemDetailFragment.CHAT_NAME))
                     putInt(ItemDetailFragment.CHAT_IMG,intent.getIntExtra(ItemDetailFragment.CHAT_IMG, -1) as Int)
                     putString(ItemDetailFragment.NOTIFICATION,intent.getStringExtra(ItemDetailFragment.NOTIFICATION))
+                    putBoolean(ItemDetailFragment.TWO_PANE,intent.getBooleanExtra(ItemDetailFragment.TWO_PANE,false))
                 }
             }
 
