@@ -26,6 +26,7 @@ class CustomNotificationReceiver : BroadcastReceiver() {
     private var chat_img: Int = -1
     private lateinit var chatName: String
     private var selected : Int = -1
+    private var twopane: Boolean = true
     private lateinit var text: String
     private var time: Int = 2
 
@@ -42,6 +43,7 @@ class CustomNotificationReceiver : BroadcastReceiver() {
         chat_img = intent.getIntExtra(ItemDetailFragment.CHAT_IMG,-1)
         chatName = intent.getStringExtra(ItemDetailFragment.CHAT_NAME).toString()
         selected = intent.getIntExtra(AlarmManagerReceiverAlwaysOn.SELECTED_CB,-1)
+        twopane = intent.getBooleanExtra(ItemDetailFragment.TWO_PANE,true)
 
         when(intent.action){
             "com.android.NotificationsExpo.CB1_CLICKED"-> updateUI(1,context,true)
@@ -54,7 +56,7 @@ class CustomNotificationReceiver : BroadcastReceiver() {
                     updateUI(-1,context,false)
                 }
                 else {
-                    text = getText(selected, context)
+                    text = getText( context)
                     //aggiungo il messaggio selezionato nel DB
                     val m: Messaggio = Messaggio(testo = text, chat = chat_id, media = null, mittente = user)
                     repository.addMessage(m)
@@ -70,6 +72,7 @@ class CustomNotificationReceiver : BroadcastReceiver() {
                     alarmIntent.putExtra(ItemDetailFragment.CHAT_ID,chat_id)
                     alarmIntent.putExtra(ItemDetailFragment.CHAT_NAME,chatName)
                     alarmIntent.putExtra(ItemDetailFragment.CHAT_IMG,chat_img)
+                    alarmIntent.putExtra(ItemDetailFragment.TWO_PANE,twopane)
 
                     // Genero un id da assegnare al broadcast per generare broadcast sempre diversi
                     // Se non lo faccio e genero più broadcast prima dello scadere del tempo non li vedrò
@@ -97,7 +100,7 @@ class CustomNotificationReceiver : BroadcastReceiver() {
             }
         }
     }
-    private fun getText(pos: Int, context: Context): String{
+    private fun getText( context: Context): String{
         when(selected){
             1-> return  context.getString(R.string.text_cb_1)
             2-> return  context.getString(R.string.text_cb_2)
@@ -195,12 +198,25 @@ class CustomNotificationReceiver : BroadcastReceiver() {
         notificationLayoutExpanded.setOnClickPendingIntent(R.id.b_annulla,baPendingIntent)
 
         //Inten per tocco su notifica non espansa
-        val intent = Intent(context, ItemDetailActivity::class.java)
-                .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
-                .putExtra(ItemDetailFragment.CHAT_NAME, chatName)
-                .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
-                .putExtra(ItemDetailFragment.NOTIFICATION, "Notifica custom template")
-        val pendingIntent = PendingIntent.getActivity(context,0,intent,PendingIntent.FLAG_CANCEL_CURRENT)
+        var target: Intent
+        var pendingIntent: PendingIntent
+        if(!twopane) {
+            target = Intent(context, ItemDetailActivity::class.java)
+                    .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    .putExtra(ItemDetailFragment.CHAT_NAME, chatName)
+                    .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                    .putExtra(ItemDetailFragment.NOTIFICATION, "Notifica custom template")
+            pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+        }
+        else{
+            target = Intent(context, ItemListActivity::class.java)
+                    .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    .putExtra(ItemDetailFragment.CHAT_NAME, chatName)
+                    .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                    .putExtra(ItemDetailFragment.NOTIFICATION, "Notifica custom template")
+                    .putExtra(AlarmManagerReceiverAlwaysOn.UPDATE_FRAGMENT,true)
+            pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+        }
 
         val notification = NotificationCompat.Builder(context, ItemListActivity.CUSTOM)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)  //TODO: mettere icona migliore

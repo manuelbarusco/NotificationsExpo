@@ -239,14 +239,26 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
     }
 
     private fun launchImageNotification(context: Context, notification_id: Int = chat_id){
-        val target = Intent(context, ItemDetailActivity::class.java)
-                .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
-                .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
-                .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
-                .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+        var target: Intent
+        var pendingIntent: PendingIntent
+        if(!twopane) {
+            target = Intent(context, ItemDetailActivity::class.java)
+                    .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+                    .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                    .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
 
-
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+            pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+        }
+        else{
+            target = Intent(context, ItemListActivity::class.java)
+                    .putExtra(ItemDetailFragment.CHAT_ID, notification_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+                    .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                    .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+                    .putExtra(UPDATE_FRAGMENT,true)
+            pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+        }
 
         val notificationManager: NotificationManager? = context.getSystemService()
 
@@ -267,13 +279,26 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
     }
 
     private fun launchExpandableNotification(context: Context, notification_id: Int = chat_id){
-        val target = Intent(context, ItemDetailActivity::class.java)
-                .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
-                .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
-                .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
-                .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+        var target: Intent
+        var pendingIntent: PendingIntent
+        if(!twopane) {
+            target = Intent(context, ItemDetailActivity::class.java)
+                    .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+                    .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                    .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
 
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+            pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+        }
+        else{
+            target = Intent(context, ItemListActivity::class.java)
+                    .putExtra(ItemDetailFragment.CHAT_ID, notification_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+                    .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                    .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+                    .putExtra(UPDATE_FRAGMENT,true)
+            pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+        }
 
         val notificationManager: NotificationManager? = context.getSystemService()
 
@@ -287,9 +312,7 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
                 .setContentIntent(pendingIntent)
                 .build()
 
-        if (notificationManager != null) {
-            notificationManager.notify(notification_id,notification)
-        }
+        notificationManager?.notify(notification_id,notification)
     }
 
     private fun launchMultipleNotifications(context: Context, notification_id: Int = chat_id){
@@ -297,7 +320,7 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
         val SUMMARY_ID = 0
         val GROUP_KEY_WORK_EMAIL = "com.android.NotificationExpo.MULTIPLE_MESSAGES"
 
-        //TODO aggiungere intent ad ogni notifica singola
+        //TODO aggiungere intent ad ogni notifica singola quindi impostare questi intent per smartphone e tablet
 
         val newMessageNotification1 = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
                 .setSmallIcon(R.drawable.group)
@@ -331,14 +354,26 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
                 .setGroup(GROUP_KEY_WORK_EMAIL)
                 .build()
 
-        val target = Intent(context, ItemDetailActivity::class.java)
-                .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
-                .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
-                .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
-                .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+        var target: Intent
+        var pendingIntent: PendingIntent
+        if(!twopane) {
+            target = Intent(context, ItemDetailActivity::class.java)
+                    .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+                    .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                    .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
 
-
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+            pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+        }
+        else{
+            target = Intent(context, ItemListActivity::class.java)
+                    .putExtra(ItemDetailFragment.CHAT_ID, notification_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+                    .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                    .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+                    .putExtra(UPDATE_FRAGMENT,true)
+            pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+        }
 
         val summaryNotification = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
                 .setContentTitle(chat_name)
@@ -371,7 +406,6 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
     }
 
     private fun launchBubbleNotification(context: Context, notification_id: Int = chat_id){
-
         val target = Intent(context, ItemDetailActivity::class.java)
                 .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
                 .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
@@ -500,12 +534,26 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
         notificationLayoutExpanded.setOnClickPendingIntent(R.id.b_annulla,baPendingIntent)
 
         //Inten per tocco su notifica non espansa
-        val intent = Intent(context, ItemDetailActivity::class.java)
-                .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
-                .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
-                .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
-                .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
-        val pendingIntent = PendingIntent.getActivity(context,0,intent,PendingIntent.FLAG_CANCEL_CURRENT)
+        var target: Intent
+        var pendingIntent: PendingIntent
+        if(!twopane) {
+            target = Intent(context, ItemDetailActivity::class.java)
+                    .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+                    .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                    .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+            pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+        }
+        else{
+            target = Intent(context, ItemListActivity::class.java)
+                    .putExtra(ItemDetailFragment.CHAT_ID, notification_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+                    .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                    .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+                    .putExtra(UPDATE_FRAGMENT,true)
+                    .setAction("com.android.NotificationsExpo.CONVERSATION")
+            pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+        }
 
         val notification = NotificationCompat.Builder(context, ItemListActivity.CUSTOM)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)  //TODO: mettere icona migliore
@@ -604,13 +652,26 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
     }
 
     private fun launchMediaControlNotification(context: Context, notification_id: Int = chat_id){
-        val target = Intent(context, ItemDetailActivity::class.java)
-            .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
-            .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
-            .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
-            .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+        var target: Intent
+        var pendingIntent: PendingIntent
+        if(!twopane) {
+            target = Intent(context, ItemDetailActivity::class.java)
+                    .putExtra(ItemDetailFragment.CHAT_ID, chat_id)
+                    .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+                    .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                    .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
 
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+            pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+        }
+        else{
+            target = Intent(context, ItemListActivity::class.java)
+                    .putExtra(ItemDetailFragment.CHAT_ID, notification_id)
+                    .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+                    .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                    .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+                    .putExtra(UPDATE_FRAGMENT,true)
+            pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+        }
 
         val notificationManager: NotificationManager? = context.getSystemService()
 
@@ -627,17 +688,14 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
             .setSmallIcon(messagesToSend[0].mittente.imgProfilo)
             .setContentTitle(chat_name)
             .setContentText(messagesToSend[0].messaggio.testo)
-            .setLargeIcon(BitmapFactory.decodeResource(context.resources, chat_img as Int))
+            .setLargeIcon(BitmapFactory.decodeResource(context.resources, chat_img))
             .setStyle(Notification.MessagingStyle(person)
                 .addMessage(message1)
             )
             .setContentIntent(pendingIntent)
             .build()
 
-
-        if (notificationManager != null) {
-            notificationManager.notify(notification_id,notification)
-        }
+        notificationManager?.notify(notification_id,notification)
     }
 
     private fun launchQuickActionsNotification(context: Context, notification_id: Int = chat_id){
@@ -654,16 +712,30 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
                 .putExtra(ItemDetailFragment.CHAT_ID, notification_id)
                 .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
                 .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                .putExtra(ItemDetailFragment.TWO_PANE,twopane)  //per diversi intent per smartphone e tablet
         val replyPendingIntent = PendingIntent.getBroadcast(context,0,replyIntent,PendingIntent.FLAG_UPDATE_CURRENT)
 
         //intent per tocco su notifica
-        val target = Intent(context, ItemDetailActivity::class.java)
-                .putExtra(ItemDetailFragment.CHAT_ID, notification_id)
-                .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
-                .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
-                .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+        var target: Intent
+        var pendingIntent: PendingIntent
+        if(!twopane) {
+            target = Intent(context, ItemDetailActivity::class.java)
+                    .putExtra(ItemDetailFragment.CHAT_ID, notification_id)
+                    .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+                    .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                    .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
 
-        val contentIntent = PendingIntent.getActivity(context,0,target,PendingIntent.FLAG_CANCEL_CURRENT)
+            pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+        }
+        else{
+            target = Intent(context, ItemListActivity::class.java)
+                    .putExtra(ItemDetailFragment.CHAT_ID, notification_id)
+                    .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+                    .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                    .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+                    .putExtra(UPDATE_FRAGMENT,true)
+            pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+        }
 
         val action: Notification.Action=
                 Notification.Action.Builder(Icon.createWithResource(context,chat_img),context.getString(R.string.reply_button_text),replyPendingIntent)
@@ -686,7 +758,7 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
                 .setSmallIcon(R.drawable.ic_launcher_foreground) //TODO: mettere immagine migliore
                 .setStyle(messagingStyle.addMessage(message))
                 .addAction(action)
-                .setContentIntent(contentIntent)
+                .setContentIntent(pendingIntent)
                 .setCategory(Notification.CATEGORY_MESSAGE)
                 .setColor(Color.GREEN)
                 .setAutoCancel(true)
