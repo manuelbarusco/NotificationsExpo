@@ -149,15 +149,21 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
     private fun generateSingleMessage(context: Context, long: Boolean){
         //recupero i messaggi "standard" e ne sceglo uno a caso se il messaggio è corto, altrimenti quello lungo se il messaggio comparirà in una notifica espandibile
         val messages: Array<String> = context.getResources().getStringArray(R.array.dummy_messages)
-        var iM=3 //TODO scegliere il messaggio lungo
-        if(!long)
-            iM = Random.nextInt(0, messages.size - 1)
+        val longMessages: Array<String> = context.getResources().getStringArray(R.array.long_dummy_messages)
+
+        val iM = if(long)
+            (longMessages.indices).random()
+        else
+            (messages.indices).random()
 
         //recupero utenti della chat
         val utenti:List<Utente> = repository.getChatUtenti(chat_id, user as String)
 
         //genero il messaggio e lo aggiungo al database
-        val mex= Messaggio(testo= messages[iM], chat = chat_id, media = null, mittente = utenti[0].nickname)
+        val mex = if(long)
+            Messaggio(testo= longMessages[iM], chat = chat_id, media = null, mittente = utenti[0].nickname)
+        else
+            Messaggio(testo= messages[iM], chat = chat_id, media = null, mittente = utenti[0].nickname)
         repository.addMessage(mex)
 
         val mittenteMessaggio= MittenteMessaggio(utenti[0], mex)

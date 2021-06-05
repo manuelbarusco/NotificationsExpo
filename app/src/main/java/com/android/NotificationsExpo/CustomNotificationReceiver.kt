@@ -27,6 +27,7 @@ class CustomNotificationReceiver : BroadcastReceiver() {
     private lateinit var chatName: String
     private var selected : Int = -1
     private lateinit var text: String
+    private var time: Int = 2
 
     override fun onReceive(context: Context, intent: Intent) {
         repository = NotificationExpoRepository.get(context)
@@ -34,7 +35,8 @@ class CustomNotificationReceiver : BroadcastReceiver() {
 
         //prelevo il nome dell'utente dalle SharedPreferences
         val preferences= context.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
-        user=preferences?.getString(ItemListActivity.KEY_USER,"") as String
+        user = preferences?.getString(ItemListActivity.KEY_USER,"") as String
+        time = preferences.getInt(SettingsActivity.SECONDS,2)
         message = intent.getStringExtra(AlarmManagerReceiverAlwaysOn.MESSAGE).toString()
         chat_id = intent.getIntExtra(ItemDetailFragment.CHAT_ID,-1)
         chat_img = intent.getIntExtra(ItemDetailFragment.CHAT_IMG,-1)
@@ -76,9 +78,10 @@ class CustomNotificationReceiver : BroadcastReceiver() {
 
                     // Nota: Sostituito con alarmManager?.set con alarmManager?.setExact per avere più precisione
                     // https://developer.android.com/reference/android/app/AlarmManager
+                    Log.d("seconds", time.toString())
                     alarmManager?.setExact(
                             AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                            SystemClock.elapsedRealtime() + 2 * 1000,
+                            SystemClock.elapsedRealtime() + time * 1000,
                             pendingIntent)
 
                     // Note sulla sicurezza:

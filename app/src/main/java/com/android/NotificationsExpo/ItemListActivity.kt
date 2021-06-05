@@ -217,7 +217,8 @@ class ItemListActivity : AppCompatActivity() {
                 true
             }
             R.id.credits -> {
-                //TODO Aggiungere codice per activity credits
+                val intent = Intent(this,CreditsActivity::class.java)
+                startActivity(intent)
                 true
             }
             else -> super.onOptionsItemSelected(item)

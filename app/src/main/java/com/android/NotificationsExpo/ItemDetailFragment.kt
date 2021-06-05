@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
@@ -34,11 +35,14 @@ class ItemDetailFragment : Fragment() {
     private lateinit var repository: NotificationExpoRepository
     private lateinit var messaggi: MutableList<Messaggio>
     private lateinit var recyclerView: RecyclerView
+    private var time: Int = 2
+    private var preferences: SharedPreferences? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val preferences= activity?.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
-        user=preferences?.getString(ItemListActivity.KEY_USER,"") as String
+        preferences = activity?.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+        user = preferences?.getString(ItemListActivity.KEY_USER,"") as String
+
         arguments?.let {
             if (it.containsKey(CHAT_ID))
                 chat_id=it.getInt(CHAT_ID)
@@ -100,9 +104,11 @@ class ItemDetailFragment : Fragment() {
 
             // Nota: Sostituito con alarmManager?.set con alarmManager?.setExact per avere più precisione
             // https://developer.android.com/reference/android/app/AlarmManager
+            time = preferences?.getInt(SettingsActivity.SECONDS,2) as Int
+            Log.d("seconds", time.toString())
             alarmManager?.setExact(
                     AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                    SystemClock.elapsedRealtime() + 2 * 1000,
+                    SystemClock.elapsedRealtime() + time * 1000,
                     pendingIntent)
 
             // Note sulla sicurezza:

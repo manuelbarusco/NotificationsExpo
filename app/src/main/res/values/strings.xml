@@ -31,14 +31,44 @@
     <string name="b_annulla">ANNULLA</string>
     <string name="reply_text">Scrivi la tua risposta...</string>
     <string name="reply_button_text">RISPONDI</string>
+    <string name="settings_text_seconds">Cambia i secondi di attesa per la risposta automatica</string>
+    <string name="settings_text_1">Cambia la modalità con cui l\'app mostra le notifiche</string>
+    <string name="settings_button_1">Vai alle impostazioni di sitema</string>
+    <string name="settings_text_2">Elimina i dati di questa app</string>
+    <string name="settings_button_2">Elimina i dati di questa app</string>
+    <string name="settings_alert_dialog_title">Conferma azione</string>
+    <string name="settings_alert_dialog_message">Sei veramente sicuro di voler eliminare tutti i dati dell\'app?
+
+L\'operazione è irreversibile
+    </string>
+    <string name="settings_alert_dialog_button">Conferma</string>
+    <string name="settings_alert_dialog_button2">Annulla</string>
+    <string name="credits_title">NotificationExpo (v. 1.0)</string>
+    <string name="credits_text1">BARUSCO MANUEL</string>
+    <string name="credits_text2">DA RE ALBERTO</string>
+    <string name="credits_text3">GREGORI SIMONE</string>
 
     <string-array name="dummy_messages">
-        <item>Prova invio messaggio</item>
-        <item>Prova 1</item>
-        <item>Prova 2</item>
-        <item>Questo è un messaggio molto lungo, il quale non ci sta all\'interno di una notifica collapsed, infatti per visualizzare interamente il suo contenuto c\'è bisogno di una notifica espandibile, sul quale l\'utente può effetturare uno swipe per espanderla</item>
+        <item>Ciao</item>
+        <item>Ok</item>
+        <item>Come stai?</item>
+        <item>😁</item>
+        <item>😂</item>
+        <item>👍</item>
+        <item>Scrivimi un messaggio così ti rispondo</item>
+        <item>Scrivimi qualcosa</item>
+        <item>Buongiorno</item>
+        <item>Sto aspettando che tu mi scriva qualcosa ...</item>
+        <item>Va bene</item>
+        <item>Grazie!</item>
+        <item>A presto!</item>
+        <item>Cosa stai facendo?</item>
+        <item>Buongiorno</item>
     </string-array>
 
+    <string-array name="long_dummy_messages">
+        <item>Questo è un messaggio molto lungo, il quale non ci sta all\'interno di una notifica collapsed, infatti per visualizzare interamente il suo contenuto c\'è bisogno di una notifica espandibile, sul quale l\'utente può effetturare uno swipe per espanderla</item>
+    </string-array>
     <string name="channel_audio_notifications_name">Player service</string>
     <string name="channel_audio_notifications_name_description">Info about songs</string>
 </resources>
