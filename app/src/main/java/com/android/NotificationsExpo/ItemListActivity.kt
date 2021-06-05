@@ -75,14 +75,18 @@ class ItemListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //TODO: Controllare se quando canali esistono già vengono ricreati
+
+        //creo i canali di notifica che serviranno all'applicazione
         createNotificationChannels()
+
+        //imposto l'utente dell'app, in questo caso è Alberto in maniera predefinita
         val preferences= getSharedPreferences("Preferences", Context.MODE_PRIVATE)
         preferences.edit().putString(KEY_USER, "Alberto").apply()
-        NotificationExpoRepository.initialize(this)
-        /*val images_id: Int = resources.getIdentifier("image_chat1","drawable", "com.ebookfrenzy.masterdetailflow")
-        Log.d("Debug","id immagine: $images_id invece di ${R.drawable.image_chat1}")*/
-        setContentView(R.layout.activity_item_list)
 
+        //inizializzo la repository dell'app
+        NotificationExpoRepository.initialize(this)
+
+        setContentView(R.layout.activity_item_list)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         toolbar.title = title
@@ -98,8 +102,13 @@ class ItemListActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        //ottengo una reference alla repository
         repository= NotificationExpoRepository.get(this)
+
         val preferences= getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+
+        //ottengo la lista delle chat per l'utente impostato
         repository.getChat(preferences.getString(KEY_USER,"") as String).observe(
                 this,
                 Observer {chat->
@@ -108,85 +117,18 @@ class ItemListActivity : AppCompatActivity() {
                     }
                 }
         )
-        Log.i("Prova", "Lanciato")
+
         // Abilito il BroadcastReceiver a runtime
         val filter = IntentFilter(AlarmManagerReceiver.ACTION_SHOW_NOTIFICATION)
         this.registerReceiver(onShowNotification, filter, AlarmManagerReceiver.PERM_PRIVATE, null)
     }
 
+    //funzione che aggiorna la lista delle chat non appena la query al database è finita e i LiveData associati sono stati aggiornati
     private fun updateUI(chat: List<ChatDAO.ChatUtente>){
         val recyclerView:RecyclerView= findViewById(R.id.item_list)
-        recyclerView.adapter = SimpleItemRecyclerViewAdapter(this, chat, twoPane)
+        recyclerView.adapter = ChatAdapter(this, chat, twoPane)
     }
 
-
-    //classe adapter per la recycler view
-    class SimpleItemRecyclerViewAdapter(private val parentActivity: ItemListActivity,
-                                        private val values: List<ChatDAO.ChatUtente>,
-                                        private val twoPane: Boolean) :
-            RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>() {
-
-        private val onClickListener: View.OnClickListener
-        //click listener per l'elemento della lista
-        init {
-            onClickListener = View.OnClickListener { v ->
-                val item = v.tag as ChatDAO.ChatUtente
-                if (twoPane) {
-                    val fragment = ItemDetailFragment().apply {
-                        arguments = Bundle().apply {
-                            putInt(ItemDetailFragment.CHAT_ID, item.idChat)     //passati id chat, nome chat, immagine della chat e notifica associata alla chat
-                            putString(ItemDetailFragment.CHAT_NAME,item.nomeChat)
-                            putInt(ItemDetailFragment.CHAT_IMG,item.imgChat)
-                            putString(ItemDetailFragment.NOTIFICATION,item.notificaAssociata)
-                        }
-                    }
-                    parentActivity.supportFragmentManager
-                            .beginTransaction()
-                            .replace(R.id.item_detail_container, fragment)
-                            .commit()
-                } else {
-                    val intent = Intent(v.context, ItemDetailActivity::class.java).apply {
-                        putExtra(ItemDetailFragment.CHAT_ID, item.idChat)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
-                        putExtra(ItemDetailFragment.CHAT_NAME,item.nomeChat)
-                        putExtra(ItemDetailFragment.CHAT_IMG,item.imgChat)
-                        putExtra(ItemDetailFragment.NOTIFICATION,item.notificaAssociata)
-                    }
-                    v.context.startActivity(intent)
-                }
-            }
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_list_content, parent, false)
-            return ViewHolder(view)
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val item = values[position]
-            holder.image.setImageResource(item.imgChat)
-            holder.name.text=item.nomeChat
-            holder.notification.text = item.notificaAssociata
-            val dateFormat: DateFormat = SimpleDateFormat("hh:mm")
-            val strDate: String = dateFormat.format(item.lastMessageDateTime)
-            holder.time.text = strDate
-
-            with(holder.itemView) {
-                tag = item
-                //imposto il listener scritto sopra
-                setOnClickListener(onClickListener)
-            }
-        }
-
-        override fun getItemCount() = values.size
-
-        inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            val name: TextView = view.findViewById(R.id.name)
-            val notification: TextView = view.findViewById(R.id.notication)
-            val time: TextView = view.findViewById(R.id.chat_time)
-            val image: ImageView = view.findViewById(R.id.image)
-        }
-    }
 
     override fun onPause() {
         // Disabilito il BroadcastReceiver a runtime
@@ -256,6 +198,80 @@ class ItemListActivity : AppCompatActivity() {
 
             channel = NotificationChannel(IMG, getString(R.string.c_name_img), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.c_descr_img) }
             notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    //classe adapter per la recycler view delle chat presente
+    class ChatAdapter(private val parentActivity: ItemListActivity,
+                      private val values: List<ChatDAO.ChatUtente>,
+                      private val twoPane: Boolean) : RecyclerView.Adapter<ChatAdapter.ChatViewHolder>() {
+
+        private val onClickListener: View.OnClickListener
+
+        //click listener per l'elemento della lista delle chat
+        init {
+            onClickListener = View.OnClickListener { v ->
+                val item = v.tag as ChatDAO.ChatUtente
+
+                if (twoPane) {
+
+                    val fragment = ItemDetailFragment().apply {
+                        //passati id chat, nome chat, immagine della chat, notifica associata alla chat e indicazione sul device (tablet o smartphone)
+                        arguments = Bundle().apply {
+                            putBoolean(ItemDetailFragment.TWO_PANE, twoPane)
+                            putInt(ItemDetailFragment.CHAT_ID, item.idChat)
+                            putString(ItemDetailFragment.CHAT_NAME,item.nomeChat)
+                            putInt(ItemDetailFragment.CHAT_IMG,item.imgChat)
+                            putString(ItemDetailFragment.NOTIFICATION,item.notificaAssociata)
+                        }
+                    }
+                    parentActivity.supportFragmentManager
+                            .beginTransaction()
+                            .replace(R.id.item_detail_container, fragment)
+                            .commit()
+                } else {
+                    //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    val intent = Intent(v.context, ItemDetailActivity::class.java).apply {
+                        putExtra(ItemDetailFragment.CHAT_ID, item.idChat)
+                        putExtra(ItemDetailFragment.CHAT_NAME,item.nomeChat)
+                        putExtra(ItemDetailFragment.CHAT_IMG,item.imgChat)
+                        putExtra(ItemDetailFragment.NOTIFICATION,item.notificaAssociata)
+                    }
+                    v.context.startActivity(intent)
+                }
+            }
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder {
+            val view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.item_list_content, parent, false)
+            return ChatViewHolder(view)
+        }
+
+        //funzione che "compila" il view holder appena creato
+        override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
+            val item = values[position]
+            holder.image.setImageResource(item.imgChat)
+            holder.name.text=item.nomeChat
+            holder.notification.text = item.notificaAssociata
+            val dateFormat: DateFormat = SimpleDateFormat("hh:mm")
+            val strDate: String = dateFormat.format(item.lastMessageDateTime)
+            holder.time.text = strDate
+
+            with(holder.itemView) {
+                tag = item
+                //imposto il listener scritto sopra
+                setOnClickListener(onClickListener)
+            }
+        }
+
+        override fun getItemCount() = values.size
+
+        inner class ChatViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            val name: TextView = view.findViewById(R.id.name)
+            val notification: TextView = view.findViewById(R.id.notication)
+            val time: TextView = view.findViewById(R.id.chat_time)
+            val image: ImageView = view.findViewById(R.id.image)
         }
     }
 

@@ -14,6 +14,8 @@ import com.android.NotificationsExpo.database.entities.Messaggio
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.*
 
 class MessageAdapter(val messageList: List<Messaggio>, val imgChat: Int, val chat_type: Int, val adapterContext: Context?) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
@@ -65,7 +67,10 @@ class MessageAdapter(val messageList: List<Messaggio>, val imgChat: Int, val cha
 
         fun bind(messaggio: Messaggio) {
             messageText.text = messaggio.testo
-            messageDate.text = messaggio.dateTime.toString()
+
+            val dateFormat: DateFormat = SimpleDateFormat("hh:mm", Locale.ITALY)
+            val strDate: String = dateFormat.format(messaggio.dateTime)
+            messageDate.text = strDate
             if (messageSender != null){
                 (messageSender as TextView).text= messaggio.mittente
             }

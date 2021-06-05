@@ -205,20 +205,20 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
             setContentText("Download in corso")
             setSmallIcon(chat_img)
         }
-        val PROGRESS_MAX = 100
-        var PROGRESS_CURRENT = 0
+        val progressMax = 100
+        var progressCurrent = 0
 
         if(notificationManager!=null){
             // imposto la notifica iniziale con progress bar a 0
-            builder.setProgress(PROGRESS_MAX, PROGRESS_CURRENT, false)
+            builder.setProgress(progressMax, progressCurrent, false)
             notificationManager.notify(notification_id+1, builder.build())
             //simulo il download di un'immagine
             Thread(Runnable {
-                while (PROGRESS_CURRENT < PROGRESS_MAX) {
+                while (progressCurrent < progressMax) {
                     try {
                         Thread.sleep(1000)
-                        PROGRESS_CURRENT+=25
-                        builder.setProgress(PROGRESS_MAX, PROGRESS_CURRENT, false)
+                        progressCurrent+=10
+                        builder.setProgress(progressMax, progressCurrent, false)
                         notificationManager.notify(notification_id+1, builder.build())
                     } catch (e: InterruptedException) {
                         e.printStackTrace()
@@ -226,7 +226,7 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
                 }
                 builder.setContentText("Download completato")
                         .setProgress(0, 0, false)
-                builder.setProgress(PROGRESS_MAX, PROGRESS_CURRENT, false);
+                builder.setProgress(progressMax, progressCurrent, false);
                 notificationManager.notify(notification_id+1, builder.build());
                 generateImageMessage()
                 launchImageNotification(context, notification_id+1)

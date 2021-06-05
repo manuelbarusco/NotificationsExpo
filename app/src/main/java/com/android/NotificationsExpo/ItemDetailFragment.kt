@@ -11,10 +11,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
+import androidx.appcompat.widget.Toolbar;
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.android.NotificationsExpo.database.NotificationExpoRepository
@@ -27,6 +25,7 @@ import com.android.NotificationsExpo.database.entities.Messaggio
  * on handsets.
  */
 class ItemDetailFragment : Fragment() {
+    private var twopane: Boolean = true
     private var chat_id:Int= -1
     private var nome_chat:String?=null
     private var img_chat:Int=-1
@@ -52,11 +51,17 @@ class ItemDetailFragment : Fragment() {
                 img_chat=it.getInt(CHAT_IMG)
             if(it.containsKey(NOTIFICATION))
                 notifica_chat=it.getString(NOTIFICATION)
+            if(it.containsKey((TWO_PANE)))
+                twopane=it.getBoolean(TWO_PANE)
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.chat_detail, container, false)
+        if(twopane) {
+            val toolbar: Toolbar=rootView.findViewById(R.id.toolbar_chat)
+            toolbar.visibility=Toolbar.GONE
+        }
         val chat_name_view:TextView=rootView.findViewById(R.id.chat_name)
         val chat_img_view:ImageView=rootView.findViewById(R.id.chat_image)
         chat_name_view.text=nome_chat
@@ -131,5 +136,6 @@ class ItemDetailFragment : Fragment() {
         const val CHAT_NAME= "Nome_chat"
         const val CHAT_IMG= "Img_chat"
         const val NOTIFICATION= "Notification_chat"
+        const val TWO_PANE= "TwoPane"
     }
 }

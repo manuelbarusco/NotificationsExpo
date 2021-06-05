@@ -67,8 +67,8 @@ abstract class NotificationExpoDatabase : RoomDatabase() {
             }
         }
 
+        //funzione per il popolamento iniziale del database
         private fun populateDatabase(userDAO: UtenteDAO, chatDAO: ChatDAO, notificaDAO: NotificaDAO, messaggioDAO: MessaggioDAO, utentiChatDAO: UtentiChatDAO) {
-            //popolamento iniziale del DB
 
             //inserisco i vari utenti di default dell'app
             val u=Utente("Alberto", "Alberto", "Da Re", R.drawable.image_chat8) //utente predefinito
@@ -89,6 +89,10 @@ abstract class NotificationExpoDatabase : RoomDatabase() {
             userDAO.insert(u7)
             val u8=Utente("Francesco", "Bianchi", "Francesco", R.drawable.image_chat7)
             userDAO.insert(u8)
+            val u9=Utente("Francesca", "Ferrari", "Francesca", R.drawable.image_chat6)
+            userDAO.insert(u9)
+            val u10=Utente("Luca", "Sainz", "Luca", R.drawable.image_chat8)
+            userDAO.insert(u10)
 
 
             //inserisco i vari tipi di notifica individuati @TODO aggiornare le descrizioni delle notifiche
@@ -111,7 +115,7 @@ abstract class NotificationExpoDatabase : RoomDatabase() {
             n=Notifica("Notifica immagine", "Prova")
             notificaDAO.insert(n)
 
-            //inserisco una chat privata tra Alberto e altri utenti per tutte le notifiche
+            //inserisco una chat privata tra Alberto e altri utenti per tutte le notifiche (le chat bubble hanno in totale 3 chat per verificarne il pieno funzionamento)
             var chat=Chat(nome = null, notificaAssociata = "Notifica espandibile", imgChat = null)
             chatDAO.insert(chat)
             var utentiChat=UtentiChat(1,u.nickname)
@@ -133,53 +137,67 @@ abstract class NotificationExpoDatabase : RoomDatabase() {
             utentiChat= UtentiChat(3, u3.nickname)
             utentiChatDAO.insert(utentiChat)
 
-            chat=Chat(nome = null, notificaAssociata = "Notifica quick actions", imgChat = null)
+            chat=Chat(nome = null, notificaAssociata = "Notifica chat bubble", imgChat = null)
             chatDAO.insert(chat)
             utentiChat=UtentiChat(4,u.nickname)
             utentiChatDAO.insert(utentiChat)
-            utentiChat= UtentiChat(4, u4.nickname)
+            utentiChat= UtentiChat(4, u9.nickname)
+            utentiChatDAO.insert(utentiChat)
+
+            chat=Chat(nome = null, notificaAssociata = "Notifica chat bubble", imgChat = null)
+            chatDAO.insert(chat)
+            utentiChat=UtentiChat(5,u.nickname)
+            utentiChatDAO.insert(utentiChat)
+            utentiChat= UtentiChat(5, u10.nickname)
+            utentiChatDAO.insert(utentiChat)
+
+            chat=Chat(nome = null, notificaAssociata = "Notifica quick actions", imgChat = null)
+            chatDAO.insert(chat)
+            utentiChat=UtentiChat(6,u.nickname)
+            utentiChatDAO.insert(utentiChat)
+            utentiChat= UtentiChat(6, u4.nickname)
             utentiChatDAO.insert(utentiChat)
 
             chat=Chat(nome = null, notificaAssociata = "Notifica media control", imgChat = null)
             chatDAO.insert(chat)
-            utentiChat=UtentiChat(5,u.nickname)
+            utentiChat=UtentiChat(7,u.nickname)
             utentiChatDAO.insert(utentiChat)
-            utentiChat= UtentiChat(5, u5.nickname)
+            utentiChat= UtentiChat(7, u5.nickname)
             utentiChatDAO.insert(utentiChat)
 
             chat=Chat(nome = null, notificaAssociata = "Notifica processo in background", imgChat = null)
             chatDAO.insert(chat)
-            utentiChat=UtentiChat(6,u.nickname)
+            utentiChat=UtentiChat(8,u.nickname)
             utentiChatDAO.insert(utentiChat)
-            utentiChat= UtentiChat(6, u6.nickname)
+            utentiChat= UtentiChat(8, u6.nickname)
             utentiChatDAO.insert(utentiChat)
 
             chat=Chat(nome = null, notificaAssociata = "Notifica custom template", imgChat = null)
             chatDAO.insert(chat)
-            utentiChat=UtentiChat(7,u.nickname)
+            utentiChat=UtentiChat(9,u.nickname)
             utentiChatDAO.insert(utentiChat)
-            utentiChat= UtentiChat(7, u7.nickname)
+            utentiChat= UtentiChat(9, u7.nickname)
             utentiChatDAO.insert(utentiChat)
 
             chat=Chat(nome = null, notificaAssociata = "Notifica immagine", imgChat = null)
             chatDAO.insert(chat)
-            utentiChat=UtentiChat(8,u.nickname)
+            utentiChat=UtentiChat(10,u.nickname)
             utentiChatDAO.insert(utentiChat)
-            utentiChat= UtentiChat(8, u8.nickname)
+            utentiChat= UtentiChat(10, u8.nickname)
             utentiChatDAO.insert(utentiChat)
 
             //aggiungo chat di gruppo
             chat=Chat(nome = "Cinema stasera?", notificaAssociata = "Notifiche multiple", imgChat = R.drawable.group)
             chatDAO.insert(chat)
-            utentiChat=UtentiChat(9,u.nickname)
+            utentiChat=UtentiChat(11,u.nickname)
             utentiChatDAO.insert(utentiChat)
-            utentiChat= UtentiChat(9, u1.nickname)
+            utentiChat= UtentiChat(11, u1.nickname)
             utentiChatDAO.insert(utentiChat)
-            utentiChat= UtentiChat(9, u2.nickname)
+            utentiChat= UtentiChat(11, u2.nickname)
             utentiChatDAO.insert(utentiChat)
-            utentiChat= UtentiChat(9, u3.nickname)
+            utentiChat= UtentiChat(11, u3.nickname)
             utentiChatDAO.insert(utentiChat)
-            utentiChat= UtentiChat(9, u8.nickname)
+            utentiChat= UtentiChat(11, u8.nickname)
             utentiChatDAO.insert(utentiChat)
 
 
@@ -201,6 +219,10 @@ abstract class NotificationExpoDatabase : RoomDatabase() {
             msg=Messaggio(testo = "Ciao Alberto", media = null, chat = 8, mittente = u8.nickname)
             messaggioDAO.insert(msg)
             msg=Messaggio(testo = "Ciao Alberto", media = null, chat = 9, mittente = u1.nickname)
+            messaggioDAO.insert(msg)
+            msg=Messaggio(testo = "Ciao Alberto", media = null, chat = 10, mittente = u1.nickname)
+            messaggioDAO.insert(msg)
+            msg=Messaggio(testo = "Ciao Alberto", media = null, chat = 11, mittente = u1.nickname)
             messaggioDAO.insert(msg)
         }
     }
