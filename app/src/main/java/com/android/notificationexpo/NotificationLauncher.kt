@@ -553,7 +553,7 @@ class NotificationLauncher(
 
         val replyIntent = Intent(context, QuickActionNotificationReceiver::class.java)
                 .putExtra(AlarmManagerReceiverAlwaysOn.ARRAY_MESSAGES_QA,messaggi) //per messaggi
-                .putExtra(ItemDetailFragment.CHAT_ID, notification_id)
+                .putExtra(ItemDetailFragment.CHAT_ID, chat_id)
                 .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
                 .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                 .putExtra(ItemDetailFragment.TWO_PANE,twopane)  //per diversi intent per smartphone e tablet
@@ -564,7 +564,7 @@ class NotificationLauncher(
         val pendingIntent: PendingIntent
         if(!twopane) {
             target = Intent(context, ItemDetailActivity::class.java)
-                    .putExtra(ItemDetailFragment.CHAT_ID, notification_id)
+                    .putExtra(ItemDetailFragment.CHAT_ID, chat_id)
                     .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
                     .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                     .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)

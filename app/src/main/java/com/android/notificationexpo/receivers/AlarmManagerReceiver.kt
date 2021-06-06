@@ -16,7 +16,7 @@ class AlarmManagerReceiver: BroadcastReceiver() {
         Log.d("MyReceiver_BASE","${System.currentTimeMillis().toString()} ${intent.action}") //Mostriamo una riga con un testo sempre nuovo (altrimenti Logcat scrive che ci sono altre n righe simili)
 
         Log.d("MyReceiver_BASE", ""+intent.getStringExtra(ItemDetailFragment.NOTIFICATION))
-        Log.d("MyReceiver_BASE", ""+intent.getIntExtra(ItemDetailFragment.CHAT_ID,-1))
+        Log.d("MyReceiver_BASE", ""+intent.getLongExtra(ItemDetailFragment.CHAT_ID,-1))
         Log.d("MyReceiver_BASE", ""+intent.getStringExtra(ItemDetailFragment.CHAT_NAME))
 
         // Invio il broadcast per mostrare la notifica (a meno che l'app non sia in background)
@@ -60,9 +60,9 @@ class AlarmManagerReceiver: BroadcastReceiver() {
     companion object {
 
         // Stringa che vien usata come action per i Broadcast
-        const val ACTION_SHOW_NOTIFICATION = "com.android.NotificationsExpo.SHOW_NOTIFICATION"
+        const val ACTION_SHOW_NOTIFICATION = "com.android.notificationexpo.SHOW_NOTIFICATION"
 
         // Per l'autorizzazione
-        const val PERM_PRIVATE = "com.android.NotificationsExpo.PRIVATE"
+        const val PERM_PRIVATE = "com.android.notificationexpo.PRIVATE"
     }
 }

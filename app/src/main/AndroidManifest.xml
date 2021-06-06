@@ -9,7 +9,7 @@
         android:protectionLevel="signature"/>
     <!--Acquisisco la permission appena dichiarata-->
     <uses-permission
-        android:name="com.android.NotificationsExpo.PRIVATE"/>
+        android:name="com.android.notificationexpo.PRIVATE"/>
 
 
 
@@ -37,7 +37,7 @@
 
 
     <application
-        android:name="com.android.notificationexpo.NotificationExpoApplication"
+        android:name=".NotificationExpoApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -88,7 +88,7 @@
         Questo BoradcastReceiver, essendo dichiarato qui, sarà attivo anche ad app chiusa
         -->
         <receiver
-            android:name="com.android.notificationexpo.AlarmManagerReceiver"
+            android:name=".receivers.AlarmManagerReceiver"
             android:exported="false"/>
             <!--
             L'attrivuto exported = false serve in quanto questro BroadcastReceiver potrebbe ricevere
@@ -111,8 +111,8 @@
         Questo BoradcastReceiver, essendo dichiarato qui, sarà attivo anche ad app chiusa.
         -->
         <receiver
-            android:name="com.android.notificationexpo.AlarmManagerReceiverAlwaysOn"
-            android:permission="com.android.NotificationsExpo.PRIVATE"
+            android:name=".receivers.AlarmManagerReceiverAlwaysOn"
+            android:permission="com.android.notificationexpo.PRIVATE"
             android:exported="false">
             <!--
             L'attrivuto exported = false serve in quanto questro BroadcastReceiver potrebbe ricevere
@@ -133,11 +133,11 @@
             <intent-filter android:priority="-999">
                 <!--Assegnamo la priorià più bassa possibile, in modo che in un ordereed broadcast
                 questo receiver sia l'ultimo ad essere chiamato-->
-                <action android:name="com.android.NotificationsExpo.SHOW_NOTIFICATION"/>
+                <action android:name="com.android.notificationexpo.SHOW_NOTIFICATION"/>
             </intent-filter>
         </receiver>
-        <receiver android:name="com.android.notificationexpo.CustomNotificationReceiver" />
-        <receiver android:name="com.android.notificationexpo.QuickActionNotificationReceiver" />
+        <receiver android:name=".receivers.CustomNotificationReceiver" />
+        <receiver android:name=".receivers.QuickActionNotificationReceiver" />
 
 
 
@@ -150,7 +150,7 @@
 
         <!-- Per ricevere i broadcast dai pulsanti mostrati nella notifica del player audio-->
         <receiver
-            android:name="com.android.notificationexpo.AudioNotificationReceiver"
+            android:name="com.android.notificationexpo.receivers.AudioNotificationReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="RESUME_ACTION"/>

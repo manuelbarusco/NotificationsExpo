@@ -31,7 +31,7 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
     private var twopane: Boolean = false
     private val messagesToSend: MutableList<MittenteMessaggio> = mutableListOf() //lista che contiene i messaggi creati e da inviare
 
-    //classe che incapsula messaggio appena creato (in modo simulato) e mittente del messaggio
+    //classe che incapsula il messaggio appena creato (in modo simulato) e mittente del messaggio
     data class MittenteMessaggio(val mittente: Utente, val messaggio: Messaggio)
 
     override fun onReceive(context: Context, intent: Intent) {
