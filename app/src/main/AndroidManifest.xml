@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.android.NotificationsExpo">
+    package="com.android.notificationexpo">
 
 
     <!--Permission usata nel boradcast (più informazioni in fondo al file)-->
     <permission
-        android:name="com.android.NotificationsExpo.PRIVATE"
+        android:name="com.android.notificationexpo.PRIVATE"
         android:protectionLevel="signature"/>
     <!--Acquisisco la permission appena dichiarata-->
     <uses-permission
@@ -37,7 +37,7 @@
 
 
     <application
-        android:name=".NotificationExpoApplication"
+        android:name="com.android.notificationexpo.NotificationExpoApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -45,7 +45,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MasterDetailFlow">
         <activity
-            android:name="com.android.NotificationsExpo.ItemListActivity"
+            android:name="com.android.notificationexpo.ItemListActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:theme="@style/Theme.MasterDetailFlow.NoActionBar">
@@ -55,30 +55,30 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.android.NotificationsExpo.SettingsActivity"
+            android:name="com.android.notificationexpo.SettingsActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.MasterDetailFlow">
         </activity>
         <activity
-            android:name="com.android.NotificationsExpo.CreditsActivity"
+            android:name="com.android.notificationexpo.CreditsActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.MasterDetailFlow">
         </activity>
         <activity
-            android:name="com.android.NotificationsExpo.WelcomeActivity"
+            android:name="com.android.notificationexpo.WelcomeActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.MasterDetailFlow">
         </activity>
         <activity
-            android:name="com.android.NotificationsExpo.ItemDetailActivity"
+            android:name="com.android.notificationexpo.ItemDetailActivity"
             android:label="@string/title_item_detail"
-            android:parentActivityName="com.android.NotificationsExpo.ItemListActivity"
+            android:parentActivityName="com.android.notificationexpo.ItemListActivity"
             android:launchMode="singleTop"
             android:theme="@style/Theme.MasterDetailFlow.NoActionBar">
             <!-- Serve per pulsante che torna indietro nella toolbar -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.android.NotificationsExpo.ItemListActivity" />
+                android:value="com.android.notificationexpo.ItemListActivity" />
         </activity>
 
 
@@ -88,7 +88,7 @@
         Questo BoradcastReceiver, essendo dichiarato qui, sarà attivo anche ad app chiusa
         -->
         <receiver
-            android:name=".AlarmManagerReceiver"
+            android:name="com.android.notificationexpo.AlarmManagerReceiver"
             android:exported="false"/>
             <!--
             L'attrivuto exported = false serve in quanto questro BroadcastReceiver potrebbe ricevere
@@ -111,7 +111,7 @@
         Questo BoradcastReceiver, essendo dichiarato qui, sarà attivo anche ad app chiusa.
         -->
         <receiver
-            android:name=".AlarmManagerReceiverAlwaysOn"
+            android:name="com.android.notificationexpo.AlarmManagerReceiverAlwaysOn"
             android:permission="com.android.NotificationsExpo.PRIVATE"
             android:exported="false">
             <!--
@@ -136,21 +136,21 @@
                 <action android:name="com.android.NotificationsExpo.SHOW_NOTIFICATION"/>
             </intent-filter>
         </receiver>
-        <receiver android:name=".CustomNotificationReceiver" />
-        <receiver android:name=".QuickActionNotificationReceiver" />
+        <receiver android:name="com.android.notificationexpo.CustomNotificationReceiver" />
+        <receiver android:name="com.android.notificationexpo.QuickActionNotificationReceiver" />
 
 
 
         <!-- Il service per il player audio in background-->
         <service
-            android:name=".PlayerService"
+            android:name="com.android.notificationexpo.PlayerService"
             android:enabled="true"
             android:exported="false" />
 
 
         <!-- Per ricevere i broadcast dai pulsanti mostrati nella notifica del player audio-->
         <receiver
-            android:name=".AudioNotificationReceiver"
+            android:name="com.android.notificationexpo.AudioNotificationReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="RESUME_ACTION"/>
