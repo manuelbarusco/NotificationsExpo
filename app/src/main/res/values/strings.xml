@@ -60,7 +60,15 @@ L\'operazione è irreversibile
     <string name="welcome3_text1">È possibile modificare questo tempo dalle impostazioni, accessibili dal menu delle opzioni in alto a destra</string>
     <string name="welcome4_text0">Questa app è progettata per funzionare sia su smartphone che su tablet</string>
     <string name="welcome4_text1">Cliccare su "INIZIA" per iniziare</string>
-
+    <string name="expandable_notification">Ciao, ti manderò una notifica espandibile entro qualche secondo. Una notifica espandibile è una notifica che può essere visualizzata interamente facendo uno swipe verso il basso.</string>
+    <string name="image_notification">Ciao, ti manderò una notifica espandibile con una immagine entro qualche secondo. Una notifica con immagine è una notifica che in versione compatta presenta una miniatura del contenuto inviato ed in versione estesa visualizza l\'immagine intera.</string>
+    <string name="bubble_notification"></string>
+    <string name="multiple_notifications"></string>
+    <string name="custom_notifications"></string>
+    <string name="conversation_notifications"></string>
+    <string name="media_control_notification"></string>
+    <string name="background_process_notification"></string>
+    <string name="quick_actions_notification"></string>
 
     <string-array name="dummy_messages">
         <item>Ciao</item>
