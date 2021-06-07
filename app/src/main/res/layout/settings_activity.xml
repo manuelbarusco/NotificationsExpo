@@ -37,7 +37,7 @@
         android:stepSize="2"
         android:layout_marginBottom="20dp"
         app:tickColorActive="@color/design_default_color_primary"
-        app:tickColorInactive="@color/cardview_shadow_end_color"/>
+        app:tickColorInactive="@color/cardview_shadow_end_color"/> <!--Imposto il colore dei tick uguale a quella della barra così non si vedono -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

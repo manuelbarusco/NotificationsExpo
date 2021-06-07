@@ -46,6 +46,8 @@ class NotificationLauncher(
         val builder = NotificationCompat.Builder(context, ItemListActivity.SERVICE).apply {
             setContentTitle("Download di una foto")
             setContentText("Download in corso")
+            setCategory(Notification.CATEGORY_MESSAGE)
+            setAutoCancel(true)
             setSmallIcon(chat_img)
         }
         val progressMax = 100
@@ -112,6 +114,8 @@ class NotificationLauncher(
                         .bigPicture(BitmapFactory.decodeResource(context.resources, messagesToSend.last().messaggio.media as Int))
                         .bigLargeIcon(null))
                 .setContentIntent(pendingIntent)
+                .setCategory(Notification.CATEGORY_MESSAGE)
+                .setAutoCancel(true)
                 .build()
 
         if (notificationManager != null) {
@@ -151,6 +155,8 @@ class NotificationLauncher(
                 .setStyle(NotificationCompat.BigTextStyle()
                         .bigText(messagesToSend[0].messaggio.testo))
                 .setContentIntent(pendingIntent)
+                .setCategory(Notification.CATEGORY_MESSAGE)
+                .setAutoCancel(true)
                 .build()
 
         notificationManager?.notify(notification_id,notification)
@@ -231,6 +237,8 @@ class NotificationLauncher(
                 //set this notification as the summary for the group
                 .setContentIntent(pendingIntent)
                 .setGroupSummary(true)
+                .setCategory(Notification.CATEGORY_MESSAGE)
+                .setAutoCancel(true)
                 .build()
 
         val notificationManager: NotificationManager? = context.getSystemService()
@@ -246,7 +254,7 @@ class NotificationLauncher(
         }
     }
 
-    fun launchBubbleNotification(notification_id: Int = getNextId()){
+    fun launchBubbleNotification(notification_id: Int = chat_id.toInt()){
         val target = Intent(context, ItemDetailActivity::class.java)
                 .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
                 .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
@@ -314,19 +322,21 @@ class NotificationLauncher(
                         .addMessage(message1)
                 )
                 .setShortcutId(notification_id.toString())
+                .setCategory(Notification.CATEGORY_MESSAGE)
                 .build()
 
 
         val notificationManager: NotificationManager? = context.getSystemService()
 
-        if (notificationManager != null) {
-            notificationManager.notify(notification_id,notification)
-        }
+        notificationManager?.notify(notification_id,notification)
     }
 
     fun launchCustomNotifications(notification_id: Int = getNextId()){
-        //Crea una notifica custom con 2 layout 1 per la notifica stantard e l'altro per la notifica espansa
         val message = messagesToSend[0].messaggio.testo
+        /*Crea una notifica custom con 2 layout 1 per la notifica stantard e l'altro per la notifica espansa
+        Di ogni layout viene fatto l'inflate su oggetto RemoteViews che permette di creare la UI direttamente sulla notifica
+        (che viene gestita dal sistema operativo in un altro processo)
+        */
         val notificationLayout = RemoteViews(context.packageName, R.layout.notification_collapsed)
         val notificationLayoutExpanded = RemoteViews(context.packageName, R.layout.notification_expanded)
 
@@ -337,7 +347,9 @@ class NotificationLauncher(
 
         /*Visto che queste View sono in altro processo non si può impostare un onClickListener come il solito.
         * Bisogna utilizzare un PendingIntent in modo tale da ridirezionare la gestione dei click sugli elementi della
-        * UI della notifica custom nell processo main dell'app.*/
+        * UI della notifica custom nel processo main dell'app; esattamente vengono ridirezionati nel Broadcast receiver
+        * CustomNotificationReceiver passando tutti i dati necessari per la gestione della notifica come Extra.*/
+        //Per distinguere i vari eventi utilizzo l'action dell'intent
         val cb1Intent = Intent(context,CustomNotificationReceiver::class.java)
                 .setAction("com.android.NotificationsExpo.CB1_CLICKED")
                 .putExtra(ItemDetailFragment.CHAT_ID,chat_id)
@@ -375,7 +387,7 @@ class NotificationLauncher(
         notificationLayoutExpanded.setOnClickPendingIntent(R.id.b_invia,biPendingIntent)
         notificationLayoutExpanded.setOnClickPendingIntent(R.id.b_annulla,baPendingIntent)
 
-        //Inten per tocco su notifica non espansa
+        //Inten per tocco su notifica differenziato se si è su smartphone o tablet
         val target: Intent
         val pendingIntent: PendingIntent
         if(!twopane) {
@@ -389,13 +401,12 @@ class NotificationLauncher(
         }
         else{
             target = Intent(context, ItemListActivity::class.java)
-                    .putExtra(ItemDetailFragment.CHAT_ID, notification_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
                     .putExtra(ItemDetailFragment.NOTIFICATION_ID, notification_id)
                     .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
                     .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                     .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
                     .putExtra(AlarmManagerReceiverAlwaysOn.UPDATE_FRAGMENT,true)
-                    .setAction("com.android.NotificationsExpo.CONVERSATION")
             pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
         }
 
@@ -405,15 +416,13 @@ class NotificationLauncher(
                 .setCustomBigContentView(notificationLayoutExpanded)
                 .setStyle(NotificationCompat.DecoratedCustomViewStyle()) //aggiunge icona, nome app e tempo come quelle normali
                 .setContentIntent(pendingIntent)
+                .setCategory(Notification.CATEGORY_MESSAGE)
                 .setAutoCancel(true)        //se tocco la notifica si cancella
                 .setOnlyAlertOnce(true)
 
         val notificationManager: NotificationManager? = context.getSystemService()
 
-        if (notificationManager != null) {
-            notificationManager.notify(notification_id,notification.build())
-
-        }
+        notificationManager?.notify(notification_id,notification.build())
 
     }
 
@@ -422,7 +431,7 @@ class NotificationLauncher(
         val shortcutManager: ShortcutManager = context.getSystemService(AppCompatActivity.SHORTCUT_SERVICE) as ShortcutManager
         val target: Intent
         val pendingIntent: PendingIntent
-        /*Creo l'intent ed il PendingIntent per la notifica a seconda se sono table o smartphone*/
+        /*Creo l'intent ed il PendingIntent per la notifica a seconda se sono su table o su smartphone*/
         if (!twopane) {
             target = Intent(context, ItemDetailActivity::class.java)
                     .putExtra(ItemDetailFragment.CHAT_ID, notification_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
@@ -453,7 +462,7 @@ class NotificationLauncher(
         /*Creo un conversation shortcut.
         * Per lanciare una conversation notification e/o una chat bubble è necessario assiociare alla notifica un
         * conversation shortcut che è uno shortcut (https://developer.android.com/guide/topics/ui/shortcuts) con
-        * particolari metadati e proprietà che servono per scatenare le conversation notification e le chat bubbles.
+        * particolari metadati e proprietà che servono per scatenare le conversation notification e/o le chat bubbles.
         * Ad uno shortcut "normale" bisogna aggiungere un Icon, un intent (che lancia una activity quando si usa lo
         * shortcut) e deve essere LongLived (così il S.O. lo memorizza nella cache per poterlo usare anche per altre
         * features delle conversazioni). Inoltre è consigliato (non obbligatorio) impostare anche un oggetto Person
@@ -478,7 +487,8 @@ class NotificationLauncher(
                 System.currentTimeMillis(),
                 person)
 
-        /*Per fare in modo che una notifica sia una notifica conversation serve impostare anche un MessagingSyle*/
+        /*Per fare in modo che una notifica sia una notifica conversation serve impostare anche un MessagingSyle e
+        * aggiungere il messaggio al suo interno*/
         val notification = Notification.Builder(context, ItemListActivity.CONVERSATION)
                 .addPerson(person)
                 .setSmallIcon(R.drawable.ic_launcher_foreground) //TODO: mettere immagine migliore
@@ -487,11 +497,10 @@ class NotificationLauncher(
                 )
                 .setShortcutId(notification_id.toString())
                 .setContentIntent(pendingIntent)
+                .setCategory(Notification.CATEGORY_MESSAGE)
                 .build()
 
-        if (notificationManager != null) {
-            notificationManager.notify(notification_id,notification)
-        }
+        notificationManager?.notify(notification_id,notification)
 
     }
 
@@ -537,29 +546,27 @@ class NotificationLauncher(
                         .addMessage(message1)
                 )
                 .setContentIntent(pendingIntent)
+                .setCategory(Notification.CATEGORY_MESSAGE)
                 .build()
 
         notificationManager?.notify(notification_id,notification)
     }
 
     fun launchQuickActionsNotification(notification_id: Int = getNextId()){
+        /*Creo un ArrayList per salvare i messaggi che potrebbero essere scritti direttamente sulla notifica, questo serve per
+        * poter aggiornare la notifica con i messaggi inviati e ricevuti mentre la notifica è ancora nel panello delle notifiche */
         val messaggi: ArrayList<String> = ArrayList()
         messaggi.add(messagesToSend[0].messaggio.testo)
 
         val replayText: String = context.getString(R.string.reply_text)
+
+        /*Per poter scrivere nella notifica è necessario usare un oggetto di tipo RemoteInput e aggiungerlo nell'action, questo
+        * aggiunge in automatico una editText e un pulsante di invio nella notifica se si tocca sul pulsante definito nell'action*/
         val remoteInput: RemoteInput = RemoteInput.Builder(AlarmManagerReceiverAlwaysOn.KEY_TEXT_REPLY)
                 .setLabel(replayText)
                 .build()
 
-        val replyIntent = Intent(context, QuickActionNotificationReceiver::class.java)
-                .putExtra(AlarmManagerReceiverAlwaysOn.ARRAY_MESSAGES_QA,messaggi) //per messaggi
-                .putExtra(ItemDetailFragment.CHAT_ID, chat_id)
-                .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
-                .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
-                .putExtra(ItemDetailFragment.TWO_PANE,twopane)  //per diversi intent per smartphone e tablet
-        val replyPendingIntent = PendingIntent.getBroadcast(context,0,replyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-
-        //intent per tocco su notifica
+        //intent per tocco su notifica differenziato se sono su tablet o smartphone
         val target: Intent
         val pendingIntent: PendingIntent
         if(!twopane) {
@@ -581,6 +588,19 @@ class NotificationLauncher(
             pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
         }
 
+        /*Creo un pendingIntent per lanciare un broadcast esplicito a QuickActionNotificationReceiver per gestire
+        * l'aggiornamento della notifica se dovesse esserci una risposta tramite l'action*/
+        val replyIntent = Intent(context, QuickActionNotificationReceiver::class.java)
+                .putExtra(AlarmManagerReceiverAlwaysOn.ARRAY_MESSAGES_QA,messaggi) //per messaggi
+                .putExtra(ItemDetailFragment.CHAT_ID, chat_id)
+                .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+                .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                .putExtra(ItemDetailFragment.NOTIFICATION_ID,notification_id)
+                .putExtra(ItemDetailFragment.TWO_PANE,twopane)  //per diversi intent per smartphone e tablet
+        val replyPendingIntent = PendingIntent.getBroadcast(context,0,replyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        /*un' Action permette di aggiungere un pulsante nella notifica. Va specificato un pendingIntent per specificare quale
+        * componete dovrà gestirla*/
         val action: Notification.Action=
                 Notification.Action.Builder(Icon.createWithResource(context,chat_img),context.getString(R.string.reply_button_text),replyPendingIntent)
                         .addRemoteInput(remoteInput)
@@ -589,9 +609,8 @@ class NotificationLauncher(
         val person = Person.Builder()
                 .setName(chat_name)
                 .setIcon(Icon.createWithResource(context,chat_img))
-                //.setImportant(true)
                 .build()
-
+        //Creao messagingStyle e aggiungo il primo messaggio di risposta
         val messagingStyle: Notification.MessagingStyle = Notification.MessagingStyle(person)
 
         val message = Notification.MessagingStyle.Message(messagesToSend[0].messaggio.testo,
@@ -609,9 +628,7 @@ class NotificationLauncher(
                 .build()
 
         val notificationManager: NotificationManager? = context.getSystemService()
-        if (notificationManager != null) {
-            notificationManager.notify(notification_id,notification)
-        }
+        notificationManager?.notify(notification_id,notification)
 
     }
 }

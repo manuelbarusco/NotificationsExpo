@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat
 import com.android.notificationexpo.receivers.AlarmManagerReceiverAlwaysOn
 import com.android.notificationexpo.receivers.AlarmManagerReceiver
 
+//TODO: togliere o tradurre i commenti in inglese scritti da Google
 /**
  * An activity representing a list of Pings. This activity
  * has different presentations for handset and tablet-size devices. On
@@ -99,7 +100,8 @@ class ItemListActivity : AppCompatActivity() {
             // activity should be in two-pane mode.
             twoPane = true
         }
-
+        //Aggiorno il fragmant se sono su tablet e nell'intent (che viene creato in ogni notifica se twopane = true) è
+        // specificato che è necessario farlo
         if (twoPane && intent.getBooleanExtra(AlarmManagerReceiverAlwaysOn.UPDATE_FRAGMENT,false))
             updateDetailFragment(intent, this)
 
@@ -287,7 +289,7 @@ class ItemListActivity : AppCompatActivity() {
             val image: ImageView = view.findViewById(R.id.image)
         }
     }
-
+    //Funzione che rimpiazza il fragment del dettaglio di una chat se tocco su una notifica e sono su un tablet
     private fun updateDetailFragment(intent: Intent, parentActivity: ItemListActivity){
         val fragment = ItemDetailFragment().apply {
             arguments = Bundle().apply {

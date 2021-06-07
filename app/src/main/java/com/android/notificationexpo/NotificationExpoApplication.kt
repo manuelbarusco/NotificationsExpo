@@ -3,7 +3,7 @@ package com.android.notificationexpo
 import android.app.Application
 import com.android.notificationexpo.database.NotificationExpoRepository
 
-//TODO: ELIMINARE
+//TODO: ELIMINARE?
 class NotificationExpoApplication: Application() {
     override fun onCreate() {
         super.onCreate()
