@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull
 data class Chat(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "ID")
-    val ID: Long=0,
+    val ID: Int=0,
 
     @ColumnInfo(name = "Nome")
     val nome:String?, //può essere null in caso di chat private (e non di gruppo)
@@ -30,7 +30,6 @@ data class Chat(
     @NotNull
     @ColumnInfo(name = "NotificaAssociata")
     val notificaAssociata: String,
-
 
     @ColumnInfo(name = "ImgChat")
     val imgChat: Int? //può valere null in caso di chat privata (non serve un immagine, si usa quella del destinatario)

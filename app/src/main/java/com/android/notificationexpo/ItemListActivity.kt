@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -227,9 +228,10 @@ class ItemListActivity : AppCompatActivity() {
         init {
             onClickListener = View.OnClickListener { v ->
                 val item = v.tag as ChatDAO.ChatUtente
+                val viewElement = v as ViewGroup
 
                 if (twoPane) {
-
+                    viewElement.setBackgroundColor(Color.parseColor("#81D4FA"))
                     val fragment = ItemDetailFragment().apply {
                         //passati id chat, nome chat, immagine della chat, notifica associata alla chat e indicazione sul device (tablet o smartphone)
                         arguments = Bundle().apply {

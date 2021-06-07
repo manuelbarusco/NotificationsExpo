@@ -30,7 +30,7 @@ import java.util.*
 data class Messaggio(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "ID")
-    val ID: Long=0,
+    val ID: Int=0,
 
     @NotNull
     @ColumnInfo(name = "Testo")
