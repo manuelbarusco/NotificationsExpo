@@ -44,6 +44,7 @@ class ItemListActivity : AppCompatActivity() {
 
     companion object{
         const val KEY_USER= "UtenteAPP"
+        const val FIRST_TIME_RUNNING= "FirstTimeRunning"
 
         //Constanti per i channel ID
         const val MULTIPLE = "MultipleNotification"
@@ -103,6 +104,13 @@ class ItemListActivity : AppCompatActivity() {
             updateDetailFragment(intent, this)
 
 
+        // Determino se l'app è stata eseguita per la prima volta
+        val firstTime = preferences.getBoolean(FIRST_TIME_RUNNING, true)
+        if (firstTime==true){
+            preferences.edit().putBoolean(FIRST_TIME_RUNNING, false).apply()
+            val welcomeIntent = Intent(this, WelcomeActivity::class.java)
+            startActivity(welcomeIntent)
+        }
     }
 
     override fun onResume() {

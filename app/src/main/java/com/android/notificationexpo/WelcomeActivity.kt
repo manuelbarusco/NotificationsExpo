@@ -1,6 +1,5 @@
 package com.android.notificationexpo
 
-import com.android.notificationexpo.WelcomeFragments.*
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
@@ -10,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.android.notificationexpo.welcomeFragments.*
 
 class WelcomeActivity : FragmentActivity() { // TODO Mettere FragmentActivity diasattiva l'App bar, da capire perchè
 
@@ -28,7 +28,7 @@ class WelcomeActivity : FragmentActivity() { // TODO Mettere FragmentActivity di
     private lateinit var welcomeButtonPrevious : Button
     private lateinit var welcomeButtonNext : Button
     private lateinit var welcomeViewPager: ViewPager2   // Il widget ViewPager2 che gestisce le animazioni e premette lo scroll orizzonatle fra i fragment
-
+    private lateinit var myWelcomeViewPagerAdapter: WelcomeViewPagerAdapter
 
     // TODO Nota: usando ViewPager2 viene gestita dalla classe il salvataggio dell'istanza per la transazione da portrait a landscape ma la cosa non viene scritta bene nella documentazione
 
@@ -42,7 +42,7 @@ class WelcomeActivity : FragmentActivity() { // TODO Mettere FragmentActivity di
         welcomeViewPager = findViewById(R.id.welcome_viewpager)
 
         // Istanzio un PagerAdapter, che fornisce le pagine al widget ViewPager2  e lo associo al mio ViewPager2
-        val myWelcomeViewPagerAdapter = WelcomeViewPagerAdapter(this)
+        myWelcomeViewPagerAdapter = WelcomeViewPagerAdapter(this)
         welcomeViewPager.adapter = myWelcomeViewPagerAdapter
 
         // Ottengo la reference agli altri widget
@@ -136,7 +136,7 @@ class WelcomeActivity : FragmentActivity() { // TODO Mettere FragmentActivity di
             }
             if (welcomeViewPager.currentItem == 4){
                 // Se siamo qui l'utente vuole uscire dal welcome screen e andare alla schemrata successiva
-                //TODO Avviare l'activity delle chat
+                this.finish() //Chiudo questa activity
             }
         }
 

@@ -48,6 +48,20 @@ L\'operazione è irreversibile
     <string name="credits_text2">DA RE ALBERTO</string>
     <string name="credits_text3">GREGORI SIMONE</string>
 
+    <string name="welcome0_text0">Benvenuto in Notifications Expo</string>
+    <string name="welcome0_text1">Questa è un\'app scritta da sviluppatori per sviluppatori</string>
+    <string name="welcome0_text2">L\'obiettivo è fornire una panoramica di ciò che è possibile fare con le notifiche di Android 11</string>
+    <string name="welcome0_text3">Scorrere per iniziare</string>
+    <string name="welcome1_text0">Si ha a disposizione un elenco di chat virtuali, ciascuna associata a un particolare tipo di notifica che si può lanciare</string>
+    <string name="welcome1_text1">Cliccare su una chat per iniziare</string>
+    <string name="welcome2_text0">Ogni chat ha un messaggio preimpostato che fornisce alcune brevi istruzioni su come funziona quel determinato tipo di notifica</string>
+    <string name="welcome2_text1">Bisogna scrivere un testo casuale, premere invia ed uscire subito dall\'app per ricevere la notifica</string>
+    <string name="welcome3_text0">Di default le notifiche vengono lanciate dopo 2 secondi dall\'invio del messaggio</string>
+    <string name="welcome3_text1">È possibile modificare questo tempo dalle impostazioni, accessibili dal menu delle opzioni in alto a destra</string>
+    <string name="welcome4_text0">Questa app è progettata per funzionare sia su smartphone che su tablet</string>
+    <string name="welcome4_text1">Cliccare su "INIZIA" per iniziare</string>
+
+
     <string-array name="dummy_messages">
         <item>Ciao</item>
         <item>Ok</item>

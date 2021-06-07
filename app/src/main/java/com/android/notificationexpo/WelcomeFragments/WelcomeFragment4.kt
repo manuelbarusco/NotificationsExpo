@@ -1,4 +1,4 @@
-package com.android.notificationexpo.WelcomeFragments
+package com.android.notificationexpo.welcomeFragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
