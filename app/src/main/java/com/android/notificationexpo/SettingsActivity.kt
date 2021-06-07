@@ -36,7 +36,7 @@ class SettingsActivity : AppCompatActivity() {
         slider = findViewById(R.id.slider)
         slider.value = preferences.getInt(SECONDS,2).toFloat()
 
-        slider.addOnChangeListener { slider, value, fromUser ->
+        slider.addOnChangeListener { _, value, _ ->
             seconds = value.toInt()
             modified = true
             Log.d("seconds", "modificato in $seconds")
