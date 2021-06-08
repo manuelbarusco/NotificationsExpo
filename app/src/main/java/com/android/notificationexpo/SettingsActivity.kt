@@ -59,7 +59,7 @@ class SettingsActivity : AppCompatActivity() {
                 setMessage(getString(R.string.settings_alert_dialog_message))
                 setPositiveButton(getString(R.string.settings_alert_dialog_button),
                     DialogInterface.OnClickListener { dialog, id ->
-                        repository.resetDatabase()
+                        repository.resetDatabase(context)
                     })
                 setNegativeButton(getString(R.string.settings_alert_dialog_button2),
                     DialogInterface.OnClickListener { dialog, id ->

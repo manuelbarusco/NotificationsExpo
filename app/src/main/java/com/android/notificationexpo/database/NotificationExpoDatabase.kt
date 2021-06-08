@@ -45,7 +45,7 @@ abstract class NotificationExpoDatabase : RoomDatabase() {
                         context.applicationContext,
                         NotificationExpoDatabase::class.java,
                         "NotificationExpo_database"
-                ).addCallback(NotificationExpoDatabaseCallback())
+                ).addCallback(NotificationExpoDatabaseCallback(context))
                 .build()
                 INSTANCE = instance
                 return instance
@@ -54,9 +54,10 @@ abstract class NotificationExpoDatabase : RoomDatabase() {
 
         //funzione che permette di resettare il DB e riportarlo al suo stato iniziale
         //ovvero quando l'app è stata appena installata
-        fun resetDatabase(){
+        fun resetDatabase(context: Context){
             INSTANCE?.clearAllTables()
-            NotificationExpoDatabaseCallback().populateDatabase(
+            NotificationExpoDatabaseCallback(context).populateDatabase(
+                    context,
                     INSTANCE?.utenteDAO() as UtenteDAO,
                     INSTANCE?.chatDAO() as ChatDAO,
                     INSTANCE?.notificaDAO() as NotificaDAO,
@@ -68,7 +69,7 @@ abstract class NotificationExpoDatabase : RoomDatabase() {
         //oggetto che definisce una callback, il quale ha due metodi:
         // * onCreate: metodo invocato alla prima creazione del database (al momento dell'installazione del DB. Serve per il popolamento iniziale)
         // * onOpen: metodo invocato ad ogni "apertura" del database, in questo caso non serve quindi l'implementazione è vuota
-        private class NotificationExpoDatabaseCallback : RoomDatabase.Callback() {
+        private class NotificationExpoDatabaseCallback(val context: Context) : RoomDatabase.Callback() {
 
             override fun onCreate(db: SupportSQLiteDatabase) {
                 super.onCreate(db)
@@ -77,6 +78,7 @@ abstract class NotificationExpoDatabase : RoomDatabase() {
                     val executor = Executors.newSingleThreadExecutor()
                     executor.execute {
                         populateDatabase(
+                                context,
                                 database.utenteDAO(),
                                 database.chatDAO(),
                                 database.notificaDAO(),
@@ -88,7 +90,7 @@ abstract class NotificationExpoDatabase : RoomDatabase() {
             }
 
             //funzione per il popolamento iniziale del database
-            fun populateDatabase(userDAO: UtenteDAO, chatDAO: ChatDAO, notificaDAO: NotificaDAO, messaggioDAO: MessaggioDAO, utentiChatDAO: UtentiChatDAO) {
+            fun populateDatabase(context: Context, userDAO: UtenteDAO, chatDAO: ChatDAO, notificaDAO: NotificaDAO, messaggioDAO: MessaggioDAO, utentiChatDAO: UtentiChatDAO) {
 
                 //inserisco i vari utenti di default dell'app
                 val u=Utente("Alberto", "Alberto", "Da Re", R.drawable.image_chat8) //utente predefinito
@@ -222,27 +224,27 @@ abstract class NotificationExpoDatabase : RoomDatabase() {
 
 
                 //aggiungo un messaggio di benvenuto ad ogni chat
-                var msg=Messaggio(testo = "Ciao Alberto", media = null, chat = id_chat1, mittente = u1.nickname)
+                var msg=Messaggio(testo = context.getString(R.string.expandable_notification) , media = null, chat = id_chat1, mittente = u1.nickname)
                 messaggioDAO.insert(msg)
-                msg=Messaggio(testo = "Ciao Alberto", media = null, chat = id_chat2, mittente = u2.nickname)
+                msg=Messaggio(testo = context.getString(R.string.conversation_notifications), media = null, chat = id_chat2, mittente = u2.nickname)
                 messaggioDAO.insert(msg)
-                msg=Messaggio(testo = "Ciao Alberto", media = null, chat = id_chat3, mittente = u3.nickname)
+                msg=Messaggio(testo = context.getString(R.string.bubble_notification), media = null, chat = id_chat3, mittente = u3.nickname)
                 messaggioDAO.insert(msg)
-                msg=Messaggio(testo = "Ciao Alberto", media = null, chat = id_chat4, mittente = u4.nickname)
+                msg=Messaggio(testo = context.getString(R.string.bubble_notification), media = null, chat = id_chat4, mittente = u4.nickname)
                 messaggioDAO.insert(msg)
-                msg=Messaggio(testo = "Ciao Alberto", media = null, chat = id_chat5, mittente = u5.nickname)
+                msg=Messaggio(testo = context.getString(R.string.bubble_notification), media = null, chat = id_chat5, mittente = u5.nickname)
                 messaggioDAO.insert(msg)
-                msg=Messaggio(testo = "Ciao Alberto", media = null, chat = id_chat6, mittente = u6.nickname)
+                msg=Messaggio(testo = context.getString(R.string.quick_actions_notification), media = null, chat = id_chat6, mittente = u6.nickname)
                 messaggioDAO.insert(msg)
-                msg=Messaggio(testo = "Ciao Alberto", media = null, chat = id_chat7, mittente = u7.nickname)
+                msg=Messaggio(testo = context.getString(R.string.media_control_notification), media = null, chat = id_chat7, mittente = u7.nickname)
                 messaggioDAO.insert(msg)
-                msg=Messaggio(testo = "Ciao Alberto", media = null, chat = id_chat8, mittente = u8.nickname)
+                msg=Messaggio(testo = context.getString(R.string.background_process_notification), media = null, chat = id_chat8, mittente = u8.nickname)
                 messaggioDAO.insert(msg)
-                msg=Messaggio(testo = "Ciao Alberto", media = null, chat = id_chat9, mittente = u1.nickname)
+                msg=Messaggio(testo = context.getString(R.string.custom_notifications), media = null, chat = id_chat9, mittente = u1.nickname)
                 messaggioDAO.insert(msg)
-                msg=Messaggio(testo = "Ciao Alberto", media = null, chat = id_chat10, mittente = u1.nickname)
+                msg=Messaggio(testo = context.getString(R.string.image_notification), media = null, chat = id_chat10, mittente = u1.nickname)
                 messaggioDAO.insert(msg)
-                msg=Messaggio(testo = "Ciao Alberto", media = null, chat = id_chat11, mittente = u1.nickname)
+                msg=Messaggio(testo = context.getString(R.string.multiple_notifications), media = null, chat = id_chat11, mittente = u1.nickname)
                 messaggioDAO.insert(msg)
             }
         }

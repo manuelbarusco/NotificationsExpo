@@ -16,6 +16,7 @@ import com.android.notificationexpo.receivers.AlarmManagerReceiverAlwaysOn
 import com.android.notificationexpo.receivers.CustomNotificationReceiver
 import com.android.notificationexpo.receivers.QuickActionNotificationReceiver
 
+//oggetto che si occupa di lanciare le notifiche contenenti i messaggi precedentemente generati dal MessageGenerator
 class NotificationLauncher(
         private val user:String,
         private val chat_id: Long,
@@ -27,6 +28,7 @@ class NotificationLauncher(
         private val context: Context
 
 ){
+    //oggetto che permette di ottenere un ID sempre diverso per le notifiche
     companion object NotificationID{
         private var ID: Int=0
 
@@ -36,13 +38,17 @@ class NotificationLauncher(
         }
     }
 
+    //tutti i metodi di seguito hanno come parametro il notification_id il quale specifica l'id da usare nel lancio della notifica
 
+    //funzione che lancia una notifica per un processo in background
     fun launchBackgroundProcessNotification(notification_id: Int = getNextId()){
 
+        //lancio prima di tutto una conversation notification per notificare l'arrivo di un messaggio
         launchConversationNotifications()
 
         val notificationManager: NotificationManager? = context.getSystemService()
 
+        //costruisco la notifica
         val builder = NotificationCompat.Builder(context, ItemListActivity.SERVICE).apply {
             setContentTitle("Download di una foto")
             setContentText("Download in corso")
@@ -50,6 +56,8 @@ class NotificationLauncher(
             setAutoCancel(true)
             setSmallIcon(chat_img)
         }
+
+        //imposto i valori massimi e minimi della barra di avanzamento del download
         val progressMax = 100
         var progressCurrent = 0
 
@@ -63,24 +71,31 @@ class NotificationLauncher(
                     try {
                         Thread.sleep(1000)
                         progressCurrent+=10
+                        //aggiorno di volta in volta il progresso nel download nella notifica
                         builder.setProgress(progressMax, progressCurrent, false)
                         notificationManager.notify(notification_id, builder.build())
                     } catch (e: InterruptedException) {
                         e.printStackTrace()
                     }
                 }
+                //imposto il download completato nella notifica
                 builder.setContentText("Download completato")
                         .setProgress(0, 0, false)
                 builder.setProgress(progressMax, progressCurrent, false)
                 notificationManager.notify(notification_id, builder.build())
+
+                //genero un messaggio immagine per simulare il download correttamente avvenuto
                 val messageGenerator= MessageGenerator(user, chat_id, messagesToSend, context)
                 messageGenerator.generateImageMessage()
+
+                //lancio una ImageNotification con il notification_id della notifica con progress bar in modo da sostituirla a downlaod avvenuto
                 launchImageNotification(notification_id)
             }).start()
         }
 
     }
 
+    //funzione che lancia una notifica espandibile contenente un'immagine
     fun launchImageNotification(notification_id: Int = getNextId()){
         val target: Intent
         val pendingIntent: PendingIntent

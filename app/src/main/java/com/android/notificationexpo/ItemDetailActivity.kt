@@ -25,6 +25,7 @@ class ItemDetailActivity : AppCompatActivity() {
     // intercettare il brodcast e usare il parametro resultCode per avvisare AlarmManagerReceiverAlwaysOn,
     // che verrà chiamato appena dopo, di non visualizzare le notifiche (in quanto ad app aperta si
     // è scelto di non visualizzare le notifiche)
+
     private val onShowNotification = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             // Se viene eseguito questo codice vuol dire che l'activity è in foreground e quindi va
@@ -37,9 +38,8 @@ class ItemDetailActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_item_detail)
-        //setSupportActionBar(findViewById(R.id.detail_toolbar))
 
-        // Show the Up button in the action bar.
+        //mostro la action bar
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         // savedInstanceState is non-null when there is fragment state
@@ -56,6 +56,7 @@ class ItemDetailActivity : AppCompatActivity() {
             // using a fragment transaction.
             val fragment = ItemDetailFragment().apply {
                 arguments = Bundle().apply {
+                    //passo al ItemDetailFragment le informazioni di cui ha bisogno
                     putLong(ItemDetailFragment.CHAT_ID, intent.getLongExtra(ItemDetailFragment.CHAT_ID,-1))
                     putString(ItemDetailFragment.CHAT_NAME, intent.getStringExtra(ItemDetailFragment.CHAT_NAME))
                     putInt(ItemDetailFragment.CHAT_IMG,intent.getIntExtra(ItemDetailFragment.CHAT_IMG, -1) as Int)
@@ -96,7 +97,6 @@ class ItemDetailActivity : AppCompatActivity() {
     override fun onPause() {
         // Disabilito il BroadcastReceiver a runtime
         this.unregisterReceiver(onShowNotification)
-
         super.onPause()
     }
 }

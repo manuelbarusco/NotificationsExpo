@@ -84,10 +84,10 @@ class NotificationExpoRepository (val context: Context) {
     }
 
     //funzione per il reset del DB
-    fun resetDatabase(){
+    fun resetDatabase(context: Context){
         val executor = Executors.newSingleThreadExecutor()
         executor.execute {
-            NotificationExpoDatabase.resetDatabase()
+            NotificationExpoDatabase.resetDatabase(context)
         }
     }
 }

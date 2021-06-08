@@ -25,6 +25,7 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import com.android.notificationexpo.receivers.AlarmManagerReceiverAlwaysOn
 import com.android.notificationexpo.receivers.AlarmManagerReceiver
+import java.util.*
 
 //TODO: togliere o tradurre i commenti in inglese scritti da Google
 /**
@@ -43,8 +44,12 @@ class ItemListActivity : AppCompatActivity() {
      */
     private var twoPane: Boolean = false
     private lateinit var repository: NotificationExpoRepository
+    private var clickedChat: View?=null
+    private var indexClickedChat : Int?=null
 
     companion object{
+        //costanti per il salvataggio di alcune SharedPreferences
+        const val SELECTED_CHAT="ChatSelected"
         const val KEY_USER= "UtenteAPP"
         const val FIRST_TIME_RUNNING= "FirstTimeRunning"
 
@@ -87,9 +92,16 @@ class ItemListActivity : AppCompatActivity() {
         val preferences= getSharedPreferences("Preferences", Context.MODE_PRIVATE)
         preferences.edit().putString(KEY_USER, "Alberto").apply()
 
+        //recupero la posizione nella recycler view della chat precedentemente selezionata prima del ripristino dell'applicazione
+        // (in seguito ad una rotazione ad esempio)
+        if (savedInstanceState != null) {
+            indexClickedChat= savedInstanceState.getInt(SELECTED_CHAT, -1)
+        }
+
         //inizializzo la repository dell'app
         NotificationExpoRepository.initialize(this)
 
+        //imposoto il layout grafico e la toolbar
         setContentView(R.layout.activity_item_list)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -101,7 +113,9 @@ class ItemListActivity : AppCompatActivity() {
             // activity should be in two-pane mode.
             twoPane = true
         }
-        //Aggiorno il fragmant se sono su tablet e nell'intent (che viene creato in ogni notifica se twopane = true) è
+
+
+        //Aggiorno il fragment se sono su tablet e nell'intent (che viene creato in ogni notifica se twopane = true) è
         // specificato che è necessario farlo
         if (twoPane && intent.getBooleanExtra(AlarmManagerReceiverAlwaysOn.UPDATE_FRAGMENT,false))
             updateDetailFragment(intent, this)
@@ -109,7 +123,7 @@ class ItemListActivity : AppCompatActivity() {
 
         // Determino se l'app è stata eseguita per la prima volta
         val firstTime = preferences.getBoolean(FIRST_TIME_RUNNING, true)
-        if (firstTime==true){
+        if (firstTime){
             preferences.edit().putBoolean(FIRST_TIME_RUNNING, false).apply()
             val welcomeIntent = Intent(this, WelcomeActivity::class.java)
             startActivity(welcomeIntent)
@@ -145,12 +159,35 @@ class ItemListActivity : AppCompatActivity() {
         recyclerView.adapter = ChatAdapter(this, chat, twoPane)
     }
 
+    //metodo per selezionare la chat che è stata cliccata dall'utente
+    private fun clickChat(){
+        clickedChat!!.setBackgroundColor(Color.parseColor("#9678cc"))
+        clickedChat!!.findViewById<TextView>(R.id.notication).setTextColor(Color.parseColor("#FFFFFF"))
+        clickedChat!!.findViewById<TextView>(R.id.chat_time).setTextColor(Color.parseColor("#FFFFFF"))
+        clickedChat!!.findViewById<TextView>(R.id.name).setTextColor(Color.parseColor("#000000"))
+        clickedChat!!.findViewById<View>(R.id.line).visibility=View.INVISIBLE
+    }
+
+    //metodo per deselezionare la chat che era stata cliccata dall'utente
+    private fun unclickChat(){
+        clickedChat!!.setBackgroundColor(Color.parseColor("#FFFFFF"))
+        clickedChat!!.findViewById<TextView>(R.id.notication).setTextColor(Color.parseColor("#b2b2b2"))
+        clickedChat!!.findViewById<TextView>(R.id.name).setTextColor(Color.parseColor("#000000"))
+        clickedChat!!.findViewById<TextView>(R.id.chat_time).setTextColor(Color.parseColor("#b2b2b2"))
+        clickedChat!!.findViewById<View>(R.id.line).visibility=View.VISIBLE
+    }
 
     override fun onPause() {
+        super.onPause()
         // Disabilito il BroadcastReceiver a runtime
         this.unregisterReceiver(onShowNotification)
+    }
 
-        super.onPause()
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        //salvo l'indice dell'ultima chat cliccata così da ripristinare lo stato dopo un restore del dispoitivo
+        if(indexClickedChat!=null)
+            outState.putInt(SELECTED_CHAT, indexClickedChat as Int)
     }
 
     // Codice necessario per creare il menu
@@ -217,47 +254,10 @@ class ItemListActivity : AppCompatActivity() {
         }
     }
 
-    //classe adapter per la recycler view delle chat presente
-    class ChatAdapter(private val parentActivity: ItemListActivity,
+    //classe adapter per la recycler view delle chat presente nella UI
+    inner class ChatAdapter(private val parentActivity: ItemListActivity,
                       private val values: List<ChatDAO.ChatUtente>,
                       private val twoPane: Boolean) : RecyclerView.Adapter<ChatAdapter.ChatViewHolder>() {
-
-        private val onClickListener: View.OnClickListener
-
-        //click listener per l'elemento della lista delle chat
-        init {
-            onClickListener = View.OnClickListener { v ->
-                val item = v.tag as ChatDAO.ChatUtente
-                val viewElement = v as ViewGroup
-
-                if (twoPane) {
-                    viewElement.setBackgroundColor(Color.parseColor("#81D4FA"))
-                    val fragment = ItemDetailFragment().apply {
-                        //passati id chat, nome chat, immagine della chat, notifica associata alla chat e indicazione sul device (tablet o smartphone)
-                        arguments = Bundle().apply {
-                            putBoolean(ItemDetailFragment.TWO_PANE, twoPane)
-                            putLong(ItemDetailFragment.CHAT_ID, item.idChat)
-                            putString(ItemDetailFragment.CHAT_NAME,item.nomeChat)
-                            putInt(ItemDetailFragment.CHAT_IMG,item.imgChat)
-                            putString(ItemDetailFragment.NOTIFICATION,item.notificaAssociata)
-                        }
-                    }
-                    parentActivity.supportFragmentManager
-                            .beginTransaction()
-                            .replace(R.id.item_detail_container, fragment)
-                            .commit()
-                } else {
-                    //passati id chat, nome chat e immagine della chat e notifica associata alla chat
-                    val intent = Intent(v.context, ItemDetailActivity::class.java).apply {
-                        putExtra(ItemDetailFragment.CHAT_ID, item.idChat)
-                        putExtra(ItemDetailFragment.CHAT_NAME,item.nomeChat)
-                        putExtra(ItemDetailFragment.CHAT_IMG,item.imgChat)
-                        putExtra(ItemDetailFragment.NOTIFICATION,item.notificaAssociata)
-                    }
-                    v.context.startActivity(intent)
-                }
-            }
-        }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder {
             val view = LayoutInflater.from(parent.context)
@@ -267,23 +267,64 @@ class ItemListActivity : AppCompatActivity() {
 
         //funzione che "compila" il view holder appena creato
         override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
+            //if che si azione durante la rigenerazione della RecyclerView dopo un restore del device,
+            //serve a selezionare la chat selezionata prima del restore. Si esegue ovviamente quando siamo su tablet
+            if(indexClickedChat == position  && twoPane){
+                //imposto la chat data come chat cliccata in questo momento
+                clickedChat = holder.itemView
+                //cambio i colori della chat in modo da far vedere che è quella selezionata
+                clickChat()
+            }
             val item = values[position]
             holder.image.setImageResource(item.imgChat)
             holder.name.text=item.nomeChat
             holder.notification.text = item.notificaAssociata
-            val dateFormat: DateFormat = SimpleDateFormat("hh:mm")
+            val dateFormat: DateFormat = SimpleDateFormat("hh:mm", Locale.ITALY)
             val strDate: String = dateFormat.format(item.lastMessageDateTime)
             holder.time.text = strDate
-
             with(holder.itemView) {
-                tag = item
-                //imposto il listener scritto sopra
-                setOnClickListener(onClickListener)
+                //imposto il listener
+                setOnClickListener{ v ->
+                    if (twoPane) {
+                        //se è presente una chat precedentemente cliccata la deseleziono
+                        if(clickedChat!=null) {
+                            unclickChat()
+                        }
+                        //aggiorno indice e riferimento alla chat attualmente selezionata
+                        indexClickedChat = position
+                        clickedChat=v
+                        clickChat()
+                        val fragment = ItemDetailFragment().apply {
+                            //passati id chat, nome chat, immagine della chat, notifica associata alla chat e indicazione sul device (tablet o smartphone)
+                            arguments = Bundle().apply {
+                                putBoolean(ItemDetailFragment.TWO_PANE, twoPane)
+                                putLong(ItemDetailFragment.CHAT_ID, item.idChat)
+                                putString(ItemDetailFragment.CHAT_NAME,item.nomeChat)
+                                putInt(ItemDetailFragment.CHAT_IMG,item.imgChat)
+                                putString(ItemDetailFragment.NOTIFICATION,item.notificaAssociata)
+                            }
+                        }
+                        parentActivity.supportFragmentManager
+                                .beginTransaction()
+                                .replace(R.id.item_detail_container, fragment)
+                                .commit()
+                    } else {
+                        //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                        val intent = Intent(v.context, ItemDetailActivity::class.java).apply {
+                            putExtra(ItemDetailFragment.CHAT_ID, item.idChat)
+                            putExtra(ItemDetailFragment.CHAT_NAME,item.nomeChat)
+                            putExtra(ItemDetailFragment.CHAT_IMG,item.imgChat)
+                            putExtra(ItemDetailFragment.NOTIFICATION,item.notificaAssociata)
+                        }
+                        v.context.startActivity(intent)
+                    }
+                }
             }
         }
 
         override fun getItemCount() = values.size
 
+        //classe interna per la gestione di ogni cassetto della RecycleView delle Chat
         inner class ChatViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val name: TextView = view.findViewById(R.id.name)
             val notification: TextView = view.findViewById(R.id.notication)
@@ -291,11 +332,13 @@ class ItemListActivity : AppCompatActivity() {
             val image: ImageView = view.findViewById(R.id.image)
         }
     }
+
     //Funzione che rimpiazza il fragment del dettaglio di una chat se tocco su una notifica e sono su un tablet
     private fun updateDetailFragment(intent: Intent, parentActivity: ItemListActivity){
         val fragment = ItemDetailFragment().apply {
             arguments = Bundle().apply {
-                putLong(ItemDetailFragment.CHAT_ID, intent.getLongExtra(ItemDetailFragment.CHAT_ID,-1))     //passati id chat, nome chat, immagine della chat e notifica associata alla chat
+                //passati id chat, nome chat, immagine della chat, notifica associata alla chat e indicazione sul device (tablet o smartphone)
+                putLong(ItemDetailFragment.CHAT_ID, intent.getLongExtra(ItemDetailFragment.CHAT_ID,-1))
                 putString(ItemDetailFragment.CHAT_NAME,intent.getStringExtra(ItemDetailFragment.CHAT_NAME))
                 putInt(ItemDetailFragment.CHAT_IMG,intent.getIntExtra(ItemDetailFragment.CHAT_IMG,-1))
                 putString(ItemDetailFragment.NOTIFICATION,intent.getStringExtra(ItemDetailFragment.NOTIFICATION))

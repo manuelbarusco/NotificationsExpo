@@ -63,11 +63,11 @@ L\'operazione è irreversibile
     <string name="expandable_notification">Ciao, ti manderò una notifica espandibile entro qualche secondo. Una notifica espandibile è una notifica che può essere visualizzata interamente facendo uno swipe verso il basso.</string>
     <string name="image_notification">Ciao, ti manderò una notifica espandibile con una immagine entro qualche secondo. Una notifica con immagine è una notifica che in versione compatta presenta una miniatura del contenuto inviato ed in versione estesa visualizza l\'immagine intera.</string>
     <string name="bubble_notification"></string>
-    <string name="multiple_notifications"></string>
+    <string name="multiple_notifications">Ciao, ti manderò una notifica multipla entro qualche secondo. Una notifica multipla è un\'unica notifica che raggruppa al suo interno più notifiche. Ti trovi in una chat di gruppo, quindi più messaggi inviati dai componenti del gruppo verranno raggruppati in quest\'unica notifica la quale è espandibile</string>
     <string name="custom_notifications"></string>
     <string name="conversation_notifications"></string>
     <string name="media_control_notification"></string>
-    <string name="background_process_notification"></string>
+    <string name="background_process_notification">Ciao, ti manderò la notifica di un processo in background entro qualche secondo. Questo tipo di notifica serve ad indicare all\'utente l\'esecuzione di un processo in background come il download di una risorsa ecc. In questo caso vedrai l\'esecuzione di un semplice download di una foto </string>
     <string name="quick_actions_notification"></string>
 
     <string-array name="dummy_messages">

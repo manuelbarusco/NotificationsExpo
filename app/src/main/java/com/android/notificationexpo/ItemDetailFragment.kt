@@ -11,7 +11,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.Toolbar;
+import androidx.appcompat.widget.Toolbar
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
@@ -26,23 +26,28 @@ import com.android.notificationexpo.receivers.AlarmManagerReceiver
  * on handsets.
  */
 class ItemDetailFragment : Fragment() {
-    private var twopane: Boolean = true
-    private var chat_id:Long= -1
-    private var nome_chat:String?=null
-    private var img_chat:Int=-1
-    private var notifica_chat:String?=null
-    private lateinit var user:String
+    private var twopane: Boolean = true                              //indicazione sulla dimensione del dispositivo
+    private var chat_id:Long= -1                                     //id della chat rappresentata dal fragment
+    private var nome_chat:String?=null                               //nome della chat rappresentata dal fragment
+    private var img_chat:Int=-1                                      //immagine della chat rappresentata dal fragment
+    private var notifica_chat:String?=null                           //notifica associata alla chat rappresentata dal fragment
+    private lateinit var user:String                                 //utente che sta usando l'app
     private lateinit var repository: NotificationExpoRepository
-    private lateinit var messaggi: MutableList<Messaggio>
+    private lateinit var messaggi: MutableList<Messaggio>            //lista di messaggi della chat
     private lateinit var recyclerView: RecyclerView
-    private var time: Int = 2
+    private var time: Int = 2                                        //valore di default del tempo di risposta al messaggio
     private var preferences: SharedPreferences? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        //recupero dalle shared preferences l'utente che sta usando l'app
         preferences = activity?.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
         user = preferences?.getString(ItemListActivity.KEY_USER,"") as String
 
+        //recupero tutte le informazioni per la visualizzazione della chat passate dalla
+        //activity ItemListActivity in caso di dispositivo tablet (twopane=true) o
+        //dall activity ItemDetailActivity in caso di dispositivo smartphone (twopane=false)
         arguments?.let {
             if (it.containsKey(CHAT_ID))
                 chat_id=it.getLong(CHAT_ID)
@@ -59,21 +64,32 @@ class ItemDetailFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.chat_detail, container, false)
+
+        //disattivo la toolbar (si vede solo in modalità smartphone) in modo da non avere la sovrapposizione di due toolbar
         if(twopane) {
             val toolbar: Toolbar=rootView.findViewById(R.id.toolbar_chat)
             toolbar.visibility=Toolbar.GONE
         }
+
+        //imposto nome e immagine della chat
         val chat_name_view:TextView=rootView.findViewById(R.id.chat_name)
         val chat_img_view:ImageView=rootView.findViewById(R.id.chat_image)
         chat_name_view.text=nome_chat
         chat_img_view.setImageResource(img_chat)
-        //TODO: risolvere problema action bar
         recyclerView=rootView.findViewById(R.id.recycler_chat)
+
+        //ottengo una reference alla repository
         if(context!=null)
             repository= NotificationExpoRepository.get(context as Context)
+
+        //recupero il tipo di chat dalla lista dei partecipanti alla chat:
+        //se il numero di partecipanti alla chat (escluso l'utente che sta usando la app) è > 1 allora la chat è di gruppo
+        //altrimenti è una chat privata
         var chat_type= MessageAdapter.PRIVATE_CHAT
         if(repository.getChatUtenti(chat_id, user).size>1)
             chat_type=MessageAdapter.GROUP_CHAT
+
+        //recupero la lista dei messaggi della chat
         repository.getChatMessages(chat_id).observe(
                 viewLifecycleOwner,
                 androidx.lifecycle.Observer {messaggi->
@@ -83,11 +99,13 @@ class ItemDetailFragment : Fragment() {
                     }
                 }
         )
+
         val userText: EditText=rootView.findViewById(R.id.user_text)
         val sendButton: Button= rootView.findViewById(R.id.button_chat_send)
 
         sendButton.setOnClickListener {
-            val mex: Messaggio=Messaggio(testo = userText.text.toString(), mittente = user, media = null, chat=chat_id)
+            //creo un messaggio col testo inserito per inserirlo poi nel Database e aggiornare la RecyclerView
+            val mex=Messaggio(testo = userText.text.toString(), mittente = user, media = null, chat=chat_id)
             repository.addMessage(mex)
             messaggi.add(mex)
             recyclerView.adapter?.notifyItemInserted(messaggi.size)
@@ -95,9 +113,8 @@ class ItemDetailFragment : Fragment() {
 
             // Impostiamo il timer e dopo un certo tempo verrà inviato un broadcast esplicito ad
             // AlarmMangerReceiver
-
             val alarmManager: AlarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            var alarmIntent = Intent(context, AlarmManagerReceiver::class.java) // intent esplicito
+            val alarmIntent = Intent(context, AlarmManagerReceiver::class.java) // intent esplicito
             alarmIntent.putExtra(NOTIFICATION,notifica_chat)
             alarmIntent.putExtra(CHAT_ID,chat_id)
             alarmIntent.putExtra(CHAT_NAME,nome_chat)
@@ -113,7 +130,7 @@ class ItemDetailFragment : Fragment() {
             // https://developer.android.com/reference/android/app/AlarmManager
             time = preferences?.getInt(SettingsActivity.SECONDS,2) as Int
             Log.d("seconds", time.toString())
-            alarmManager?.setExact(
+            alarmManager.setExact(
                     AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     SystemClock.elapsedRealtime() + time * 1000,
                     pendingIntent)

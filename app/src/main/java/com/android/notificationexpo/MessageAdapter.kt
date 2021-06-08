@@ -10,12 +10,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.android.notificationexpo.database.entities.Messaggio
-
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MessageAdapter(val messageList: List<Messaggio>, val imgChat: Int, val chat_type: Int, val adapterContext: Context?) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
+
+//classe adapter per la recycler view dei messaggi presente nel ItemDetailFragment
+class MessageAdapter(private val messageList: List<Messaggio>, private val imgChat: Int, private val chat_type: Int, private val adapterContext: Context?) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
 
     companion object {
         const val PRIVATE_CHAT = 0
@@ -32,10 +33,11 @@ class MessageAdapter(val messageList: List<Messaggio>, val imgChat: Int, val cha
         private var imgMessage: ImageView? = null
 
         private var myAudioResource: Int? = null
-        private var userName: String? = null //L'utente che ha inviato il messaggio
+        private var mittente: String? = null //L'utente che ha inviato il messaggio
         private var userImageResource: Int? = null
 
         init{
+            //recupero il tipo di messaggio, in modo da caricare il giusto layout per il cassetto
             if(viewType == Messaggio.MESSAGE_RECEIVED && chat_type == GROUP_CHAT)
                 messageSender = itemView.findViewById(R.id.message_sender)
             if(viewType == Messaggio.MESSAGE_RECEIVED_IMG)
@@ -49,7 +51,7 @@ class MessageAdapter(val messageList: List<Messaggio>, val imgChat: Int, val cha
                 val serviceIntent = Intent(adapterContext, PlayerService::class.java) // Intent esplicito (che identifica il mio player service)
                 serviceIntent.putExtra(PlayerService.PLAY_START, true)
                 serviceIntent.putExtra(PlayerService.AUDIO_RESOURCE, myAudioResource)
-                serviceIntent.putExtra(PlayerService.AUDIO_USER_NAME, userName)
+                serviceIntent.putExtra(PlayerService.AUDIO_USER_NAME, mittente)
                 serviceIntent.putExtra(PlayerService.AUDIO_USER_IMAGE_RESOURCE, userImageResource)
                 // Metto un intent extra che indica l'operazione che deve essere compiuta (play).
                 // E' una coppia chiave-valore (chiave: PLAY_START, valore: true)
@@ -61,6 +63,7 @@ class MessageAdapter(val messageList: List<Messaggio>, val imgChat: Int, val cha
 
             }
         }
+
 
         fun bind(messaggio: Messaggio) {
             messageText.text = messaggio.testo
@@ -76,7 +79,7 @@ class MessageAdapter(val messageList: List<Messaggio>, val imgChat: Int, val cha
             if(buttonPlayStop != null)
                 myAudioResource=messaggio.media as Int
 
-            userName = messaggio.mittente
+            mittente = messaggio.mittente
             userImageResource = imgChat
 
         }
@@ -85,7 +88,9 @@ class MessageAdapter(val messageList: List<Messaggio>, val imgChat: Int, val cha
     //metodo che verifica quale layout associare al cassetto che ospiterà il messaggio nella posizione $position
     //della lista di messaggi in base al tipo di messaggio (RECEIVED o SEND)
     override fun getItemViewType(position: Int): Int {
-        if(messageList[position].mittente=="Alberto")
+        val preferences = adapterContext?.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+        val userApp = preferences?.getString(ItemListActivity.KEY_USER,"") as String
+        if(messageList[position].mittente==userApp)
             return Messaggio.MESSAGE_SEND
         else {
             if(messageList[position].media!= null) {
