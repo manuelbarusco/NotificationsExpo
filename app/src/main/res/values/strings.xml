@@ -66,7 +66,7 @@ L\'operazione è irreversibile
     <string name="multiple_notifications">Ciao, ti manderò una notifica multipla entro qualche secondo. Una notifica multipla è un\'unica notifica che raggruppa al suo interno più notifiche. Ti trovi in una chat di gruppo, quindi più messaggi inviati dai componenti del gruppo verranno raggruppati in quest\'unica notifica la quale è espandibile</string>
     <string name="custom_notifications"></string>
     <string name="conversation_notifications"></string>
-    <string name="media_control_notification"></string>
+    <string name="media_control_notification">Ciao, per attivare la notifica Media Control mandami un messaggio. Non è necessario uscire dall\'app ma bisogna cliccare sull\'icona Play del messaggio che ti manderò. Per terminare la riproduzione dell\'audio clicca sul pulsante Stop della notifica</string>
     <string name="background_process_notification">Ciao, ti manderò la notifica di un processo in background entro qualche secondo. Questo tipo di notifica serve ad indicare all\'utente l\'esecuzione di un processo in background come il download di una risorsa ecc. In questo caso vedrai l\'esecuzione di un semplice download di una foto </string>
     <string name="quick_actions_notification"></string>
 
