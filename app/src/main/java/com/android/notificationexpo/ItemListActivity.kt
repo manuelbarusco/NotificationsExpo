@@ -44,6 +44,7 @@ class ItemListActivity : AppCompatActivity() {
      */
     private var twoPane: Boolean = false
     private lateinit var repository: NotificationExpoRepository
+    private var nChat: Int =0
     private var clickedChat: View?=null
     private var indexClickedChat : Int?=null
 
@@ -143,6 +144,7 @@ class ItemListActivity : AppCompatActivity() {
                 this,
                 Observer {chat->
                     chat?.let{
+                        nChat=chat.size
                         updateUI(chat)
                     }
                 }
@@ -175,6 +177,12 @@ class ItemListActivity : AppCompatActivity() {
         clickedChat!!.findViewById<TextView>(R.id.name).setTextColor(Color.parseColor("#000000"))
         clickedChat!!.findViewById<TextView>(R.id.chat_time).setTextColor(Color.parseColor("#b2b2b2"))
         clickedChat!!.findViewById<View>(R.id.line).visibility=View.VISIBLE
+    }
+
+    //metodo per modificare in modo controllato il campo indexClickedChat
+    fun setIndexClickedChat(index: Int){
+        if(index>=0 && index<nChat)
+            indexClickedChat=index
     }
 
     override fun onPause() {
@@ -286,28 +294,32 @@ class ItemListActivity : AppCompatActivity() {
                 //imposto il listener
                 setOnClickListener{ v ->
                     if (twoPane) {
-                        //se è presente una chat precedentemente cliccata la deseleziono
-                        if(clickedChat!=null) {
-                            unclickChat()
-                        }
-                        //aggiorno indice e riferimento alla chat attualmente selezionata
-                        indexClickedChat = position
-                        clickedChat=v
-                        clickChat()
-                        val fragment = ItemDetailFragment().apply {
-                            //passati id chat, nome chat, immagine della chat, notifica associata alla chat e indicazione sul device (tablet o smartphone)
-                            arguments = Bundle().apply {
-                                putBoolean(ItemDetailFragment.TWO_PANE, twoPane)
-                                putLong(ItemDetailFragment.CHAT_ID, item.idChat)
-                                putString(ItemDetailFragment.CHAT_NAME,item.nomeChat)
-                                putInt(ItemDetailFragment.CHAT_IMG,item.imgChat)
-                                putString(ItemDetailFragment.NOTIFICATION,item.notificaAssociata)
+                        //controllo se la chat appena selezionata è la chat precedente selezionata, in tal caso non faccio nulla
+                        //se invece la nuova chat selezionata è diversa da quella precedente allora aggiorno il fragment, effettuo le deselezioni ecc. 
+                        if(position!=indexClickedChat) {
+                            //se è presente una chat precedentemente selezionata la deseleziono
+                            if (clickedChat != null) {
+                                unclickChat()
                             }
+                            //aggiorno indice e riferimento alla chat attualmente selezionata
+                            indexClickedChat = position
+                            clickedChat = v
+                            clickChat()
+                            val fragment = ItemDetailFragment().apply {
+                                //passati id chat, nome chat, immagine della chat, notifica associata alla chat e indicazione sul device (tablet o smartphone)
+                                arguments = Bundle().apply {
+                                    putBoolean(ItemDetailFragment.TWO_PANE, twoPane)
+                                    putLong(ItemDetailFragment.CHAT_ID, item.idChat)
+                                    putString(ItemDetailFragment.CHAT_NAME, item.nomeChat)
+                                    putInt(ItemDetailFragment.CHAT_IMG, item.imgChat)
+                                    putString(ItemDetailFragment.NOTIFICATION, item.notificaAssociata)
+                                }
+                            }
+                            parentActivity.supportFragmentManager
+                                    .beginTransaction()
+                                    .replace(R.id.item_detail_container, fragment)
+                                    .commit()
                         }
-                        parentActivity.supportFragmentManager
-                                .beginTransaction()
-                                .replace(R.id.item_detail_container, fragment)
-                                .commit()
                     } else {
                         //passati id chat, nome chat e immagine della chat e notifica associata alla chat
                         val intent = Intent(v.context, ItemDetailActivity::class.java).apply {

@@ -106,9 +106,14 @@ class ItemDetailFragment : Fragment() {
         sendButton.setOnClickListener {
             //creo un messaggio col testo inserito per inserirlo poi nel Database e aggiornare la RecyclerView
             val mex=Messaggio(testo = userText.text.toString(), mittente = user, media = null, chat=chat_id)
+
             repository.addMessage(mex)
             messaggi.add(mex)
+
+            //aggiorno la recycler view dei messaggi e aggiorno l'indice dell'elemento selezionato dato che ora la chat data si trova in
+            //cima alla lista delle chat nella ItemListActitivy
             recyclerView.adapter?.notifyItemInserted(messaggi.size)
+            (activity as ItemListActivity).setIndexClickedChat(0)
             userText.text.clear()
 
             // Impostiamo il timer e dopo un certo tempo verrà inviato un broadcast esplicito ad
