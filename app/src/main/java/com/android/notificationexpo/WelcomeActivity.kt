@@ -134,7 +134,7 @@ class WelcomeActivity : FragmentActivity() { // TODO Mettere FragmentActivity di
                 // Vado alla pagina successiva
                 welcomeViewPager.currentItem = welcomeViewPager.currentItem + 1
             }
-            if (welcomeViewPager.currentItem == 4){
+            else if (welcomeViewPager.currentItem == 4){
                 // Se siamo qui l'utente vuole uscire dal welcome screen e andare alla schemrata successiva
                 this.finish() //Chiudo questa activity
             }
