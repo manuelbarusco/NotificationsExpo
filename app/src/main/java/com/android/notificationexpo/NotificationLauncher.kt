@@ -182,42 +182,9 @@ class NotificationLauncher(
         val summary_id= 0
         val group_notification = "com.android.NotificationExpo.MULTIPLE_MESSAGES"
 
-        //TODO aggiungere intent ad ogni notifica singola quindi impostare questi intent per smartphone e tablet
-
-        val newMessageNotification1 = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
-                .setSmallIcon(R.drawable.group)
-                .setContentTitle(messagesToSend[0].mittente.nickname)
-                .setContentText(messagesToSend[0].messaggio.testo)
-                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[0].mittente.imgProfilo))
-                .setGroup(group_notification)
-                .build()
-
-        val newMessageNotification2 = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
-                .setSmallIcon(R.drawable.group)
-                .setContentTitle(messagesToSend[1].mittente.nickname)
-                .setContentText(messagesToSend[1].messaggio.testo)
-                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[1].mittente.imgProfilo))
-                .setGroup(group_notification)
-                .build()
-
-        val newMessageNotification3 = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
-                .setSmallIcon(R.drawable.group)
-                .setContentTitle(messagesToSend[2].mittente.nickname)
-                .setContentText(messagesToSend[2].messaggio.testo)
-                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[2].mittente.imgProfilo))
-                .setGroup(group_notification)
-                .build()
-
-        val newMessageNotification4 = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
-                .setSmallIcon(R.drawable.group)
-                .setContentTitle(messagesToSend[3].mittente.nickname)
-                .setContentText(messagesToSend[3].messaggio.testo)
-                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[3].mittente.imgProfilo))
-                .setGroup(group_notification)
-                .build()
-
         val target: Intent
         val pendingIntent: PendingIntent
+
         if(!twopane) {
             target = Intent(context, ItemDetailActivity::class.java)
                     .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
@@ -236,6 +203,42 @@ class NotificationLauncher(
                     .putExtra(AlarmManagerReceiverAlwaysOn.UPDATE_FRAGMENT,true)
             pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
         }
+
+        val newMessageNotification1 = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
+                .setSmallIcon(R.drawable.group)
+                .setContentTitle(messagesToSend[0].mittente.nickname)
+                .setContentText(messagesToSend[0].messaggio.testo)
+                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[0].mittente.imgProfilo))
+                .setGroup(group_notification)
+                .setContentIntent(pendingIntent)
+                .build()
+
+        val newMessageNotification2 = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
+                .setSmallIcon(R.drawable.group)
+                .setContentTitle(messagesToSend[1].mittente.nickname)
+                .setContentText(messagesToSend[1].messaggio.testo)
+                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[1].mittente.imgProfilo))
+                .setContentIntent(pendingIntent)
+                .setGroup(group_notification)
+                .build()
+
+        val newMessageNotification3 = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
+                .setSmallIcon(R.drawable.group)
+                .setContentTitle(messagesToSend[2].mittente.nickname)
+                .setContentText(messagesToSend[2].messaggio.testo)
+                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[2].mittente.imgProfilo))
+                .setContentIntent(pendingIntent)
+                .setGroup(group_notification)
+                .build()
+
+        val newMessageNotification4 = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
+                .setSmallIcon(R.drawable.group)
+                .setContentTitle(messagesToSend[3].mittente.nickname)
+                .setContentText(messagesToSend[3].messaggio.testo)
+                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[3].mittente.imgProfilo))
+                .setContentIntent(pendingIntent)
+                .setGroup(group_notification)
+                .build()
 
         val summaryNotification = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
                 .setContentTitle(chat_name)

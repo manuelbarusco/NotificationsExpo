@@ -24,7 +24,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var preferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        //TODO: togliere i log
+
         super.onCreate(savedInstanceState)
         preferences = getSharedPreferences("Preferences", Context.MODE_PRIVATE)
         // Display the layout
@@ -39,7 +39,6 @@ class SettingsActivity : AppCompatActivity() {
         slider.addOnChangeListener { _, value, _ ->
             seconds = value.toInt()
             modified = true
-            Log.d("seconds", "modificato in $seconds")
         }
 
         // Set the action to be performed when the button is pressed
@@ -80,7 +79,6 @@ class SettingsActivity : AppCompatActivity() {
         super.onPause()
         if(modified) {
             preferences.edit().putInt(SECONDS, seconds).apply()
-            Log.d("seconds", "salvato ${seconds}")
         }
     }
     companion object{

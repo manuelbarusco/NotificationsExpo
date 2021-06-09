@@ -6,7 +6,6 @@
     android:layout_height="wrap_content"
     android:layout_marginStart="8dp"
     android:layout_marginTop="16dp">
-    <!-- TODO: sistemare constraint verticale -->
 
     <androidx.cardview.widget.CardView
         android:id="@+id/card_gchat_message_other"
@@ -17,7 +16,8 @@
         app:cardElevation="0dp"
         app:cardPreventCornerOverlap="false"
         app:cardUseCompatPadding="true"
-        tools:layout_editor_absoluteY="60dp">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:id="@+id/layout_gchat_container_other"
@@ -31,7 +31,7 @@
                 android:layout_height="50dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/image_play"/>
+                android:background="@drawable/image_play" />
 
             <TextView
                 android:id="@+id/text_message"

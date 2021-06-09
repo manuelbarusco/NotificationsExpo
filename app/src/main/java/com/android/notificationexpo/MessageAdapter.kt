@@ -84,7 +84,7 @@ class MessageAdapter(private val messageList: List<Messaggio>, private val imgCh
 
         }
     }
-    //TODO recuperare utente dalle shared
+
     //metodo che verifica quale layout associare al cassetto che ospiterà il messaggio nella posizione $position
     //della lista di messaggi in base al tipo di messaggio (RECEIVED o SEND)
     override fun getItemViewType(position: Int): Int {

@@ -11,7 +11,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.android.notificationexpo.welcomeFragments.*
 
-class WelcomeActivity : FragmentActivity() { // TODO Mettere FragmentActivity diasattiva l'App bar, da capire perchè
+class WelcomeActivity : FragmentActivity() {
 
     object CONST{
         //Il numero di fragments per le pagine di benvenuto.

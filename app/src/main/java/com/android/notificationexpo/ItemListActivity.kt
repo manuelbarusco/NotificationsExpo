@@ -295,7 +295,7 @@ class ItemListActivity : AppCompatActivity() {
                 setOnClickListener{ v ->
                     if (twoPane) {
                         //controllo se la chat appena selezionata è la chat precedente selezionata, in tal caso non faccio nulla
-                        //se invece la nuova chat selezionata è diversa da quella precedente allora aggiorno il fragment, effettuo le deselezioni ecc. 
+                        //se invece la nuova chat selezionata è diversa da quella precedente allora aggiorno il fragment, effettuo le deselezioni ecc.
                         if(position!=indexClickedChat) {
                             //se è presente una chat precedentemente selezionata la deseleziono
                             if (clickedChat != null) {
