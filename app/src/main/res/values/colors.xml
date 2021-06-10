@@ -10,5 +10,6 @@
     <color name="red">#FF0000</color>
     <color name="welcome_background_A">#448AFF</color>
     <color name="welcome_background_B">#83B6FF</color>
+    <color name="welcome_text_color">#FFFFFFFF</color>
 
 </resources>

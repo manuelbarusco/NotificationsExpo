@@ -18,7 +18,7 @@
         android:layout_marginTop="30dp"
         android:text="@string/welcome0_text0"
         android:textAlignment="center"
-        android:textColor="@color/black"
+        android:textColor="@color/welcome_text_color"
         android:textSize="@dimen/welcome_text_size" />
     <LinearLayout
         android:layout_width="wrap_content"
@@ -49,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="30dp"
                 android:text="@string/welcome0_text1"
-                android:textColor="@color/black"
+                android:textColor="@color/welcome_text_color"
                 android:textSize="@dimen/welcome_text_size" />
 
             <TextView
@@ -59,7 +59,7 @@
                 android:layout_marginHorizontal="30dp"
                 android:layout_marginTop="30dp"
                 android:text="@string/welcome0_text2"
-                android:textColor="@color/black"
+                android:textColor="@color/welcome_text_color"
                 android:textSize="@dimen/welcome_text_size" />
 
         </LinearLayout>
@@ -76,7 +76,7 @@
         android:layout_marginBottom="40dp"
         android:text="@string/welcome0_text3"
         android:textAlignment="center"
-        android:textColor="@color/black"
+        android:textColor="@color/welcome_text_color"
         android:layout_gravity="center"
         android:textSize="18sp" />
 

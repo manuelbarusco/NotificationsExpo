@@ -27,7 +27,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="left"
             android:text="Indietro"
-            android:layout_marginLeft="10dp"/>
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/white"
+            android:background="@drawable/welcome_button"
+            android:layout_marginBottom="10dip"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -76,7 +79,10 @@
             android:layout_height="wrap_content"
             android:text="Avanti"
             android:layout_gravity="right"
-            android:layout_marginRight="10dp"/>
+            android:layout_marginRight="10dp"
+            android:textColor="@color/white"
+            android:background="@drawable/welcome_button"
+            android:layout_marginBottom="10dip"/>
 
 
     </FrameLayout>
