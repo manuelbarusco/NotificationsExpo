@@ -3,6 +3,7 @@ package com.android.notificationexpo
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.content.LocusId
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.BitmapFactory
@@ -36,6 +37,8 @@ class NotificationLauncher(
             ID++
             return ID-1
         }
+        const val ACTION_BUBBLE = "com.android.NotificationsExpo.BUBBLE"
+        const val ACTION_CONVERSATION = "com.android.NotificationsExpo.CONVERSATION"
     }
 
     //tutti i metodi di seguito hanno come parametro il notification_id il quale specifica l'id da usare nel lancio della notifica
@@ -110,7 +113,7 @@ class NotificationLauncher(
         }
         else{
             target = Intent(context, ItemListActivity::class.java)
-                    .putExtra(ItemDetailFragment.CHAT_ID, notification_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
                     .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
                     .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                     .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
@@ -152,7 +155,7 @@ class NotificationLauncher(
         }
         else{
             target = Intent(context, ItemListActivity::class.java)
-                    .putExtra(ItemDetailFragment.CHAT_ID, notification_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
                     .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
                     .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                     .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
@@ -196,7 +199,7 @@ class NotificationLauncher(
         }
         else{
             target = Intent(context, ItemListActivity::class.java)
-                    .putExtra(ItemDetailFragment.CHAT_ID, notification_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
                     .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
                     .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                     .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
@@ -273,12 +276,12 @@ class NotificationLauncher(
     }
 
     fun launchBubbleNotification(notification_id: Int = chat_id.toInt()){
-        val target = Intent(context, ItemDetailActivity::class.java)
+        val target = Intent(context, BubbleActivity::class.java)
                 .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
                 .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
                 .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                 .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
-                .setAction("com.android.NotificationsExpo.BUBBLE")
+                .setAction(ACTION_BUBBLE)
 
         /*Oggetto Person può essere riutilizzato su altre API per una migliore integrazione
         * setImortant per indicare gli utenti che interagiscono frequentemente con l'utente*/
@@ -303,6 +306,7 @@ class NotificationLauncher(
                 .setLongLabel(chat_name as CharSequence)
                 .setIntent(target)
                 .setPerson(person)
+                .setLocusId(LocusId(notification_id.toString()))
                 .build()
 
         /*pubblico lo shortcut come dinamico tramite pushDynamicShortcut che in automatico gestisce il limite
@@ -310,7 +314,7 @@ class NotificationLauncher(
         val shortcutManager: ShortcutManager = context.getSystemService(AppCompatActivity.SHORTCUT_SERVICE) as ShortcutManager
         shortcutManager.pushDynamicShortcut(shortcut)
 
-        //Invece di fare come sopra (commento) posso riutilizzare i dati dello shortcut passando il suo id
+        //Invece di creare dei bubbleMetadata da "zero" posso riutilizzare i dati dello shortcut passando il suo id
         /*setDesiredHeight(600) --> imposta la lunghezza della bubble espansa (in dp)
         * setAutoExpandBubble(true) --> bubble espansa in automatico (solo se l'app è in foreground) default = false
         * .setSuppressNotification()--> imposta se la bubble verrà pubblicato senza la notifica associata nell'area apposita default = false.*/
@@ -334,7 +338,6 @@ class NotificationLauncher(
         /*Per fare in modo che una notifica sia una notifica conversation serve impostare anche un MessagingSyle*/
         val notification = Notification.Builder(context, ItemListActivity.BUBBLES)
                 .setBubbleMetadata(bubbleData)
-                .addPerson(person)
                 .setSmallIcon(R.drawable.ic_launcher_foreground) //TODO: mettere immagine migliore
                 .setStyle(Notification.MessagingStyle(person)
                         .addMessage(message1)
@@ -411,7 +414,6 @@ class NotificationLauncher(
         if(!twopane) {
             target = Intent(context, ItemDetailActivity::class.java)
                     .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
-                    .putExtra(ItemDetailFragment.NOTIFICATION_ID, notification_id)
                     .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
                     .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                     .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
@@ -420,7 +422,6 @@ class NotificationLauncher(
         else{
             target = Intent(context, ItemListActivity::class.java)
                     .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
-                    .putExtra(ItemDetailFragment.NOTIFICATION_ID, notification_id)
                     .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
                     .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                     .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
@@ -452,21 +453,23 @@ class NotificationLauncher(
         /*Creo l'intent ed il PendingIntent per la notifica a seconda se sono su table o su smartphone*/
         if (!twopane) {
             target = Intent(context, ItemDetailActivity::class.java)
-                    .putExtra(ItemDetailFragment.CHAT_ID, notification_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
                     .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
                     .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                     .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
-                    .setAction("com.android.NotificationsExpo.CONVERSATION")
+                    .setAction(ACTION_CONVERSATION)
+           //target.apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT}
             pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+
         }
         else{
             target = Intent(context, ItemListActivity::class.java)
-                    .putExtra(ItemDetailFragment.CHAT_ID, notification_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
                     .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
                     .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                     .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
                     .putExtra(AlarmManagerReceiverAlwaysOn.UPDATE_FRAGMENT,true)
-                    .setAction("com.android.NotificationsExpo.CONVERSATION")
+                    .setAction(ACTION_CONVERSATION)
             pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
         }
 
@@ -493,6 +496,7 @@ class NotificationLauncher(
                 .setLongLabel(chat_name as CharSequence)
                 .setIntent(target)
                 .setPerson(person)
+                .setLocusId(LocusId(notification_id.toString()))
                 .build()
 
         /*pubblico lo shortcut come dinamico tramite pushDynamicShortcut che in automatico gestisce il limite
@@ -516,6 +520,7 @@ class NotificationLauncher(
                 .setShortcutId(notification_id.toString())
                 .setContentIntent(pendingIntent)
                 .setCategory(Notification.CATEGORY_MESSAGE)
+                .setAutoCancel(true)
                 .build()
 
         notificationManager?.notify(notification_id,notification)
@@ -536,7 +541,7 @@ class NotificationLauncher(
         }
         else{
             target = Intent(context, ItemListActivity::class.java)
-                    .putExtra(ItemDetailFragment.CHAT_ID, notification_id)
+                    .putExtra(ItemDetailFragment.CHAT_ID, chat_id)
                     .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
                     .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                     .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
@@ -598,7 +603,7 @@ class NotificationLauncher(
         }
         else{
             target = Intent(context, ItemListActivity::class.java)
-                    .putExtra(ItemDetailFragment.CHAT_ID, notification_id)
+                    .putExtra(ItemDetailFragment.CHAT_ID, chat_id)
                     .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
                     .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                     .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)

@@ -70,16 +70,26 @@
         </activity>
         <activity
             android:name="com.android.notificationexpo.ItemDetailActivity"
+            android:allowEmbedded="true"
+            android:resizeableActivity="true"
             android:label="@string/title_item_detail"
-            android:parentActivityName="com.android.notificationexpo.ItemListActivity"
             android:launchMode="singleTop"
+            android:parentActivityName="com.android.notificationexpo.ItemListActivity"
             android:theme="@style/Theme.MasterDetailFlow.NoActionBar">
-            <!-- Serve per pulsante che torna indietro nella toolbar -->
+            <!-- Serve per pulsante che torna indietro nella toolbar TODO: Eliminare?-->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.android.notificationexpo.ItemListActivity" />
         </activity>
+        <activity
+            android:name="com.android.notificationexpo.BubbleActivity"
+            android:allowEmbedded="true"
+            android:resizeableActivity="true"
+            android:label="@string/title_bubble_activity"
+            android:parentActivityName="com.android.notificationexpo.ItemListActivity"
+            android:theme="@style/Theme.MasterDetailFlow.NoActionBar">
 
+        </activity>
 
 
         <!--

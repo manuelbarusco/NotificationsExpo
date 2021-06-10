@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Notifications Expo</string>
     <string name="title_item_detail">Item Detail</string>
+    <string name="title_bubble_activity">Bubble Activity</string>
     <string name="istructions">Istruzioni</string>
     <string name="settings">Impostazioni</string>
     <string name="credits">Crediti</string>
@@ -62,13 +63,13 @@ L\'operazione è irreversibile
     <string name="welcome4_text1">Cliccare su "INIZIA" per iniziare</string>
     <string name="expandable_notification">Ciao, ti manderò una notifica espandibile entro qualche secondo. Una notifica espandibile è una notifica che può essere visualizzata interamente facendo uno swipe verso il basso.</string>
     <string name="image_notification">Ciao, ti manderò una notifica espandibile con una immagine entro qualche secondo. Una notifica con immagine è una notifica che in versione compatta presenta una miniatura del contenuto inviato ed in versione estesa visualizza l\'immagine intera.</string>
-    <string name="bubble_notification"></string>
+    <string name="bubble_notification">Ciao, per attivare una Chat Bubble inviami un messaggio. Entro qualche secondo ti invierò una risposta tramite una Conversation Notification per attivare la Bubble tocca il pulsante sotto il messaggio oppure imposta la priorità massima sulla mia notifica così la Chat Bubble comparirà di default. Una volta attivata ed espansa puoi scrivermi da lì</string>
     <string name="multiple_notifications">Ciao, ti manderò una notifica multipla entro qualche secondo. Una notifica multipla è un\'unica notifica che raggruppa al suo interno più notifiche. Ti trovi in una chat di gruppo, quindi più messaggi inviati dai componenti del gruppo verranno raggruppati in quest\'unica notifica la quale è espandibile</string>
-    <string name="custom_notifications"></string>
-    <string name="conversation_notifications"></string>
+    <string name="custom_notifications">Ciao, ti manderò una notifica custom entro qualche secondo. Con le notifiche custom è possibile definite un layout personalizzato sia per la notifica non espansa sia per quella espansa. Quando arriverà il messaggio espandi la notifica così potrai scegliere tra quattro risposte</string>
+    <string name="conversation_notifications">Ciao, ti manderò una Conversation Notification entro qualche secondo. Una Conversation Notification è una notifica particolare creata apposta per i messaggi delle chat che rimane sempre in cima nel panello delle notifiche in una sezione apposita</string>
     <string name="media_control_notification">Ciao, per attivare la notifica Media Control mandami un messaggio. Non è necessario uscire dall\'app ma bisogna cliccare sull\'icona Play del messaggio che ti manderò. Per terminare la riproduzione dell\'audio clicca sul pulsante Stop della notifica</string>
     <string name="background_process_notification">Ciao, ti manderò la notifica di un processo in background entro qualche secondo. Questo tipo di notifica serve ad indicare all\'utente l\'esecuzione di un processo in background come il download di una risorsa ecc. In questo caso vedrai l\'esecuzione di un semplice download di una foto </string>
-    <string name="quick_actions_notification"></string>
+    <string name="quick_actions_notification">Ciao, ti manderò una notifica che permette di rispondere direttamente da essa. Ricorda che, se mi risponderai dalla notifica, io ti scriverò di nuovo sempre dopo 2 secondi</string>
 
     <string-array name="dummy_messages">
         <item>Ciao</item>

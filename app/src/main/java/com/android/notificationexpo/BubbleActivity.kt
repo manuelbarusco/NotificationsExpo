@@ -7,18 +7,18 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import com.android.notificationexpo.receivers.AlarmManagerReceiver
 
-/**
- * An activity representing a single Item detail screen. This
- * activity is only used on narrow width devices. On tablet-size devices,
- * item details are presented side-by-side with a list of ITEMS
- * in a [ItemListActivity].
- */
-class ItemDetailActivity : AppCompatActivity() {
+/*Classe identica a ItemDetailActivity, serve per gestire il fatto che se espando una Chat Bubble (quindi creo un instanza
+* di ItemDetailActivity) poi tocco una qualsiasi altra notifica che ha un intent che lancia ItemDetailActivity Android esegue
+* onRestart() -> onStart() -> onResume() di ItemDetailActivity senza passare per onCreate(). Quindi, visto che in onCreate()
+* c'è il codice necessario per visualizzare il fragment corretto (riga 51-68), al tocco della notifica viene visualizzata
+* sempre l'Activity ridimensionata collegata alla Bubble. Usando un'Activity con un nome diverso, che viene invocata solo se si
+* espande una Bubble, il problema viene risolto.*/
 
+class BubbleActivity: AppCompatActivity() {
     // Broadcast receiver
     // Lo scopo di questo boradcast receiver, che viene chiamto sicuramente prima di
     // AlarmManagerReceiverAlwaysOn (in quanto si usano gli ordered broadcast) è quello di
@@ -98,4 +98,5 @@ class ItemDetailActivity : AppCompatActivity() {
         this.unregisterReceiver(onShowNotification)
         super.onPause()
     }
+
 }
