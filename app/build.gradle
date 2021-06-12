@@ -35,7 +35,7 @@ repositories {
 }
 
 dependencies {
-
+    implementation 'com.google.code.gson:gson:2.8.6'
     implementation "androidx.appcompat:appcompat:$rootProject.appCompatVersion"
     // Dependencies for working with Architecture components
     // You'll probably have to update the version numbers in build.gradle (Project)

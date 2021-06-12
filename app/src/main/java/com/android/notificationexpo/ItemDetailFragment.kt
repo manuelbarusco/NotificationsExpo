@@ -18,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.notificationexpo.database.NotificationExpoRepository
 import com.android.notificationexpo.database.entities.Messaggio
 import com.android.notificationexpo.receivers.AlarmManagerReceiver
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 /* Un Fragment che rappresenta il dettaglio di una chat. Questo Fragment è contento in ItemListActivity (per tablet)
 * oppure in ItemDetailActivity (per smartphone)*/
@@ -78,6 +80,25 @@ class ItemDetailFragment : Fragment() {
         //ottengo una reference alla repository
         if(context!=null)
             repository= NotificationExpoRepository.get(context as Context)
+
+        //accedo alle preferences
+        val preferences= context?.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+        val gson = Gson()
+        val notReadChat:ArrayList<Long>
+
+        //recupero la lista delle chat
+        val jsonChat: String? = preferences?.getString(ItemListActivity.NOT_READ, "")
+        val type = object : TypeToken<List<Long?>?>() {}.type
+        notReadChat= gson.fromJson(jsonChat, type)
+
+        //rimuovo l'id della chat alla lista
+        notReadChat.remove(chatId)
+
+        //aggiorno la lista
+        val json = gson.toJson(notReadChat)
+        if (preferences != null) {
+            preferences.edit().putString(ItemListActivity.NOT_READ, json).apply()
+        }
 
         //recupero il tipo di chat dalla lista dei partecipanti alla chat:
         //se il numero di partecipanti alla chat (escluso l'utente che sta usando la app) è > 1 allora la chat è di gruppo

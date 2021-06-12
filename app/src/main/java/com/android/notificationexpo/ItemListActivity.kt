@@ -3,10 +3,7 @@ package com.android.notificationexpo
 import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -17,15 +14,19 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.cardview.widget.CardView
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.android.notificationexpo.database.NotificationExpoRepository
 import com.android.notificationexpo.database.dao.ChatDAO
+import com.android.notificationexpo.receivers.AlarmManagerReceiver
+import com.android.notificationexpo.receivers.AlarmManagerReceiverAlwaysOn
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import com.android.notificationexpo.receivers.AlarmManagerReceiverAlwaysOn
-import com.android.notificationexpo.receivers.AlarmManagerReceiver
 import java.util.*
+import kotlin.collections.ArrayList
 
 /*Questa Activity mostra la lista delle chat disponibili con un RecyclerView. Se un elemento viene toccato ed il dispositivo
 * usato è uno smartphone l'Activity ItemDetailActivity verrà visualizzata a tutto schermo invece se il dispositivo utilizzato
@@ -36,14 +37,18 @@ class ItemListActivity : AppCompatActivity() {
     private var twoPane: Boolean = false //true -> sono su tablet
     private lateinit var repository: NotificationExpoRepository
     private var nChat: Int =0
+    private var notReadChat = ArrayList<Long>()
     private var clickedChat: View?=null
     private var indexClickedChat : Int?=null
+    private lateinit var preferences: SharedPreferences
+    private lateinit var chat_list: List<ChatDAO.ChatUtente>
 
     companion object{
         //costanti per il salvataggio di alcune SharedPreferences
         const val SELECTED_CHAT="ChatSelected"
         const val KEY_USER= "UtenteAPP"
         const val FIRST_TIME_RUNNING= "FirstTimeRunning"
+        const val NOT_READ="ChatNotRead"
 
         //Constanti per i channel ID
         const val MULTIPLE = "MultipleNotification"
@@ -55,6 +60,13 @@ class ItemListActivity : AppCompatActivity() {
         const val CUSTOM = "CustomNotification"
         const val IMG = "NotificaImmagine"
         //mancano notifica con pulsanti, notifiche con immagini
+    }
+
+    //oggetto listener che si attiva ogni qual volta viene fatta una modifica alle SharedPreferences
+    private val sharedPreferencesListener: SharedPreferences.OnSharedPreferenceChangeListener =  object : SharedPreferences.OnSharedPreferenceChangeListener {
+        override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+            updateUI()
+        }
     }
 
 
@@ -80,8 +92,19 @@ class ItemListActivity : AppCompatActivity() {
         createNotificationChannels()
 
         //imposto l'utente dell'app, in questo caso è Alberto in maniera predefinita
-        val preferences= getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+        preferences= getSharedPreferences("Preferences", Context.MODE_PRIVATE)
         preferences.edit().putString(KEY_USER, "Alberto").apply()
+        //recupero la lista di chat non lette e se non esiste la creo vuota
+
+        val gson = Gson()
+        val jsonChat: String? = preferences.getString(NOT_READ, "")
+        if(jsonChat=="") {
+            val json = gson.toJson(notReadChat)
+            preferences.edit().putString(NOT_READ, json).apply()
+        } else {
+            val type = object : TypeToken<List<Long?>?>() {}.type
+            notReadChat= gson.fromJson(jsonChat, type)
+        }
 
         //recupero la posizione nella recycler view della chat precedentemente selezionata prima del ripristino dell'applicazione
         // (in seguito ad una rotazione ad esempio)
@@ -133,11 +156,15 @@ class ItemListActivity : AppCompatActivity() {
                 this,
                 Observer {chat->
                     chat?.let{
+                        chat_list=chat
                         nChat=chat.size
                         updateUI(chat)
                     }
                 }
         )
+
+        //aggiungo un observer alle sharedpreferences
+        preferences.registerOnSharedPreferenceChangeListener(sharedPreferencesListener);
 
         // Abilito il BroadcastReceiver a runtime
         val filter = IntentFilter(AlarmManagerReceiver.ACTION_SHOW_NOTIFICATION)
@@ -145,13 +172,20 @@ class ItemListActivity : AppCompatActivity() {
     }
 
     //funzione che aggiorna la lista delle chat non appena la query al database è finita e i LiveData associati sono stati aggiornati
-    private fun updateUI(chat: List<ChatDAO.ChatUtente>){
+    private fun updateUI(chat: List<ChatDAO.ChatUtente> = this.chat_list){
+        //recupero la lista aggiornata delle chat non lette
+        val gson=Gson()
+        val preferences= getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+        val jsonChat: String? = preferences?.getString(NOT_READ, "")
+        val type = object : TypeToken<List<Long?>?>() {}.type
+        notReadChat= gson.fromJson(jsonChat, type)
         val recyclerView:RecyclerView= findViewById(R.id.item_list)
         recyclerView.adapter = ChatAdapter(this, chat, twoPane)
     }
 
     //metodo per selezionare la chat che è stata cliccata dall'utente
     private fun clickChat(){
+        clickedChat!!.findViewById<CardView>(R.id.notRead).setCardBackgroundColor(Color.parseColor("#9678cc"))
         clickedChat!!.setBackgroundColor(Color.parseColor("#9678cc"))
         clickedChat!!.findViewById<TextView>(R.id.notication).setTextColor(Color.parseColor("#FFFFFF"))
         clickedChat!!.findViewById<TextView>(R.id.chat_time).setTextColor(Color.parseColor("#FFFFFF"))
@@ -161,6 +195,7 @@ class ItemListActivity : AppCompatActivity() {
 
     //metodo per deselezionare la chat che era stata cliccata dall'utente
     private fun unclickChat(){
+        clickedChat!!.findViewById<CardView>(R.id.notRead).setCardBackgroundColor(Color.parseColor("#FFFFFF"))
         clickedChat!!.setBackgroundColor(Color.parseColor("#FFFFFF"))
         clickedChat!!.findViewById<TextView>(R.id.notication).setTextColor(Color.parseColor("#b2b2b2"))
         clickedChat!!.findViewById<TextView>(R.id.name).setTextColor(Color.parseColor("#000000"))
@@ -178,6 +213,8 @@ class ItemListActivity : AppCompatActivity() {
         super.onPause()
         // Disabilito il BroadcastReceiver a runtime
         this.unregisterReceiver(onShowNotification)
+        //disabilito observer dalle sharedpreferences
+        preferences.registerOnSharedPreferenceChangeListener(sharedPreferencesListener);
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -279,6 +316,10 @@ class ItemListActivity : AppCompatActivity() {
             val dateFormat: DateFormat = SimpleDateFormat("hh:mm", Locale.ITALY)
             val strDate: String = dateFormat.format(item.lastMessageDateTime)
             holder.time.text = strDate
+            if(item.idChat in notReadChat) {
+                Log.d("chat", "aggiorno stato")
+                holder.status.setCardBackgroundColor(Color.parseColor("#FF6200EE"))
+            }
             with(holder.itemView) {
                 //imposto il listener
                 setOnClickListener{ v ->
@@ -331,6 +372,7 @@ class ItemListActivity : AppCompatActivity() {
             val notification: TextView = view.findViewById(R.id.notication)
             val time: TextView = view.findViewById(R.id.chat_time)
             val image: ImageView = view.findViewById(R.id.image)
+            val status: CardView =view.findViewById(R.id.notRead)
         }
     }
 

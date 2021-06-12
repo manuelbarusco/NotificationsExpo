@@ -4,6 +4,7 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.LocusId
+import android.content.SharedPreferences
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.BitmapFactory
@@ -16,6 +17,8 @@ import androidx.core.content.getSystemService
 import com.android.notificationexpo.receivers.AlarmManagerReceiverAlwaysOn
 import com.android.notificationexpo.receivers.CustomNotificationReceiver
 import com.android.notificationexpo.receivers.QuickActionNotificationReceiver
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 //TODO modifica del badge
 
@@ -28,7 +31,8 @@ class NotificationLauncher(
         private val messagesToSend: MutableList<AlarmManagerReceiverAlwaysOn.MittenteMessaggio>,
         private val notificationType: String,
         private val twopane: Boolean,
-        private val context: Context
+        private val context: Context,
+        private val preferences: SharedPreferences = context.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
 
 ){
     //oggetto che permette di ottenere un ID sempre diverso per le notifiche
@@ -41,6 +45,25 @@ class NotificationLauncher(
         }
         const val ACTION_BUBBLE = "com.android.NotificationsExpo.BUBBLE"
         const val ACTION_CONVERSATION = "com.android.NotificationsExpo.CONVERSATION"
+    }
+
+    //metodo che aggiorna le chat che contengono messaggi non letti dopo che è stata inviata la notifica
+    private fun updateNotReadChat(){
+        val gson = Gson()
+        val notReadChat:ArrayList<Long>
+
+        //recupero la lista delle chat
+        val jsonChat: String? = preferences.getString(ItemListActivity.NOT_READ, "")
+        val type = object : TypeToken<List<Long?>?>() {}.type
+        notReadChat= gson.fromJson(jsonChat, type)
+
+        //aggiungo l'id della chat alla lista se non è già presente
+        if(chat_id !in notReadChat)
+            notReadChat.add(chat_id)
+
+        //aggiorno la lista
+        val json = gson.toJson(notReadChat)
+        preferences.edit().putString(ItemListActivity.NOT_READ, json).apply()
     }
 
     //tutti i metodi di seguito hanno come parametro il notification_id il quale specifica l'id da usare nel lancio della notifica
@@ -138,9 +161,12 @@ class NotificationLauncher(
                 .setAutoCancel(true)
                 .build()
 
+        updateNotReadChat()
+
         notificationManager?.notify(notification_id,notification)
     }
 
+    //funzione che lancia una notifica espandibile contenente solo testo
     fun launchExpandableNotification(notification_id: Int = getNextId()){
         val target: Intent
         val pendingIntent: PendingIntent
@@ -168,7 +194,7 @@ class NotificationLauncher(
         val notification = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
                 .setSmallIcon(R.drawable.ic_stat_name)
                 .setContentTitle(chat_name)
-                .setContentText(messagesToSend[0].messaggio.testo.substring(0,10))
+                .setContentText(messagesToSend[0].messaggio.testo.substring(0,20)+"...")
                 .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[0].mittente.imgProfilo))
                 .setStyle(NotificationCompat.BigTextStyle().bigText(messagesToSend[0].messaggio.testo))
                 .setContentIntent(pendingIntent)
@@ -177,11 +203,14 @@ class NotificationLauncher(
                 .setAutoCancel(true)
                 .build()
 
+        updateNotReadChat()
+
         notificationManager?.notify(notification_id,notification)
     }
 
+    //funzione che lancia più notifiche le quali vengono poi raggruppate
     fun launchMultipleNotifications(notification_id: Int = getNextId()){
-        //use constant ID for notification used as group summary
+        //uso un valore intero e una stringa per raggruppare le varie notifiche
         val summary_id= 0
         val group_notification = "com.android.notificationexpo.MULTIPLE_MESSAGES"
 
@@ -207,6 +236,7 @@ class NotificationLauncher(
             pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
         }
 
+        //definisco le varie notifiche singole del gruppo di notifiche, definendo per ognuna il gruppo di appartenenza
         val newMessageNotification1 = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
                 .setSmallIcon(R.drawable.ic_stat_name)
                 .setContentTitle(messagesToSend[0].mittente.nickname)
@@ -243,36 +273,41 @@ class NotificationLauncher(
                 .setGroup(group_notification)
                 .build()
 
+        //definisco una notifica di riassunto che contiene le altre notifiche
         val summaryNotification = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
                 .setContentTitle(chat_name)
-                //set content text to support devices running API level < 24
+                //set content per mantenere la compatibilità con Android API level < 24
                 .setContentText("4 Nuovi Messaggi")
                 .setSmallIcon(R.drawable.ic_stat_name)
-                //build summary info into InboxStyle template
+                //costruisco il riassunto
                 .setStyle(NotificationCompat.InboxStyle()
                         .addLine(""+messagesToSend[0].mittente.nickname+" "+messagesToSend[0].messaggio.testo)
                         .addLine(""+messagesToSend[1].mittente.nickname+" "+messagesToSend[0].messaggio.testo)
                         .setBigContentTitle("Altri due messaggi"))
-                //specify which group this notification belongs to
+                //specifico il gruppo di appartenenza di questa notifica
                 .setGroup(group_notification)
-                //set this notification as the summary for the group
+                //definisco quessta notifica come "padre" delle altre notifiche
                 .setContentIntent(pendingIntent)
                 .setGroupSummary(true)
                 .setCategory(Notification.CATEGORY_MESSAGE)
                 .setAutoCancel(true)
                 .build()
 
+        updateNotReadChat()
+
         val notificationManager: NotificationManager? = context.getSystemService()
 
         notificationManager?.apply {
+            //specifico un id diverso per ogni notifica
             notify(notification_id, newMessageNotification1)
-            notify(notification_id+1, newMessageNotification2)
-            notify(notification_id+2, newMessageNotification3)
-            notify(notification_id+3, newMessageNotification4)
+            notify(getNextId(), newMessageNotification2)
+            notify(getNextId(), newMessageNotification3)
+            notify(getNextId(), newMessageNotification4)
             notify(summary_id, summaryNotification)
         }
     }
 
+    //funzione che lancia una bubble notification
     fun launchBubbleNotification(notification_id: Int = chat_id.toInt()){
         val target = Intent(context, BubbleActivity::class.java)
                 .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
@@ -347,9 +382,12 @@ class NotificationLauncher(
 
         val notificationManager: NotificationManager? = context.getSystemService()
 
+        updateNotReadChat()
+
         notificationManager?.notify(notification_id,notification)
     }
 
+    //funzione che lancia una custom notification
     fun launchCustomNotifications(notification_id: Int = getNextId()){
         val message = messagesToSend[0].messaggio.testo
         /*Crea una notifica custom con 2 layout 1 per la notifica stantard e l'altro per la notifica espansa
@@ -439,10 +477,13 @@ class NotificationLauncher(
 
         val notificationManager: NotificationManager? = context.getSystemService()
 
+        updateNotReadChat()
+
         notificationManager?.notify(notification_id,notification.build())
 
     }
 
+    //funzione che lancia una conversation notification
     fun launchConversationNotifications(notification_id: Int = getNextId()) {
         val notificationManager: NotificationManager? = context.getSystemService()
         val shortcutManager: ShortcutManager = context.getSystemService(AppCompatActivity.SHORTCUT_SERVICE) as ShortcutManager
@@ -521,10 +562,13 @@ class NotificationLauncher(
                 .setAutoCancel(true)
                 .build()
 
+        updateNotReadChat()
+
         notificationManager?.notify(notification_id,notification)
 
     }
 
+    //funzione che lancia una media control notification
     fun launchMediaControlNotification(notification_id: Int = getNextId()){
         val target: Intent
         val pendingIntent: PendingIntent
@@ -570,9 +614,12 @@ class NotificationLauncher(
                 .setCategory(Notification.CATEGORY_MESSAGE)
                 .build()
 
+        updateNotReadChat()
+
         notificationManager?.notify(notification_id,notification)
     }
 
+    //funzione che lancia una notifica con azioni rapide su di essa
     fun launchQuickActionsNotification(notification_id: Int = getNextId()){
         /*Creo un ArrayList per salvare i messaggi che potrebbero essere scritti direttamente sulla notifica, questo serve per
         * poter aggiornare la notifica con i messaggi inviati e ricevuti mentre la notifica è ancora nel panello delle notifiche */
@@ -647,6 +694,8 @@ class NotificationLauncher(
                 .setColor(Color.GREEN)
                 .setAutoCancel(true)
                 .build()
+
+        updateNotReadChat()
 
         val notificationManager: NotificationManager? = context.getSystemService()
         notificationManager?.notify(notification_id,notification)
