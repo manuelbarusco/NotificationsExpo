@@ -2,8 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.android.notificationexpo">
 
-
-    <!--Permission usata nel boradcast (più informazioni in fondo al file)-->
+    <!--Permission usata nel boradcast (maggiori informazioni più avanti nel file)-->
     <permission
         android:name="com.android.notificationexpo.PRIVATE"
         android:protectionLevel="signature"/>
@@ -12,28 +11,20 @@
         android:name="com.android.notificationexpo.PRIVATE"/>
 
 
-
-    <!--
-    Since API level 28, apps wanting to use foreground services must request the
-    FOREGROUND_SERVICE permission.
-    This is a normal permission, so the system automatically grants it.
-    https://developer.android.com/about/versions/pie/android-9.0-migration#tya
-    -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <!--
     La permission FOREGROUND_SERVICE serve per indicare all'OS che terminare il processo avrebbe
     un effetto negativo per l'utente. Va chiamato anche il metodo startForeground.
     Permission necessaria da API level >= 28
+    https://developer.android.com/about/versions/pie/android-9.0-migration#tya
     -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
 
     <!--Per evitare, dopo aver chiamato l'opportuno metodo, che il gestore del risparmio energetico
     tolga la CPU e interrompa la musica-->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <!--TODO serve??-->
     <permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />
-
 
 
     <application
@@ -93,7 +84,7 @@
 
 
         <!--
-        Aggiungo il BroadcastReceiver che si attiva quando l'AlarmManger termina.
+        Aggiungo il BroadcastReceiver che si attiva quando scatta l'AlarmManger.
         Questo BoradcastReceiver, essendo dichiarato qui, sarà attivo anche ad app chiusa
         -->
         <receiver
@@ -133,11 +124,11 @@
 
             Questo broadcast è in ascolto di intent implicti. Utilizziamo gli intent impliciti in quanto
             con quelli espliciti possiamo notificare solo un BoradcastReceiver, mentre noi dobbiamo
-            notificarne o due o uno a seocnda dei casi (c'è un receiver attivo a runtime).
-            Per via delle restrizioni di Android ai broadcast impliciti, se dichiaramo il boradcast nel
+            notificarne o due o uno a seconda dei casi (c'è un receiver attivo solo a runtime).
+            Per via delle restrizioni di Android ai broadcast impliciti, se dichiaramo il broadcast nel
             manifest senza un adeguata permission, il broadcast non verrà recapitato.
-            Nello specifico, con il meccanismo delle permissions di livello "signature"
-            si possono riceve intent solo da app provenienti dallo stesso sviluppatore.
+            Nello specifico, con il meccanismo delle permissions di livello "signature",
+            si possono ricevere intent solo da app provenienti dallo stesso sviluppatore.
             -->
             <intent-filter android:priority="-999">
                 <!--Assegnamo la priorià più bassa possibile, in modo che in un ordereed broadcast
@@ -164,7 +155,6 @@
             <intent-filter>
                 <action android:name="RESUME_ACTION"/>
                 <action android:name="STOP_ACTION"/>
-                <action android:name="CANCEL_ACTION"/>
             </intent-filter>
         </receiver>
 

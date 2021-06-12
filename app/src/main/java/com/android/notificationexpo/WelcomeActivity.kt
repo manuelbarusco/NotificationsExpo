@@ -30,7 +30,6 @@ class WelcomeActivity : FragmentActivity() {
     private lateinit var welcomeViewPager: ViewPager2   // Il widget ViewPager2 che gestisce le animazioni e premette lo scroll orizzonatle fra i fragment
     private lateinit var myWelcomeViewPagerAdapter: WelcomeViewPagerAdapter
 
-    // TODO Nota: usando ViewPager2 viene gestita dalla classe il salvataggio dell'istanza per la transazione da portrait a landscape ma la cosa non viene scritta bene nella documentazione
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -160,7 +159,6 @@ class WelcomeActivity : FragmentActivity() {
 
     // L'adapter per ViewPager2 che permette di ottenere il Fragment corretto per ciascuna posizione
     // Nota: E' una inner class, ma funzioan anche senza dichiararla inner
-    // TODO Provare a istanziare sempre la stessa classe WelcomeFragment con diverse UI
     private inner class WelcomeViewPagerAdapter(fa: FragmentActivity) : FragmentStateAdapter(fa) {
         override fun getItemCount(): Int = CONST.NUM_WELCOME_FRAGMENTS
 

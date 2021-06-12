@@ -13,12 +13,6 @@ import com.android.notificationexpo.ItemDetailFragment
 class AlarmManagerReceiver: BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
 
-        Log.d("MyReceiver_BASE","${System.currentTimeMillis().toString()} ${intent.action}") //Mostriamo una riga con un testo sempre nuovo (altrimenti Logcat scrive che ci sono altre n righe simili)
-
-        Log.d("MyReceiver_BASE", ""+intent.getStringExtra(ItemDetailFragment.NOTIFICATION))
-        Log.d("MyReceiver_BASE", ""+intent.getLongExtra(ItemDetailFragment.CHAT_ID,-1))
-        Log.d("MyReceiver_BASE", ""+intent.getStringExtra(ItemDetailFragment.CHAT_NAME))
-
         // Invio il broadcast per mostrare la notifica (a meno che l'app non sia in background)
         val myIntent = Intent(ACTION_SHOW_NOTIFICATION) // Qui se vuoi puo aggiungere dei putExtra
         myIntent.putExtra(ItemDetailFragment.NOTIFICATION,intent.getStringExtra(ItemDetailFragment.NOTIFICATION))
@@ -36,14 +30,14 @@ class AlarmManagerReceiver: BroadcastReceiver() {
 
         // Al momento dell'invio di un oredered broadcast il resultCode verrà impostato automaticamente
         // a RESULT_OK. Se avremo un activity in foreground, il receiver relativo cambierà tale
-        // resultCode per segnalare il fatto che le motifiche non vanno mostrate (in quanto non
+        // resultCode per segnalare il fatto che le notifiche non vanno mostrate (in quanto non
         // vogliamo la visualizzazione delle notifiche ad app aperta)
 
         // L'ordine con cui saranno chiamati i receiver è il seguente:
-        // 1) Verrà chiamato il recyver relativo all'activity, se l'activity è in foreground
+        // 1) Verrà chiamato il receiver relativo all'activity, se l'activity è in foreground
         // 2) Verrà chiamatp AlarmManagerReciverAlwaysOn
-        // L'ordine è garantito dal fatto che nel manifest il receiver AlarmmangerAlwaysOn ha il campo
-        // priority impostato su -999 (questo è il valore di priorità più basso inseribile, i numeiri
+        // L'ordine è garantito dal fatto che nel manifest il receiver AlarmMangerAlwaysOn ha il campo
+        // priority impostato su -999 (questo è il valore di priorità più basso inseribile, i numeri
         // al di sotto sono riservati)
 
         // Nota sulla sicurezza:

@@ -77,10 +77,10 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
         // Se è intervenuto prima l'altro BroadcastReceiver non mostro nemmeno la notifica
         if (resultCode != Activity.RESULT_OK){
             // Vuol dire che un activity è in foreground. Non mostrare le neotifiche
-            Log.d("MyR", "Eravamo in foreground")
+            Log.d("NotificationExpo_Receiver", "Eravamo in foreground")
             return
         }
-        Log.d("MyR", "Eravamo in background")
+        Log.d("NotificationExpo_Receiver", "Eravamo in background")
 
         //delego il lancio della notifica al NotificationLauncher
         val notificationLauncher = NotificationLauncher(user, chat_id, chat_name, chat_img, messagesToSend, notificationType, twopane, context)
