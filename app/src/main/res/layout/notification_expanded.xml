@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent" android:layout_height="256dp">
 
     <ImageView
         android:id="@+id/e_notification_icon"
         android:layout_width="50dp"
-        android:layout_height="50dp" />
+        android:layout_height="50dp"
+        tools:ignore="ContentDescription" />
     <TextView
         android:id="@+id/e_notification_title"
         style="@style/TextAppearance.Compat.Notification.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingBottom="4dp"
-        android:layout_toRightOf="@id/e_notification_icon"
-        android:layout_marginLeft="30dp"
+        android:layout_toEndOf="@id/e_notification_icon"
+        android:layout_marginStart="30dp"
         android:layout_marginTop="20dp"
         android:layout_alignBaseline="@id/e_notification_icon"/>
     <TextView
@@ -24,7 +26,7 @@
         android:layout_height="wrap_content"
         android:paddingBottom="4dp"
         android:layout_below="@id/e_notification_icon"
-        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="8dp" />
 
     <LinearLayout
@@ -32,83 +34,87 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/e_notification_content"
-        android:layout_marginLeft="30dp">
+        android:layout_marginStart="30dp">
         <ImageButton
             android:id="@+id/cb_1"
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:background="@drawable/checkbox"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            tools:ignore="ContentDescription" />
         <TextView
             android:id="@+id/text_cb_1"
             style="@style/TextAppearance.Compat.Notification.Title"
             android:text="@string/text_cb_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"/>
+            android:layout_marginStart="10dp"/>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/second_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/first_layout"
-        android:layout_marginLeft="30dp"
+        android:layout_marginStart="30dp"
         android:layout_marginTop="5dp">
         <ImageButton
             android:id="@+id/cb_2"
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:background="@drawable/checkbox"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            tools:ignore="ContentDescription" />
         <TextView
             android:id="@+id/text_cb_2"
             style="@style/TextAppearance.Compat.Notification.Title"
             android:text="@string/text_cb_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"/>
+            android:layout_marginStart="10dp"/>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/third_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/second_layout"
-        android:layout_marginLeft="30dp"
+        android:layout_marginStart="30dp"
         android:layout_marginTop="5dp">
         <ImageButton
             android:id="@+id/cb_3"
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:background="@drawable/checkbox"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            tools:ignore="ContentDescription" />
         <TextView
             android:id="@+id/text_cb_3"
             style="@style/TextAppearance.Compat.Notification.Title"
             android:text="@string/text_cb_3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"/>
+            android:layout_marginStart="10dp"/>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/fourth_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/third_layout"
-        android:layout_marginLeft="30dp"
+        android:layout_marginStart="30dp"
         android:layout_marginTop="5dp">
         <ImageButton
             android:id="@+id/cb_4"
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:background="@drawable/checkbox"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            tools:ignore="ContentDescription" />
         <TextView
             android:id="@+id/text_cb_4"
             style="@style/TextAppearance.Compat.Notification.Title"
             android:text="@string/text_cb_4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"/>
+            android:layout_marginStart="10dp"/>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/button_layout"
@@ -122,14 +128,14 @@
             android:text="@string/b_invia"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="40dp"
+            android:layout_marginEnd="40dp"
             style="@style/Widget.AppCompat.Button.Borderless.Colored" />
         <Button
             android:id="@+id/b_annulla"
             android:text="@string/b_annulla"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="0dp"
+            android:layout_marginEnd="0dp"
             style="@style/Widget.AppCompat.Button.Borderless.Colored"/>
     </LinearLayout>
 </RelativeLayout>

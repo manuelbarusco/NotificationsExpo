@@ -31,7 +31,8 @@
                 android:layout_height="50dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/image_play" />
+                android:background="@drawable/image_play"
+                tools:ignore="ContentDescription" />
 
             <TextView
                 android:id="@+id/text_message"

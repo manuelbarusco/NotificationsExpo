@@ -27,22 +27,13 @@ import com.android.notificationexpo.receivers.AlarmManagerReceiverAlwaysOn
 import com.android.notificationexpo.receivers.AlarmManagerReceiver
 import java.util.*
 
-//TODO: togliere o tradurre i commenti in inglese scritti da Google
-/**
- * An activity representing a list of Pings. This activity
- * has different presentations for handset and tablet-size devices. On
- * handsets, the activity presents a list of ITEMS, which when touched,
- * lead to a [ItemDetailActivity] representing
- * item details. On tablets, the activity presents the list of ITEMS and
- * item details side-by-side using two vertical panes.
- */
+/*Questa Activity mostra la lista delle chat disponibili con un RecyclerView. Se un elemento viene toccato ed il dispositivo
+* usato è uno smartphone l'Activity ItemDetailActivity verrà visualizzata a tutto schermo invece se il dispositivo utilizzato
+* è un tablet il dettaglio verrà visualizzato a destra tramite un Fragment*/
+
 class ItemListActivity : AppCompatActivity() {
 
-    /**
-     * Whether or not the activity is in two-pane mode, i.e. running on a tablet
-     * device.
-     */
-    private var twoPane: Boolean = false
+    private var twoPane: Boolean = false //true -> sono su tablet
     private lateinit var repository: NotificationExpoRepository
     private var nChat: Int =0
     private var clickedChat: View?=null
@@ -107,10 +98,9 @@ class ItemListActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         toolbar.title = title
         if (findViewById<FrameLayout>(R.id.item_detail_container) != null) {
-            // The detail container view will be present only in the
-            // large-screen layouts (res/values-w900dp).
-            // If this view is present, then the
-            // activity should be in two-pane mode.
+            /*Se il FrameLauout definito nel file item_list.xml (w900dp) esiste significa che Android ha scelto automaticamente
+             questo layout per schermo grande quindi il dispositivo utilizato è un tablet e l'interfaccia utente sarà
+             divisa in due pannelli*/
             twoPane = true
         }
 
@@ -180,7 +170,7 @@ class ItemListActivity : AppCompatActivity() {
 
     //metodo per modificare in modo controllato il campo indexClickedChat
     fun setIndexClickedChat(index: Int){
-        if(index>=0 && index<nChat)
+        if(index in 0 until nChat)
             indexClickedChat=index
     }
 
@@ -206,7 +196,7 @@ class ItemListActivity : AppCompatActivity() {
 
     // Codice necessario per gestire i click nel menu
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle item selection
+        // Gestione della selezione dell'elemento
         return when (item.itemId) {
             R.id.istructions -> {
                 val intent = Intent(this, WelcomeActivity::class.java)
@@ -229,11 +219,11 @@ class ItemListActivity : AppCompatActivity() {
 
     //Funzione che crea tutti i channel per le notifiche, uno per ogni tipo di notifica
     private fun createNotificationChannels(){
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
+        // Creazione dei Notification Channel solo se API 26+ perché prima non è necessario lanciare una notifica in un NotificationChannel.
+        // Inoltre la classe NotificationChannel è nuova e non c'è nella support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             var channel = NotificationChannel(MULTIPLE, getString(R.string.c_name_multiple), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.c_descr_multiple) }
-            // Register the channel with the system
+
             val notificationManager: NotificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
@@ -241,22 +231,22 @@ class ItemListActivity : AppCompatActivity() {
             channel = NotificationChannel(CONVERSATION, getString(R.string.c_name_conversation), NotificationManager.IMPORTANCE_HIGH).apply { description = getString(R.string.c_descr_conversation)}
             notificationManager.createNotificationChannel(channel)
 
-            channel = NotificationChannel(EXPANDABLE, getString(R.string.c_name_expandable), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.c_descr_expandable) }
+            channel = NotificationChannel(EXPANDABLE, getString(R.string.c_name_expandable), NotificationManager.IMPORTANCE_HIGH).apply { description = getString(R.string.c_descr_expandable) }
             notificationManager.createNotificationChannel(channel)
 
-            channel = NotificationChannel(MEDIA, getString(R.string.c_name_media), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.c_descr_media) }
+            channel = NotificationChannel(MEDIA, getString(R.string.c_name_media), NotificationManager.IMPORTANCE_HIGH).apply { description = getString(R.string.c_descr_media) }
             notificationManager.createNotificationChannel(channel)
 
             channel = NotificationChannel(BUBBLES, getString(R.string.c_name_bubbles), NotificationManager.IMPORTANCE_HIGH).apply { description = getString(R.string.c_descr_bubbles) }
             notificationManager.createNotificationChannel(channel)
 
-            channel = NotificationChannel(SERVICE, getString(R.string.c_name_service), NotificationManager.IMPORTANCE_LOW).apply { description = getString(R.string.c_descr_service) }
+            channel = NotificationChannel(SERVICE, getString(R.string.c_name_service), NotificationManager.IMPORTANCE_HIGH).apply { description = getString(R.string.c_descr_service) }
             notificationManager.createNotificationChannel(channel)
 
             channel = NotificationChannel(CUSTOM, getString(R.string.c_name_custom), NotificationManager.IMPORTANCE_HIGH).apply { description = getString(R.string.c_descr_custom) }
             notificationManager.createNotificationChannel(channel)
 
-            channel = NotificationChannel(IMG, getString(R.string.c_name_img), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.c_descr_img) }
+            channel = NotificationChannel(IMG, getString(R.string.c_name_img), NotificationManager.IMPORTANCE_HIGH).apply { description = getString(R.string.c_descr_img) }
             notificationManager.createNotificationChannel(channel)
         }
     }

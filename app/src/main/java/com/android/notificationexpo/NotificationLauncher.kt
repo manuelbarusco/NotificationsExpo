@@ -138,9 +138,7 @@ class NotificationLauncher(
                 .setAutoCancel(true)
                 .build()
 
-        if (notificationManager != null) {
-            notificationManager.notify(notification_id,notification)
-        }
+        notificationManager?.notify(notification_id,notification)
     }
 
     fun launchExpandableNotification(notification_id: Int = getNextId()){
@@ -266,14 +264,12 @@ class NotificationLauncher(
 
         val notificationManager: NotificationManager? = context.getSystemService()
 
-        if (notificationManager != null) {
-            notificationManager.apply {
-                notify(notification_id, newMessageNotification1)
-                notify(notification_id+1, newMessageNotification2)
-                notify(notification_id+2, newMessageNotification3)
-                notify(notification_id+3, newMessageNotification4)
-                notify(summary_id, summaryNotification)
-            }
+        notificationManager?.apply {
+            notify(notification_id, newMessageNotification1)
+            notify(notification_id+1, newMessageNotification2)
+            notify(notification_id+2, newMessageNotification3)
+            notify(notification_id+3, newMessageNotification4)
+            notify(summary_id, summaryNotification)
         }
     }
 

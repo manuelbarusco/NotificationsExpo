@@ -23,9 +23,9 @@ class QuickActionNotificationReceiver: BroadcastReceiver() {
     private var notificationManager: NotificationManager? = null
     private lateinit var user:String
     private lateinit var message: String
-    private var chat_id: Long = -1
-    private var notification_id: Int = -1
-    private var chat_img: Int = -1
+    private var chatId: Long = -1
+    private var notificationId: Int = -1
+    private var chatImg: Int = -1
     private lateinit var chatName: String
     private var size : Int = 0
     private var i : Int = 0
@@ -38,9 +38,9 @@ class QuickActionNotificationReceiver: BroadcastReceiver() {
         /*Prelevo dall'intent i dati che servono per aggiornare una notifica, in particolare ArrayList di messaggi che
         * a questo punto contiene già un messaggio al suo interno (quello inserito nel NoticationLauncher)*/
         messaggi = intent.getStringArrayListExtra(AlarmManagerReceiverAlwaysOn.ARRAY_MESSAGES_QA) as ArrayList<String>
-        chat_id = intent.getLongExtra(ItemDetailFragment.CHAT_ID,-1)
-        notification_id =intent.getIntExtra(ItemDetailFragment.NOTIFICATION_ID, -1)
-        chat_img = intent.getIntExtra(ItemDetailFragment.CHAT_IMG,-1)
+        chatId = intent.getLongExtra(ItemDetailFragment.CHAT_ID,-1)
+        notificationId =intent.getIntExtra(ItemDetailFragment.NOTIFICATION_ID, -1)
+        chatImg = intent.getIntExtra(ItemDetailFragment.CHAT_IMG,-1)
         chatName = intent.getStringExtra(ItemDetailFragment.CHAT_NAME).toString()
         /*Prelevo anche la variabile twopane perché serve per creare l'intent (per tablet o smartphone) da specificare quando
         * ricostruisco la notifica*/
@@ -75,7 +75,7 @@ class QuickActionNotificationReceiver: BroadcastReceiver() {
     private fun updateNotification(context: Context, answer: Boolean){
         val person = Person.Builder()
                 .setName(chatName)
-                .setIcon(Icon.createWithResource(context,chat_img))
+                .setIcon(Icon.createWithResource(context,chatImg))
                 .build()
         //oggetto Person che rappresenta l'utente dell'applicazione
         val me = Person.Builder()
@@ -108,7 +108,7 @@ class QuickActionNotificationReceiver: BroadcastReceiver() {
         * Il messaggio generato viene inserito nel DB nella seconda chiamata di updateNotification in questo modo gli inserimenti sono
         * per forza separati da circa 2 secondi ciò non provoca problemi di ordinamento nel DB*/
         if(!answer){
-            val m = Messaggio(testo = message, chat = chat_id, media = null, mittente = user)
+            val m = Messaggio(testo = message, chat = chatId, media = null, mittente = user)
             repository.addMessage(m)
         }
         //Ricreo la notifica
@@ -119,10 +119,10 @@ class QuickActionNotificationReceiver: BroadcastReceiver() {
         //Specifico ancora il pendingIntent verso QuickActionNotificationReceiver per gestire eventuali altri risposte da parte dell'utente
         val replyIntent = Intent(context, QuickActionNotificationReceiver::class.java)
                 .putExtra(AlarmManagerReceiverAlwaysOn.ARRAY_MESSAGES_QA,messaggi) //per messaggi
-                .putExtra(ItemDetailFragment.CHAT_ID, chat_id)
-                .putExtra(ItemDetailFragment.NOTIFICATION_ID, notification_id)
+                .putExtra(ItemDetailFragment.CHAT_ID, chatId)
+                .putExtra(ItemDetailFragment.NOTIFICATION_ID, notificationId)
                 .putExtra(ItemDetailFragment.CHAT_NAME, chatName)
-                .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                .putExtra(ItemDetailFragment.CHAT_IMG, chatImg)
                 .putExtra(ItemDetailFragment.TWO_PANE,twopane)
         val replyPendingIntent = PendingIntent.getBroadcast(context,0,replyIntent,PendingIntent.FLAG_UPDATE_CURRENT)
 
@@ -131,27 +131,27 @@ class QuickActionNotificationReceiver: BroadcastReceiver() {
         val pendingIntent: PendingIntent
         if(!twopane) {
             target = Intent(context, ItemDetailActivity::class.java)
-                    .putExtra(ItemDetailFragment.CHAT_ID, chat_id)
+                    .putExtra(ItemDetailFragment.CHAT_ID, chatId)
                     .putExtra(ItemDetailFragment.CHAT_NAME, chatName)
-                    .putExtra(ItemDetailFragment.NOTIFICATION_ID, notification_id)
-                    .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                    .putExtra(ItemDetailFragment.NOTIFICATION_ID, notificationId)
+                    .putExtra(ItemDetailFragment.CHAT_IMG, chatImg)
                     .putExtra(ItemDetailFragment.NOTIFICATION, "Notifica quick actions")
 
              pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
         }
         else{
             target = Intent(context, ItemListActivity::class.java)
-                    .putExtra(ItemDetailFragment.CHAT_ID, chat_id)
+                    .putExtra(ItemDetailFragment.CHAT_ID, chatId)
                     .putExtra(ItemDetailFragment.CHAT_NAME, chatName)
-                    .putExtra(ItemDetailFragment.NOTIFICATION_ID, notification_id)
-                    .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                    .putExtra(ItemDetailFragment.NOTIFICATION_ID, notificationId)
+                    .putExtra(ItemDetailFragment.CHAT_IMG, chatImg)
                     .putExtra(ItemDetailFragment.NOTIFICATION, "Notifica quick actions")
                     .putExtra(AlarmManagerReceiverAlwaysOn.UPDATE_FRAGMENT,true)
             pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
         }
 
         val action: Notification.Action=
-                Notification.Action.Builder(Icon.createWithResource(context,chat_img),context.getString(R.string.reply_button_text),replyPendingIntent)
+                Notification.Action.Builder(Icon.createWithResource(context,chatImg),context.getString(R.string.reply_button_text),replyPendingIntent)
                         .addRemoteInput(remoteInput)
                         .build()
 
@@ -167,7 +167,7 @@ class QuickActionNotificationReceiver: BroadcastReceiver() {
                 .setAutoCancel(true)
                 .build()
 
-        notificationManager?.notify(notification_id,notification)
+        notificationManager?.notify(notificationId,notification)
 
     }
     //Funzione che preleva un messaggio dall'array di dummy messages e lo inserisce nel DB
@@ -177,7 +177,7 @@ class QuickActionNotificationReceiver: BroadcastReceiver() {
         val index = Random.nextInt(0, messages.size - 1)
 
         //genero il messaggio e lo aggiungo al database
-        val mex= Messaggio(testo= messages[index], chat = chat_id, media = null, mittente = chatName)
+        val mex= Messaggio(testo= messages[index], chat = chatId, media = null, mittente = chatName)
         repository.addMessage(mex)
 
         return messages[index]

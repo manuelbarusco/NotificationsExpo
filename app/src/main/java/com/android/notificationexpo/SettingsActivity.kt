@@ -7,7 +7,6 @@ import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import com.android.notificationexpo.database.NotificationExpoRepository
@@ -57,11 +56,11 @@ class SettingsActivity : AppCompatActivity() {
                 setTitle(getString(R.string.settings_alert_dialog_title))
                 setMessage(getString(R.string.settings_alert_dialog_message))
                 setPositiveButton(getString(R.string.settings_alert_dialog_button),
-                    DialogInterface.OnClickListener { dialog, id ->
+                    DialogInterface.OnClickListener { _, _ ->
                         repository.resetDatabase(context)
                     })
                 setNegativeButton(getString(R.string.settings_alert_dialog_button2),
-                    DialogInterface.OnClickListener { dialog, id ->
+                    DialogInterface.OnClickListener { _, _ ->
                         // User cancelled the dialog
                     })
             }

@@ -27,9 +27,9 @@ class CustomNotificationReceiver : BroadcastReceiver() {
     private var notificationManager: NotificationManager? = null
     private lateinit var user:String
     private lateinit var message: String
-    private var chat_id: Long = -1
-    private var notification_id: Int =-1
-    private var chat_img: Int = -1
+    private var chatId: Long = -1
+    private var notificationId: Int =-1
+    private var chatImg: Int = -1
     private lateinit var chatName: String
     private var selected : Int = -1
     private var twopane: Boolean = true
@@ -43,12 +43,12 @@ class CustomNotificationReceiver : BroadcastReceiver() {
         //prelevo il nome dell'utente dalle SharedPreferences, serve per salvare correttamente nel DB i messaggi scelti dall'utente
         val preferences= context.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
         user = preferences?.getString(ItemListActivity.KEY_USER,"") as String
-        //Prelevo il tempo da aspettare per mandare la risposta
+        //Prelevo dalle SharedPreferences i secondi di attesa per la risposta automatica (impostabili nella Settings Activity)
         time = preferences.getInt(SettingsActivity.SECONDS,2)
         message = intent.getStringExtra(AlarmManagerReceiverAlwaysOn.MESSAGE).toString()
-        chat_id = intent.getLongExtra(ItemDetailFragment.CHAT_ID,-1)
-        notification_id= intent.getIntExtra(ItemDetailFragment.NOTIFICATION_ID, -1)
-        chat_img = intent.getIntExtra(ItemDetailFragment.CHAT_IMG,-1)
+        chatId = intent.getLongExtra(ItemDetailFragment.CHAT_ID,-1)
+        notificationId= intent.getIntExtra(ItemDetailFragment.NOTIFICATION_ID, -1)
+        chatImg = intent.getIntExtra(ItemDetailFragment.CHAT_IMG,-1)
         chatName = intent.getStringExtra(ItemDetailFragment.CHAT_NAME).toString()
         selected = intent.getIntExtra(AlarmManagerReceiverAlwaysOn.SELECTED_CB,-1)
         twopane = intent.getBooleanExtra(ItemDetailFragment.TWO_PANE,true)
@@ -67,21 +67,21 @@ class CustomNotificationReceiver : BroadcastReceiver() {
                     //Solita procedura per inviare un messaggio di risposta
                     text = getText(context)
                     //aggiungo il messaggio selezionato nel DB e poi cancello la notifica
-                    val m = Messaggio(testo = text, chat = chat_id, media = null, mittente = user)
+                    val m = Messaggio(testo = text, chat = chatId, media = null, mittente = user)
                     repository.addMessage(m)
-                    notificationManager?.cancel(notification_id)
+                    notificationManager?.cancel(notificationId)
 
                     //Risposta automatica come in ItemDetailFragment
 
                     // Impostiamo il timer e dopo un certo tempo verrà inviato un broadcast esplicito ad
                     // AlarmMangerReceiver
                     val alarmManager: AlarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                    var alarmIntent = Intent(context, AlarmManagerReceiver::class.java) // intent esplicito
+                    val alarmIntent = Intent(context, AlarmManagerReceiver::class.java) // intent esplicito
                     alarmIntent.putExtra(ItemDetailFragment.NOTIFICATION,"Notifica custom template")
-                    alarmIntent.putExtra(ItemDetailFragment.CHAT_ID,chat_id)
-                    alarmIntent.putExtra(ItemDetailFragment.NOTIFICATION_ID,notification_id)
+                    alarmIntent.putExtra(ItemDetailFragment.CHAT_ID,chatId)
+                    alarmIntent.putExtra(ItemDetailFragment.NOTIFICATION_ID,notificationId)
                     alarmIntent.putExtra(ItemDetailFragment.CHAT_NAME,chatName)
-                    alarmIntent.putExtra(ItemDetailFragment.CHAT_IMG,chat_img)
+                    alarmIntent.putExtra(ItemDetailFragment.CHAT_IMG,chatImg)
                     alarmIntent.putExtra(ItemDetailFragment.TWO_PANE,twopane)
 
                     // Genero un id da assegnare al broadcast per generare broadcast sempre diversi
@@ -107,7 +107,7 @@ class CustomNotificationReceiver : BroadcastReceiver() {
 
             "com.android.NotificationsExpo.BUTTON_ANNULLA_CLICKED"-> {
                 //Cancello la notifica
-                notificationManager?.cancel(notification_id)
+                notificationManager?.cancel(notificationId)
             }
         }
     }
@@ -126,9 +126,9 @@ class CustomNotificationReceiver : BroadcastReceiver() {
         val notificationLayoutExpanded = RemoteViews(context.packageName, R.layout.notification_expanded)
         val notificationLayout = RemoteViews(context.packageName, R.layout.notification_collapsed)
 
-        notificationLayout.setImageViewResource(R.id.notification_icon,chat_img)
+        notificationLayout.setImageViewResource(R.id.notification_icon,chatImg)
         notificationLayout.setTextViewText(R.id.notification_title,"Nuovo messaggio da $chatName")
-        notificationLayoutExpanded.setImageViewResource(R.id.e_notification_icon,chat_img)
+        notificationLayoutExpanded.setImageViewResource(R.id.e_notification_icon,chatImg)
         notificationLayoutExpanded.setTextViewText(R.id.e_notification_title,message)
 
         if(isSelected) {
@@ -177,10 +177,10 @@ class CustomNotificationReceiver : BroadcastReceiver() {
         * UI della notifica custom nell processo main dell'app.*/
         val cb1Intent = Intent(context,CustomNotificationReceiver::class.java)
                 .setAction("com.android.NotificationsExpo.CB1_CLICKED")
-                .putExtra(ItemDetailFragment.CHAT_ID,chat_id)
-                .putExtra(ItemDetailFragment.NOTIFICATION_ID,notification_id)
+                .putExtra(ItemDetailFragment.CHAT_ID,chatId)
+                .putExtra(ItemDetailFragment.NOTIFICATION_ID,notificationId)
                 .putExtra(AlarmManagerReceiverAlwaysOn.MESSAGE,message)
-                .putExtra(ItemDetailFragment.CHAT_IMG,chat_img)
+                .putExtra(ItemDetailFragment.CHAT_IMG,chatImg)
                 .putExtra(ItemDetailFragment.CHAT_NAME,chatName)
                 .putExtra(AlarmManagerReceiverAlwaysOn.SELECTED_CB,selected) //devo passare anche la variabile selected perché ogni volta che l'utente sceglie una risposta (senza inviare) viene creata una nuova notifica
         //FLAG_UPDATE_CURRENT indica che se il PendingIntent descritto esiste già, lo conservalo ma sostituisce dati salvati come extra
@@ -218,17 +218,17 @@ class CustomNotificationReceiver : BroadcastReceiver() {
         val pendingIntent: PendingIntent
         if(!twopane) {
             target = Intent(context, ItemDetailActivity::class.java)
-                    .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    .putExtra(ItemDetailFragment.CHAT_ID, chatId)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
                     .putExtra(ItemDetailFragment.CHAT_NAME, chatName)
-                    .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                    .putExtra(ItemDetailFragment.CHAT_IMG, chatImg)
                     .putExtra(ItemDetailFragment.NOTIFICATION, "Notifica custom template")
             pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
         }
         else{
             target = Intent(context, ItemListActivity::class.java)
-                    .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    .putExtra(ItemDetailFragment.CHAT_ID, chatId)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
                     .putExtra(ItemDetailFragment.CHAT_NAME, chatName)
-                    .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                    .putExtra(ItemDetailFragment.CHAT_IMG, chatImg)
                     .putExtra(ItemDetailFragment.NOTIFICATION, "Notifica custom template")
                     .putExtra(AlarmManagerReceiverAlwaysOn.UPDATE_FRAGMENT,true)
             pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
@@ -244,7 +244,7 @@ class CustomNotificationReceiver : BroadcastReceiver() {
                 .setAutoCancel(true)        //se tocco la notifica si cancella
                 .setOnlyAlertOnce(true)     //avvisa l'utente con suoni/vibrazioni solo la prima volta
 
-        notificationManager?.notify(notification_id,notification.build())
+        notificationManager?.notify(notificationId,notification.build())
     }
 
 }

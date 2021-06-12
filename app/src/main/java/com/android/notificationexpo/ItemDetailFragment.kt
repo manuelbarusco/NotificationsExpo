@@ -19,18 +19,15 @@ import com.android.notificationexpo.database.NotificationExpoRepository
 import com.android.notificationexpo.database.entities.Messaggio
 import com.android.notificationexpo.receivers.AlarmManagerReceiver
 
-/**
- * A fragment representing a single Item detail screen.
- * This fragment is either contained in a [ItemListActivity]
- * in two-pane mode (on tablets) or a [ItemDetailActivity]
- * on handsets.
- */
+/* Un Fragment che rappresenta il dettaglio di una chat. Questo Fragment è contento in ItemListActivity (per tablet)
+* oppure in ItemDetailActivity (per smartphone)*/
+
 class ItemDetailFragment : Fragment() {
     private var twopane: Boolean = true                              //indicazione sulla dimensione del dispositivo
-    private var chat_id:Long= -1                                     //id della chat rappresentata dal fragment
-    private var nome_chat:String?=null                               //nome della chat rappresentata dal fragment
-    private var img_chat:Int=-1                                      //immagine della chat rappresentata dal fragment
-    private var notifica_chat:String?=null                           //notifica associata alla chat rappresentata dal fragment
+    private var chatId:Long= -1                                     //id della chat rappresentata dal fragment
+    private var nomeChat:String?=null                               //nome della chat rappresentata dal fragment
+    private var imgChat:Int=-1                                      //immagine della chat rappresentata dal fragment
+    private var notificaChat:String?=null                           //notifica associata alla chat rappresentata dal fragment
     private lateinit var user:String                                 //utente che sta usando l'app
     private lateinit var repository: NotificationExpoRepository
     private lateinit var messaggi: MutableList<Messaggio>            //lista di messaggi della chat
@@ -50,13 +47,13 @@ class ItemDetailFragment : Fragment() {
         //dall activity ItemDetailActivity in caso di dispositivo smartphone (twopane=false)
         arguments?.let {
             if (it.containsKey(CHAT_ID))
-                chat_id=it.getLong(CHAT_ID)
+                chatId=it.getLong(CHAT_ID)
             if(it.containsKey(CHAT_NAME))
-                nome_chat=it.getString(CHAT_NAME)
+                nomeChat=it.getString(CHAT_NAME)
             if(it.containsKey(CHAT_IMG))
-                img_chat=it.getInt(CHAT_IMG)
+                imgChat=it.getInt(CHAT_IMG)
             if(it.containsKey(NOTIFICATION))
-                notifica_chat=it.getString(NOTIFICATION)
+                notificaChat=it.getString(NOTIFICATION)
             if(it.containsKey((TWO_PANE)))
                 twopane=it.getBoolean(TWO_PANE)
         }
@@ -72,10 +69,10 @@ class ItemDetailFragment : Fragment() {
         }
 
         //imposto nome e immagine della chat
-        val chat_name_view:TextView=rootView.findViewById(R.id.chat_name)
-        val chat_img_view:ImageView=rootView.findViewById(R.id.chat_image)
-        chat_name_view.text=nome_chat
-        chat_img_view.setImageResource(img_chat)
+        val chatNameView:TextView=rootView.findViewById(R.id.chat_name)
+        val chatImgView:ImageView=rootView.findViewById(R.id.chat_image)
+        chatNameView.text=nomeChat
+        chatImgView.setImageResource(imgChat)
         recyclerView=rootView.findViewById(R.id.recycler_chat)
 
         //ottengo una reference alla repository
@@ -85,17 +82,17 @@ class ItemDetailFragment : Fragment() {
         //recupero il tipo di chat dalla lista dei partecipanti alla chat:
         //se il numero di partecipanti alla chat (escluso l'utente che sta usando la app) è > 1 allora la chat è di gruppo
         //altrimenti è una chat privata
-        var chat_type= MessageAdapter.PRIVATE_CHAT
-        if(repository.getChatUtenti(chat_id, user).size>1)
-            chat_type=MessageAdapter.GROUP_CHAT
+        var chatType= MessageAdapter.PRIVATE_CHAT
+        if(repository.getChatUtenti(chatId, user).size>1)
+            chatType=MessageAdapter.GROUP_CHAT
 
         //recupero la lista dei messaggi della chat
-        repository.getChatMessages(chat_id).observe(
+        repository.getChatMessages(chatId).observe(
                 viewLifecycleOwner,
                 androidx.lifecycle.Observer {messaggi->
                     messaggi?.let{
                         this.messaggi=messaggi
-                        recyclerView.adapter=MessageAdapter(messaggi, img_chat, chat_type, context)
+                        recyclerView.adapter=MessageAdapter(messaggi, imgChat, chatType, context)
                     }
                 }
         )
@@ -105,7 +102,7 @@ class ItemDetailFragment : Fragment() {
 
         sendButton.setOnClickListener {
             //creo un messaggio col testo inserito per inserirlo poi nel Database e aggiornare la RecyclerView
-            val mex=Messaggio(testo = userText.text.toString(), mittente = user, media = null, chat=chat_id)
+            val mex=Messaggio(testo = userText.text.toString(), mittente = user, media = null, chat=chatId)
 
             repository.addMessage(mex)
             messaggi.add(mex)
@@ -121,10 +118,10 @@ class ItemDetailFragment : Fragment() {
             // AlarmMangerReceiver
             val alarmManager: AlarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             val alarmIntent = Intent(context, AlarmManagerReceiver::class.java) // intent esplicito
-            alarmIntent.putExtra(NOTIFICATION,notifica_chat)
-            alarmIntent.putExtra(CHAT_ID,chat_id)
-            alarmIntent.putExtra(CHAT_NAME,nome_chat)
-            alarmIntent.putExtra(CHAT_IMG,img_chat)
+            alarmIntent.putExtra(NOTIFICATION,notificaChat)
+            alarmIntent.putExtra(CHAT_ID,chatId)
+            alarmIntent.putExtra(CHAT_NAME,nomeChat)
+            alarmIntent.putExtra(CHAT_IMG,imgChat)
             alarmIntent.putExtra(TWO_PANE,twopane)
 
             // Genero un id da assegnare al broadcast per generare broadcast sempre diversi
@@ -132,15 +129,15 @@ class ItemDetailFragment : Fragment() {
             val boradcastId:Int = System.currentTimeMillis().toInt()
             val pendingIntent = PendingIntent.getBroadcast(context, boradcastId, alarmIntent, 0)
 
-            // Nota: Sostituito con alarmManager?.set con alarmManager?.setExact per avere più precisione
-            // https://developer.android.com/reference/android/app/AlarmManager
+            //Prelevo dalle SharedPreferences i secondi di attesa per la risposta automatica (impostabili nella Settings Activity)
             time = preferences?.getInt(SettingsActivity.SECONDS,2) as Int
             Log.d("seconds", time.toString())
+            // Nota: Sostituito con alarmManager?.set con alarmManager?.setExact per avere più precisione
+            // https://developer.android.com/reference/android/app/AlarmManager
             alarmManager.setExact(
                     AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     SystemClock.elapsedRealtime() + time * 1000,
                     pendingIntent)
-
             // Note sulla sicurezza:
             // 1) Essendo broadcast espliciti ho la certezza che non verrranno recapitati ad altri
             // 2) Poichè AlarmManagerReceiver è dichiarato nel manifest con exported=false, esso
@@ -153,10 +150,7 @@ class ItemDetailFragment : Fragment() {
     }
 
     companion object {
-        /**
-         * The fragment argument representing the item ID that this fragment
-         * represents.
-         */
+        //costanti per identificare gli arguments passati al fragment che servono per caricare tutti i dati necesari per visualizzare una specifica chat
         const val CHAT_ID = "Chat_id"
         const val CHAT_NAME= "Nome_chat"
         const val CHAT_IMG= "Img_chat"
