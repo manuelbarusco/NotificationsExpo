@@ -18,7 +18,6 @@ import com.android.notificationexpo.receivers.CustomNotificationReceiver
 import com.android.notificationexpo.receivers.QuickActionNotificationReceiver
 
 //TODO modifica del badge
-//TODO
 
 //oggetto che si occupa di lanciare le notifiche contenenti i messaggi precedentemente generati dal MessageGenerator
 class NotificationLauncher(
@@ -60,7 +59,7 @@ class NotificationLauncher(
             setContentText("Download in corso")
             setCategory(Notification.CATEGORY_MESSAGE)
             setAutoCancel(true)
-            setSmallIcon(chat_img)
+            setSmallIcon(R.drawable.ic_stat_name)
         }
 
         //imposto i valori massimi e minimi della barra di avanzamento del download
@@ -127,7 +126,7 @@ class NotificationLauncher(
         val notificationManager: NotificationManager? = context.getSystemService()
 
         val notification = NotificationCompat.Builder(context, ItemListActivity.IMG)
-                .setSmallIcon(messagesToSend[0].mittente.imgProfilo)
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setContentTitle(chat_name)
                 .setContentText(messagesToSend[0].messaggio.testo)
                 .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend.last().messaggio.media as Int))
@@ -169,7 +168,7 @@ class NotificationLauncher(
         val notificationManager: NotificationManager? = context.getSystemService()
 
         val notification = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setContentTitle(chat_name)
                 .setContentText(messagesToSend[0].messaggio.testo.substring(0,10))
                 .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[0].mittente.imgProfilo))
@@ -211,7 +210,7 @@ class NotificationLauncher(
         }
 
         val newMessageNotification1 = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
-                .setSmallIcon(R.drawable.group)
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setContentTitle(messagesToSend[0].mittente.nickname)
                 .setContentText(messagesToSend[0].messaggio.testo)
                 .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[0].mittente.imgProfilo))
@@ -220,7 +219,7 @@ class NotificationLauncher(
                 .build()
 
         val newMessageNotification2 = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
-                .setSmallIcon(R.drawable.group)
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setContentTitle(messagesToSend[1].mittente.nickname)
                 .setContentText(messagesToSend[1].messaggio.testo)
                 .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[1].mittente.imgProfilo))
@@ -229,7 +228,7 @@ class NotificationLauncher(
                 .build()
 
         val newMessageNotification3 = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
-                .setSmallIcon(R.drawable.group)
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setContentTitle(messagesToSend[2].mittente.nickname)
                 .setContentText(messagesToSend[2].messaggio.testo)
                 .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[2].mittente.imgProfilo))
@@ -238,7 +237,7 @@ class NotificationLauncher(
                 .build()
 
         val newMessageNotification4 = NotificationCompat.Builder(context, ItemListActivity.EXPANDABLE)
-                .setSmallIcon(R.drawable.group)
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setContentTitle(messagesToSend[3].mittente.nickname)
                 .setContentText(messagesToSend[3].messaggio.testo)
                 .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[3].mittente.imgProfilo))
@@ -250,7 +249,7 @@ class NotificationLauncher(
                 .setContentTitle(chat_name)
                 //set content text to support devices running API level < 24
                 .setContentText("4 Nuovi Messaggi")
-                .setSmallIcon(chat_img)
+                .setSmallIcon(R.drawable.ic_stat_name)
                 //build summary info into InboxStyle template
                 .setStyle(NotificationCompat.InboxStyle()
                         .addLine(""+messagesToSend[0].mittente.nickname+" "+messagesToSend[0].messaggio.testo)
@@ -341,7 +340,7 @@ class NotificationLauncher(
         /*Per fare in modo che una notifica sia una notifica conversation serve impostare anche un MessagingSyle*/
         val notification = Notification.Builder(context, ItemListActivity.BUBBLES)
                 .setBubbleMetadata(bubbleData)
-                .setSmallIcon(R.drawable.ic_launcher_foreground) //TODO: mettere immagine migliore
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setStyle(Notification.MessagingStyle(person)
                         .addMessage(message1)
                 )
@@ -433,7 +432,7 @@ class NotificationLauncher(
         }
 
         val notification = NotificationCompat.Builder(context, ItemListActivity.CUSTOM)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)  //TODO: mettere icona migliore
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setCustomContentView(notificationLayout)
                 .setCustomBigContentView(notificationLayoutExpanded)
                 .setStyle(NotificationCompat.DecoratedCustomViewStyle()) //aggiunge icona, nome app e tempo come quelle normali
@@ -516,7 +515,7 @@ class NotificationLauncher(
         * aggiungere il messaggio al suo interno*/
         val notification = Notification.Builder(context, ItemListActivity.CONVERSATION)
                 .addPerson(person)
-                .setSmallIcon(R.drawable.ic_launcher_foreground) //TODO: mettere immagine migliore
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setStyle(Notification.MessagingStyle(person)
                         .addMessage(message1)
                 )
@@ -564,7 +563,7 @@ class NotificationLauncher(
                 person)
 
         val notification = Notification.Builder(context, ItemListActivity.MEDIA)
-                .setSmallIcon(messagesToSend[0].mittente.imgProfilo)
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setContentTitle(chat_name)
                 .setContentText(messagesToSend[0].messaggio.testo)
                 .setLargeIcon(BitmapFactory.decodeResource(context.resources, chat_img))
@@ -644,7 +643,7 @@ class NotificationLauncher(
                 person)
 
         val notification = Notification.Builder(context, ItemListActivity.CUSTOM)
-                .setSmallIcon(R.drawable.ic_launcher_foreground) //TODO: mettere immagine migliore
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setStyle(messagingStyle.addMessage(message))
                 .addAction(action)
                 .setContentIntent(pendingIntent)
