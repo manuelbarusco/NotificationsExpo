@@ -6,7 +6,7 @@ android {
     compileSdkVersion 30
     buildToolsVersion '30.0.3'
     defaultConfig {
-        applicationId "com.android.NotificationExpo"
+        applicationId "com.android.notificationexpo"
         minSdkVersion 30
         targetSdkVersion 30
         versionCode 1
@@ -35,6 +35,7 @@ repositories {
 }
 
 dependencies {
+
     implementation "androidx.appcompat:appcompat:$rootProject.appCompatVersion"
     // Dependencies for working with Architecture components
     // You'll probably have to update the version numbers in build.gradle (Project)

@@ -17,6 +17,9 @@ import com.android.notificationexpo.receivers.AlarmManagerReceiverAlwaysOn
 import com.android.notificationexpo.receivers.CustomNotificationReceiver
 import com.android.notificationexpo.receivers.QuickActionNotificationReceiver
 
+//TODO modifica del badge
+//TODO
+
 //oggetto che si occupa di lanciare le notifiche contenenti i messaggi precedentemente generati dal MessageGenerator
 class NotificationLauncher(
         private val user:String,
@@ -170,9 +173,9 @@ class NotificationLauncher(
                 .setContentTitle(chat_name)
                 .setContentText(messagesToSend[0].messaggio.testo.substring(0,10))
                 .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[0].mittente.imgProfilo))
-                .setStyle(NotificationCompat.BigTextStyle()
-                        .bigText(messagesToSend[0].messaggio.testo))
+                .setStyle(NotificationCompat.BigTextStyle().bigText(messagesToSend[0].messaggio.testo))
                 .setContentIntent(pendingIntent)
+                .setBadgeIconType(NotificationCompat.BADGE_ICON_SMALL)
                 .setCategory(Notification.CATEGORY_MESSAGE)
                 .setAutoCancel(true)
                 .build()
@@ -183,7 +186,7 @@ class NotificationLauncher(
     fun launchMultipleNotifications(notification_id: Int = getNextId()){
         //use constant ID for notification used as group summary
         val summary_id= 0
-        val group_notification = "com.android.NotificationExpo.MULTIPLE_MESSAGES"
+        val group_notification = "com.android.notificationexpo.MULTIPLE_MESSAGES"
 
         val target: Intent
         val pendingIntent: PendingIntent

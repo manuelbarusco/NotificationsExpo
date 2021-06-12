@@ -84,7 +84,6 @@ class ItemListActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //TODO: Controllare se quando canali esistono già vengono ricreati
 
         //creo i canali di notifica che serviranno all'applicazione
         createNotificationChannels()
