@@ -79,7 +79,7 @@ class WelcomeActivity : FragmentActivity() {
                     indicator2.background = ResourcesCompat.getDrawable(resources,R.drawable.indicator, theme)
                     indicator3.background = ResourcesCompat.getDrawable(resources,R.drawable.indicator, theme)
                     indicator4.background = ResourcesCompat.getDrawable(resources,R.drawable.indicator, theme)
-                    welcomeButtonPrevious.isVisible= false;
+                    welcomeButtonPrevious.isVisible= false
                 }
                 else if (position == 1){
                     // E' visualizzata la seconda pagina
@@ -88,7 +88,7 @@ class WelcomeActivity : FragmentActivity() {
                     indicator2.background = ResourcesCompat.getDrawable(resources,R.drawable.indicator, theme)
                     indicator3.background = ResourcesCompat.getDrawable(resources,R.drawable.indicator, theme)
                     indicator4.background = ResourcesCompat.getDrawable(resources,R.drawable.indicator, theme)
-                    welcomeButtonPrevious.isVisible= true;
+                    welcomeButtonPrevious.isVisible= true
                 }
                 else if (position == 2){
                     // E' visualizzata la terza pagina
@@ -105,7 +105,7 @@ class WelcomeActivity : FragmentActivity() {
                     indicator2.background = ResourcesCompat.getDrawable(resources,R.drawable.indicator, theme)
                     indicator3.background = ResourcesCompat.getDrawable(resources,R.drawable.indicator_selected, theme)
                     indicator4.background = ResourcesCompat.getDrawable(resources,R.drawable.indicator, theme)
-                    welcomeButtonNext.text = "Avanti"
+                    welcomeButtonNext.text = getString(R.string.welcome_button_next)
                 }
                 else {
                     // E' visualizzata la quinta pagina
@@ -114,7 +114,7 @@ class WelcomeActivity : FragmentActivity() {
                     indicator2.background = ResourcesCompat.getDrawable(resources,R.drawable.indicator, theme)
                     indicator3.background = ResourcesCompat.getDrawable(resources,R.drawable.indicator, theme)
                     indicator4.background = ResourcesCompat.getDrawable(resources,R.drawable.indicator_selected, theme)
-                    welcomeButtonNext.text = "Inizia"
+                    welcomeButtonNext.text = getString(R.string.welcome_button_start)
                 }
             }
         })
@@ -164,19 +164,19 @@ class WelcomeActivity : FragmentActivity() {
 
         override fun createFragment(position: Int): Fragment{
             if (position == 0){
-                return WelcomeFragment0();
+                return WelcomeFragment0()
             }
             else if (position == 1){
-                return WelcomeFragment1();
+                return WelcomeFragment1()
             }
             else if (position == 2){
-                return WelcomeFragment2();
+                return WelcomeFragment2()
             }
             else if (position == 3){
-                return WelcomeFragment3();
+                return WelcomeFragment3()
             }
             else {
-                return WelcomeFragment4();
+                return WelcomeFragment4()
             }
         }
     }

@@ -27,7 +27,6 @@ class PlayerService : Service()
 
     val callback = object: MediaSession.Callback() {
         // Per interpretare il cambiamento di posizione nella barra di socrrimento della notifica
-        // TODO Altri metodi come onPlay() e onPause() vanno qui. Noi li abbiamo implementati a livello di UI ma in questo caso dovrebbero funzionare anche con il pulsante play/pausa delle cuffie
 
         override fun onSeekTo(pos: Long) {
             // Aggiorno il player
@@ -171,7 +170,7 @@ class PlayerService : Service()
             MediaMetadata.Builder()
 
             // Titolo
-            .putString(MediaMetadata.METADATA_KEY_TITLE, "Audio ricevuto")
+            .putString(MediaMetadata.METADATA_KEY_TITLE, getString(R.string.message_audio_received))
 
             // Artista
             .putString(MediaMetadata.METADATA_KEY_ARTIST, audioUserName)
@@ -250,7 +249,7 @@ class PlayerService : Service()
         // effetto negativo sull'utente. Devo passare una notifica che verrà mostrata fintanto che il
         // service sta eseguendo il suo lavoro.
         // E' necessaria la relativa permission nel file manifest
-        val notificationID = 5786423 // Id per la notifica
+        val notificationID = MEDIA_PLAYER_NOTIFICATION_ID // Id per la notifica
         startForeground(notificationID, notification2)
 
         // Nota: Questa notifica non è rimovibile. E' vero che è possibile fare uno swipe
@@ -309,7 +308,7 @@ class PlayerService : Service()
                     )
                     .build()
 
-            val notificationID = 5786423 //TODO Metterlo nel companion object (insieme agli altri)
+            val notificationID = MEDIA_PLAYER_NOTIFICATION_ID
             startForeground(notificationID, notification2)
 
         }
@@ -361,7 +360,7 @@ class PlayerService : Service()
                     )
                     .build()
 
-            val notificationID = 5786423
+            val notificationID = MEDIA_PLAYER_NOTIFICATION_ID
             startForeground(notificationID, notification2)
 
         }
@@ -373,7 +372,7 @@ class PlayerService : Service()
             isPlaying = false
             myPlayer?.release() // Rilascio l'oggetto MediaPLayer
             myPlayer = null
-            mediaSession?.release() // TODO Controllare
+            mediaSession?.release()
             stopForeground(true) // Indico che il service non ha più importanza per l'utente
         }
     }
@@ -396,5 +395,7 @@ class PlayerService : Service()
         const val AUDIO_RESOURCE = "action_resource"
         const val AUDIO_USER_NAME = "action_user_name"
         const val AUDIO_USER_IMAGE_RESOURCE = "action_user_image_resource"
+
+        const val MEDIA_PLAYER_NOTIFICATION_ID = 5786423
     }
 }

@@ -35,7 +35,7 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
     data class MittenteMessaggio(val mittente: Utente, val messaggio: Messaggio)
 
     override fun onReceive(context: Context, intent: Intent) {
-        Log.d("MyReceiver_ALWAYSON","${System.currentTimeMillis().toString()} ${intent?.action}") //Mostriamo una riga con un testo sempre nuovo (altrimenti Logcat scrive che ci sono altre n righe simili)
+
 
         //ottengo l'utente che sta usando l'app
         val preferences= context.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
@@ -54,7 +54,7 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
         twopane = intent.getBooleanExtra(ItemDetailFragment.TWO_PANE,true)
 
         // Devo generare uno o più messaggi sulla base del tipo di notifica associata alla chat (ad
-        // esempio per una notifica conversation genererò 10 messaggi)
+        // esempio per una notifica conversation genererò più messaggi)
         notificationType= intent.getStringExtra(ItemDetailFragment.NOTIFICATION) as String
         Log.d("MyR_Tipo di notifica: ", notificationType)
 
@@ -76,11 +76,9 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
 
         // Se è intervenuto prima l'altro BroadcastReceiver non mostro nemmeno la notifica
         if (resultCode != Activity.RESULT_OK){
-            // Vuol dire che un activity è in foreground. Non mostrare le neotifiche
-            Log.d("NotificationExpo_Receiver", "Eravamo in foreground")
+            // Vuol dire che un activity è in foreground. Non mostrare le notifiche
             return
         }
-        Log.d("NotificationExpo_Receiver", "Eravamo in background")
 
         //delego il lancio della notifica al NotificationLauncher
         val notificationLauncher = NotificationLauncher(user, chat_id, chat_name, chat_img, messagesToSend, notificationType, twopane, context)

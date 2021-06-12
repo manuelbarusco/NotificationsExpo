@@ -94,4 +94,10 @@ L\'operazione è irreversibile
     </string-array>
     <string name="channel_audio_notifications_name">Player musicale</string>
     <string name="channel_audio_notifications_name_description">Canale per le notifiche del player musicale</string>
+
+    <string name="message_audio_received">Audio ricevuto</string>
+    <string name="text_audio_chat">Audio</string>
+    <string name="welcome_button_next">Avanti</string>
+    <string name="welcome_button_back">Indietro</string>
+    <string name="welcome_button_start">Inizia</string>
 </resources>

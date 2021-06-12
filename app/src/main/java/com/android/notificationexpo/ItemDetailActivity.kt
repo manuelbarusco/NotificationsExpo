@@ -28,7 +28,6 @@ class ItemDetailActivity : AppCompatActivity() {
         override fun onReceive(context: Context?, intent: Intent?) {
             // Se viene eseguito questo codice vuol dire che l'activity è in foreground e quindi va
             // disabilitata la visualizzazione delle notifiche
-            Log.d("MyRDinamicoDETAIL", "Devo disabilitare le notifiche")
             resultCode = Activity.RESULT_CANCELED // Cambia il result code di questo ordered broadcast
         }
     }
