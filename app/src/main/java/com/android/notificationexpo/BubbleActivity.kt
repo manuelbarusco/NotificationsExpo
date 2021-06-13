@@ -16,7 +16,8 @@ import com.android.notificationexpo.receivers.AlarmManagerReceiver
 * onRestart() -> onStart() -> onResume() di ItemDetailActivity senza passare per onCreate(). Quindi, visto che in onCreate()
 * c'è il codice necessario per visualizzare il fragment corretto (riga 51-68), al tocco della notifica viene visualizzata
 * sempre l'Activity ridimensionata collegata alla Bubble. Usando un'Activity con un nome diverso, che viene invocata solo se si
-* espande una Bubble, il problema viene risolto.*/
+* espande una Bubble, il problema viene risolto.
+* Serve anche perché altrimenti lo shortcut lancerebbe l'activity ridimensionata creata se si espansa una bubble TODO: sistemare*/
 
 class BubbleActivity: AppCompatActivity() {
     // Broadcast receiver
@@ -82,6 +83,10 @@ class BubbleActivity: AppCompatActivity() {
         this.registerReceiver(onShowNotification, filter, AlarmManagerReceiver.PERM_PRIVATE, null)
     }
 
+    override fun onStart() {
+        super.onStart()
+        Log.d("BubbleActivity","${intent.getLongExtra(ItemDetailFragment.CHAT_ID,-1)}")
+    }
     override fun onPause() {
         // Disabilito il BroadcastReceiver a runtime
         this.unregisterReceiver(onShowNotification)

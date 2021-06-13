@@ -84,7 +84,7 @@ class ItemListActivity : AppCompatActivity() {
     }
 
     //callback chiamata quando all'activity viene associato un nuovo intent dato che l'activity è di tipo singleTop
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         //imposto il nuovo intent
         setIntent(intent)
@@ -92,7 +92,8 @@ class ItemListActivity : AppCompatActivity() {
         // specificato che è necessario farlo
         // potrei metterlo in onResume ma non si ha la certezza che l'aggiornamento dell'intent venga effettuato
         // prima dell'onResume
-        if (twoPane && intent?.getBooleanExtra(AlarmManagerReceiverAlwaysOn.UPDATE_FRAGMENT,false) as Boolean){
+        if (twoPane &&  (intent.getBooleanExtra(AlarmManagerReceiverAlwaysOn.UPDATE_FRAGMENT,false)
+                        || intent.action==NotificationLauncher.ACTION_SHORTCUT)){
             updateDetailFragment(intent, this)
             indexClickedChat=0
         }
@@ -139,7 +140,9 @@ class ItemListActivity : AppCompatActivity() {
 
         //Aggiorno il fragment se sono su tablet e nell'intent (che viene creato in ogni notifica se twopane = true) è
         // specificato che è necessario farlo
-        if (twoPane && intent.getBooleanExtra(AlarmManagerReceiverAlwaysOn.UPDATE_FRAGMENT,false)){
+        //Oppure se sono su tablet e ho usato uno shortcut per le bubbles e le conversation
+        if (twoPane && (intent.getBooleanExtra(AlarmManagerReceiverAlwaysOn.UPDATE_FRAGMENT,false)
+                    || intent.action==NotificationLauncher.ACTION_SHORTCUT)){
             updateDetailFragment(intent, this)
             indexClickedChat=0
         }

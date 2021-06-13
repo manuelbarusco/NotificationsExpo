@@ -43,6 +43,7 @@ class NotificationLauncher(
         }
         const val ACTION_BUBBLE = "com.android.NotificationsExpo.BUBBLE"
         const val ACTION_CONVERSATION = "com.android.NotificationsExpo.CONVERSATION"
+        const val ACTION_SHORTCUT = "com.android.NotificationsExpo.SHORTCUT"
     }
 
     //metodo che aggiorna le chat che contengono messaggi non letti dopo che è stata inviata la notifica
@@ -301,12 +302,42 @@ class NotificationLauncher(
 
     //funzione che lancia una bubble notification
     fun launchBubbleNotification(notification_id: Int = chat_id.toInt()){
-        val target = Intent(context, BubbleActivity::class.java)
+        val target: Intent
+        //Intent per shortcut
+        if(!twopane) {
+            target = Intent(context, ItemDetailActivity::class.java)
                 .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
                 .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
                 .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                 .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
-                .setAction(ACTION_BUBBLE)
+                .setAction(ACTION_SHORTCUT)
+            target.apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+        }
+        else{
+            target = Intent(context, ItemListActivity::class.java)
+                    .putExtra(ItemDetailFragment.TWO_PANE,twopane)
+                    .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+                    .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                    .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+                    .setAction(ACTION_SHORTCUT)
+            target.apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+        }
+
+        //Intet per espansione bubble
+        val target2 = Intent(context, BubbleActivity::class.java)
+            .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+            .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+            .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+            .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+            .setAction(ACTION_BUBBLE)
+        /*target2.apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }*/
 
         /*Oggetto Person può essere riutilizzato su altre API per una migliore integrazione
         * setImortant per indicare gli utenti che interagiscono frequentemente con l'utente*/
@@ -339,12 +370,13 @@ class NotificationLauncher(
         val shortcutManager: ShortcutManager = context.getSystemService(AppCompatActivity.SHORTCUT_SERVICE) as ShortcutManager
         shortcutManager.pushDynamicShortcut(shortcut)
 
+        //TODO: sistemare commento
         //Invece di creare dei bubbleMetadata da "zero" posso riutilizzare i dati dello shortcut passando il suo id
         /*setDesiredHeight(600) --> imposta la lunghezza della bubble espansa (in dp)
         * setAutoExpandBubble(true) --> bubble espansa in automatico (solo se l'app è in foreground) default = false
         * .setSuppressNotification()--> imposta se la bubble verrà pubblicato senza la notifica associata nell'area apposita default = false.*/
 
-        val bubbleData = Notification.BubbleMetadata.Builder(notification_id.toString())
+        val bubbleData = Notification.BubbleMetadata.Builder(PendingIntent.getActivity(context,0,target2,PendingIntent.FLAG_UPDATE_CURRENT),Icon.createWithResource(context,chat_img))
                 .setDesiredHeight(600)
                 .setAutoExpandBubble(false)
                 .setSuppressNotification(false)
@@ -445,6 +477,9 @@ class NotificationLauncher(
                     .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
                     .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                     .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+            /*target.apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }*/
             pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
         }
         else{
@@ -476,7 +511,7 @@ class NotificationLauncher(
     }
 
     //funzione che lancia una conversation notification
-    fun launchConversationNotifications(notification_id: Int = getNextId()) {
+    fun launchConversationNotifications(notification_id: Int = chat_id.toInt()) {
         val notificationManager: NotificationManager? = context.getSystemService()
         val shortcutManager: ShortcutManager = context.getSystemService(AppCompatActivity.SHORTCUT_SERVICE) as ShortcutManager
         val target: Intent
@@ -489,9 +524,8 @@ class NotificationLauncher(
                     .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                     .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
                     .setAction(ACTION_CONVERSATION)
-           //target.apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT}
             pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
-
+        //TODO: sistemare intent shortcuts anche qui
         }
         else{
             target = Intent(context, ItemListActivity::class.java)
@@ -525,7 +559,10 @@ class NotificationLauncher(
                 .setIcon(Icon.createWithResource(context, chat_img))
                 .setShortLabel(chat_name as CharSequence)
                 .setLongLabel(chat_name as CharSequence)
-                .setIntent(target)
+                .setIntent(target.apply {
+                    action = ACTION_SHORTCUT
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })
                 .setPerson(person)
                 .setLocusId(LocusId(notification_id.toString()))
                 .build()

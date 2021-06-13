@@ -35,7 +35,7 @@ class ItemDetailActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_item_detail)
-
+        Log.d("bugBubbles","onCreate di ItemListActivity")
         //mostro la action bar
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -77,11 +77,23 @@ class ItemDetailActivity : AppCompatActivity() {
         // Abilito il BroadcastReceiver a runtime
         val filter = IntentFilter(AlarmManagerReceiver.ACTION_SHOW_NOTIFICATION)
         this.registerReceiver(onShowNotification, filter, AlarmManagerReceiver.PERM_PRIVATE, null)
+        Log.d("bugBubbles","onResume di ItemListActivity")
     }
+
 
     override fun onPause() {
         // Disabilito il BroadcastReceiver a runtime
         this.unregisterReceiver(onShowNotification)
+        Log.d("bugBubbles","onPause di ItemListActivity")
         super.onPause()
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        if(intent.action==NotificationLauncher.ACTION_SHORTCUT && intent.getBooleanExtra(ItemDetailFragment.TWO_PANE,false)){
+            Log.d("bugBubbles","onBackPressed di itemDetailActivity")
+            val intent = Intent(this, ItemListActivity::class.java)
+            startActivity(intent)
+        }
     }
 }
