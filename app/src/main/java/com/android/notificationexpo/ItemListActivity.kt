@@ -158,7 +158,7 @@ class ItemListActivity : AppCompatActivity() {
                 Observer {chat->
                     chat?.let{
                         chat_list=chat
-                        if(intent.action==NotificationLauncher.ACTION_SHORTCUT) {
+                        if(intent.action==NotificationLauncher.ACTION_SHORTCUT_T || intent.action==NotificationLauncher.ACTION_SHORTCUT_S) {
                             updateIndexClickedChat(intent)
                             updateDetailFragment(intent,this)
                         }

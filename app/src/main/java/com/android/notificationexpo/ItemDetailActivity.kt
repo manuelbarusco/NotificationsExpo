@@ -110,7 +110,7 @@ class ItemDetailActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        if(intent.action==NotificationLauncher.ACTION_SHORTCUT && !intent.getBooleanExtra(ItemDetailFragment.TWO_PANE,true)){
+        if(intent.action==NotificationLauncher.ACTION_SHORTCUT_S){
             val intent = Intent(this, ItemListActivity::class.java)
             startActivity(intent)
         }

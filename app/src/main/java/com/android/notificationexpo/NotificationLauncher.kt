@@ -41,7 +41,8 @@ class NotificationLauncher(
 
         const val ACTION_BUBBLE = "com.android.NotificationsExpo.BUBBLE"
         const val ACTION_CONVERSATION = "com.android.NotificationsExpo.CONVERSATION"
-        const val ACTION_SHORTCUT = "com.android.NotificationsExpo.SHORTCUT"
+        const val ACTION_SHORTCUT_T = "com.android.NotificationsExpo.SHORTCUT.T"
+        const val ACTION_SHORTCUT_S = "com.android.NotificationsExpo.SHORTCUT.S"
     }
 
 
@@ -321,7 +322,7 @@ class NotificationLauncher(
                 .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
                 .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                 .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
-                .setAction(ACTION_SHORTCUT)
+                .setAction(ACTION_SHORTCUT_S)
             target.apply {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
@@ -333,7 +334,7 @@ class NotificationLauncher(
                     .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
                     .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                     .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
-                    .setAction(ACTION_SHORTCUT)
+                    .setAction(ACTION_SHORTCUT_T)
             target.apply {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
@@ -529,7 +530,7 @@ class NotificationLauncher(
                     .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
                     .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                     .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
-                    .setAction(ACTION_CONVERSATION)
+                    .setAction(ACTION_SHORTCUT_S)
             pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
         }
         else{
@@ -539,7 +540,7 @@ class NotificationLauncher(
                     .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                     .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
                     .putExtra(AlarmManagerReceiverAlwaysOn.UPDATE_FRAGMENT,true)
-                    .setAction(ACTION_CONVERSATION)
+                    .setAction(ACTION_SHORTCUT_T)
             pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
         }
 
@@ -565,7 +566,6 @@ class NotificationLauncher(
                 .setShortLabel(chat_name as CharSequence)
                 .setLongLabel(chat_name as CharSequence)
                 .setIntent(target.apply {
-                    action = ACTION_SHORTCUT
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 })
                 .setPerson(person)
