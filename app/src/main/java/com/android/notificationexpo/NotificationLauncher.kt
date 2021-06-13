@@ -32,12 +32,13 @@ class NotificationLauncher(
 ){
     //oggetto che permette di ottenere un ID sempre diverso per le notifiche
     companion object NotificationID{
-        private var ID: Int=0
+        private var ID: Int=1
 
         fun getNextId():Int {
             ID++
             return ID-1
         }
+
         const val ACTION_BUBBLE = "com.android.NotificationsExpo.BUBBLE"
         const val ACTION_CONVERSATION = "com.android.NotificationsExpo.CONVERSATION"
         const val ACTION_SHORTCUT = "com.android.NotificationsExpo.SHORTCUT"
