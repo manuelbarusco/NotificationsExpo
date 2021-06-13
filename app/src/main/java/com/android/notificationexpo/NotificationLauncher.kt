@@ -32,7 +32,7 @@ class NotificationLauncher(
 ){
     //oggetto che permette di ottenere un ID sempre diverso per le notifiche
     companion object NotificationID{
-        private var ID: Int=1
+        private var ID: Int=2
 
         fun getNextId():Int {
             ID++
@@ -643,6 +643,7 @@ class NotificationLauncher(
                 .setStyle(Notification.MessagingStyle(person)
                         .addMessage(message1)
                 )
+                .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
                 .setCategory(Notification.CATEGORY_MESSAGE)
                 .build()
