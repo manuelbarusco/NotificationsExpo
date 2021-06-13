@@ -4,7 +4,6 @@ import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import com.android.notificationexpo.database.entities.Messaggio
 import com.android.notificationexpo.database.entities.Utente
 import com.android.notificationexpo.ItemDetailFragment
@@ -56,7 +55,6 @@ class AlarmManagerReceiverAlwaysOn: BroadcastReceiver() {
         // Devo generare uno o più messaggi sulla base del tipo di notifica associata alla chat (ad
         // esempio per una notifica conversation genererò più messaggi)
         notificationType= intent.getStringExtra(ItemDetailFragment.NOTIFICATION) as String
-        Log.d("MyR_Tipo di notifica: ", notificationType)
 
         //delego la creazione dei messaggi al MessageGenerator
         val messageGenerator = MessageGenerator(user, chat_id, messagesToSend, context)

@@ -3,7 +3,6 @@ package com.android.notificationexpo.receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import com.android.notificationexpo.ItemDetailFragment
 
 // Questo BroadcastReceiver entrerà in funzione anche quando l'app non è in eseguzione in quanto viene

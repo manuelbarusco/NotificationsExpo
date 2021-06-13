@@ -18,8 +18,6 @@ import com.android.notificationexpo.receivers.AlarmManagerReceiverAlwaysOn
 import com.android.notificationexpo.receivers.CustomNotificationReceiver
 import com.android.notificationexpo.receivers.QuickActionNotificationReceiver
 
-//TODO modifica del badge
-
 //oggetto che si occupa di lanciare le notifiche contenenti i messaggi precedentemente generati dal MessageGenerator
 class NotificationLauncher(
         private val user:String,
@@ -64,10 +62,41 @@ class NotificationLauncher(
     //funzione che lancia una notifica per un processo in background
     fun launchBackgroundProcessNotification(notification_id: Int = getNextId()){
 
-        //lancio prima di tutto una conversation notification per notificare l'arrivo di un messaggio
-        launchConversationNotifications()
+        val target: Intent
+        val pendingIntent: PendingIntent
+        if(!twopane) {
+            target = Intent(context, ItemDetailActivity::class.java)
+                    .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+                    .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                    .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+
+            pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
+        else{
+            target = Intent(context, ItemListActivity::class.java)
+                    .putExtra(ItemDetailFragment.CHAT_ID, chat_id)       //passati id chat, nome chat e immagine della chat e notifica associata alla chat
+                    .putExtra(ItemDetailFragment.CHAT_NAME, chat_name)
+                    .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
+                    .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
+                    .putExtra(AlarmManagerReceiverAlwaysOn.UPDATE_FRAGMENT,true)
+            pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
 
         val notificationManager: NotificationManager? = context.getSystemService()
+
+        //lancio prima di tutto un messaggio per notificare l'arrivo di un messaggi
+        val newMessageNotification = NotificationCompat.Builder(context, ItemListActivity.CONVERSATION)
+                .setSmallIcon(R.drawable.ic_stat_name)
+                .setContentTitle(messagesToSend[0].mittente.nickname)
+                .setContentText(messagesToSend[0].messaggio.testo)
+                .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[0].mittente.imgProfilo))
+                .setContentIntent(pendingIntent)
+                .build()
+
+        if (notificationManager != null) {
+            notificationManager.notify(getNextId(),newMessageNotification)
+        }
 
         //costruisco la notifica
         val builder = NotificationCompat.Builder(context, ItemListActivity.SERVICE).apply {
@@ -191,7 +220,6 @@ class NotificationLauncher(
                 .setLargeIcon(BitmapFactory.decodeResource(context.resources, messagesToSend[0].mittente.imgProfilo))
                 .setStyle(NotificationCompat.BigTextStyle().bigText(messagesToSend[0].messaggio.testo))
                 .setContentIntent(pendingIntent)
-                .setBadgeIconType(NotificationCompat.BADGE_ICON_SMALL)
                 .setCategory(Notification.CATEGORY_MESSAGE)
                 .setAutoCancel(true)
                 .build()
@@ -370,11 +398,9 @@ class NotificationLauncher(
         val shortcutManager: ShortcutManager = context.getSystemService(AppCompatActivity.SHORTCUT_SERVICE) as ShortcutManager
         shortcutManager.pushDynamicShortcut(shortcut)
 
-        //TODO: sistemare commento
-        //Invece di creare dei bubbleMetadata da "zero" posso riutilizzare i dati dello shortcut passando il suo id
         /*setDesiredHeight(600) --> imposta la lunghezza della bubble espansa (in dp)
         * setAutoExpandBubble(true) --> bubble espansa in automatico (solo se l'app è in foreground) default = false
-        * .setSuppressNotification()--> imposta se la bubble verrà pubblicato senza la notifica associata nell'area apposita default = false.*/
+        * setSuppressNotification()--> imposta se la bubble verrà pubblicato senza la notifica associata nell'area apposita default = false.*/
 
         val bubbleData = Notification.BubbleMetadata.Builder(PendingIntent.getActivity(context,0,target2,PendingIntent.FLAG_UPDATE_CURRENT),Icon.createWithResource(context,chat_img))
                 .setDesiredHeight(600)
@@ -525,7 +551,6 @@ class NotificationLauncher(
                     .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
                     .setAction(ACTION_CONVERSATION)
             pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
-        //TODO: sistemare intent shortcuts anche qui
         }
         else{
             target = Intent(context, ItemListActivity::class.java)

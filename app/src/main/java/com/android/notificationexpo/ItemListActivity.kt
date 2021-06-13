@@ -7,7 +7,6 @@ import android.content.*
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -15,7 +14,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
-import androidx.core.content.getSystemService
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.android.notificationexpo.database.NotificationExpoRepository
@@ -92,10 +90,9 @@ class ItemListActivity : AppCompatActivity() {
         // specificato che è necessario farlo
         // potrei metterlo in onResume ma non si ha la certezza che l'aggiornamento dell'intent venga effettuato
         // prima dell'onResume
-        if (twoPane &&  (intent.getBooleanExtra(AlarmManagerReceiverAlwaysOn.UPDATE_FRAGMENT,false)
-                        || intent.action==NotificationLauncher.ACTION_SHORTCUT)){
+        if (twoPane &&  (intent.getBooleanExtra(AlarmManagerReceiverAlwaysOn.UPDATE_FRAGMENT,false))){
             updateDetailFragment(intent, this)
-            indexClickedChat=0
+            updateIndexClickedChat(intent)
         }
     }
 
@@ -138,16 +135,6 @@ class ItemListActivity : AppCompatActivity() {
         }
 
 
-        //Aggiorno il fragment se sono su tablet e nell'intent (che viene creato in ogni notifica se twopane = true) è
-        // specificato che è necessario farlo
-        //Oppure se sono su tablet e ho usato uno shortcut per le bubbles e le conversation
-        if (twoPane && (intent.getBooleanExtra(AlarmManagerReceiverAlwaysOn.UPDATE_FRAGMENT,false)
-                    || intent.action==NotificationLauncher.ACTION_SHORTCUT)){
-            updateDetailFragment(intent, this)
-            indexClickedChat=0
-        }
-
-
         // Determino se l'app è stata eseguita per la prima volta
         val firstTime = preferences.getBoolean(FIRST_TIME_RUNNING, true)
         if (firstTime){
@@ -171,6 +158,10 @@ class ItemListActivity : AppCompatActivity() {
                 Observer {chat->
                     chat?.let{
                         chat_list=chat
+                        if(intent.action==NotificationLauncher.ACTION_SHORTCUT) {
+                            updateIndexClickedChat(intent)
+                            updateDetailFragment(intent,this)
+                        }
                         nChat=chat.size
                         updateUI(chat)
                     }
@@ -178,11 +169,18 @@ class ItemListActivity : AppCompatActivity() {
         )
 
         //aggiungo un observer alle sharedpreferences
-        preferences.registerOnSharedPreferenceChangeListener(sharedPreferencesListener);
+        preferences.registerOnSharedPreferenceChangeListener(sharedPreferencesListener)
 
         // Abilito il BroadcastReceiver a runtime
         val filter = IntentFilter(AlarmManagerReceiver.ACTION_SHOW_NOTIFICATION)
         this.registerReceiver(onShowNotification, filter, AlarmManagerReceiver.PERM_PRIVATE, null)
+    }
+
+    //funzione che aggiorna l'elemento selezionato nella lista della chat se ci troviamo su tablet
+    private fun updateIndexClickedChat(intent: Intent){
+        for(elem in chat_list)
+            if(elem.idChat == intent.getLongExtra(ItemDetailFragment.CHAT_ID,-1))
+                indexClickedChat=chat_list.indexOf(elem)
     }
 
     //funzione che aggiorna la lista delle chat non appena la query al database è finita e i LiveData associati sono stati aggiornati
@@ -226,7 +224,7 @@ class ItemListActivity : AppCompatActivity() {
         // Disabilito il BroadcastReceiver a runtime
         this.unregisterReceiver(onShowNotification)
         //disabilito observer dalle sharedpreferences
-        preferences.registerOnSharedPreferenceChangeListener(sharedPreferencesListener);
+        preferences.registerOnSharedPreferenceChangeListener(sharedPreferencesListener)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -328,10 +326,8 @@ class ItemListActivity : AppCompatActivity() {
             val dateFormat: DateFormat = SimpleDateFormat("hh:mm", Locale.ITALY)
             val strDate: String = dateFormat.format(item.lastMessageDateTime)
             holder.time.text = strDate
-            if(item.idChat in notReadChat) {
-                Log.d("chat", "aggiorno stato")
+            if(item.idChat in notReadChat)
                 holder.status.setCardBackgroundColor(Color.parseColor("#FF6200EE"))
-            }
             with(holder.itemView) {
                 //imposto il listener
                 setOnClickListener{ v ->

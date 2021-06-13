@@ -14,8 +14,7 @@
     This layout is a two-pane layout for the Items master/detail flow.
     -->
 
-    <androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/item_list"
         android:name="com.ebookfrenzy.masterdetailflow.ItemListFragment"
         android:layout_width="250dp"

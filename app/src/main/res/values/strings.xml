@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Notifications Expo</string>
+    <string name="send">Invia</string>
+    <string name="insert_message">Inserisci un messaggio</string>
     <string name="title_item_detail">Item Detail</string>
     <string name="title_bubble_activity">Bubble Activity</string>
     <string name="istructions">Istruzioni</string>

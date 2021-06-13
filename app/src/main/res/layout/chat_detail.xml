@@ -40,7 +40,7 @@
                         android:src="@drawable/image_chat1"
                         android:background="@color/white"
                         android:scaleType="centerCrop"
-                        />
+                        tools:ignore="ContentDescription" />
                 </androidx.cardview.widget.CardView>
 
                 <TextView
@@ -89,7 +89,7 @@
             android:layout_centerVertical="true"
             android:layout_toStartOf="@+id/button_chat_send"
             android:background="@android:color/transparent"
-            android:hint="Inserisci un messaggio"
+            android:hint="@string/insert_message"
             android:inputType="text"
             android:maxLines="6"
             tools:ignore="Autofill" />
@@ -100,7 +100,7 @@
             android:layout_height="48dp"
             android:layout_alignParentEnd="true"
             android:background="?attr/selectableItemBackground"
-            android:text="Invia"
+            android:text="@string/send"
             android:textColor="#673AB7"
             android:textSize="14sp" />
 

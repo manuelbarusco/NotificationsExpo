@@ -8,7 +8,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.SystemClock
-import android.util.Log
 import android.util.TypedValue
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
@@ -91,7 +90,6 @@ class CustomNotificationReceiver : BroadcastReceiver() {
 
                     // Nota: Sostituito con alarmManager?.set con alarmManager?.setExact per avere più precisione
                     // https://developer.android.com/reference/android/app/AlarmManager
-                    Log.d("seconds", time.toString())
                     alarmManager.setExact(
                             AlarmManager.ELAPSED_REALTIME_WAKEUP,
                             SystemClock.elapsedRealtime() + time * 1000,

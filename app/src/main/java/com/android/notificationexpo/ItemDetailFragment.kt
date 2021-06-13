@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.SystemClock
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -154,7 +153,7 @@ class ItemDetailFragment : Fragment() {
 
                 //Prelevo dalle SharedPreferences i secondi di attesa per la risposta automatica (impostabili nella Settings Activity)
                 time = preferences?.getInt(SettingsActivity.SECONDS, 2) as Int
-                Log.d("seconds", time.toString())
+
                 // Nota: Sostituito con alarmManager?.set con alarmManager?.setExact per avere più precisione
                 // https://developer.android.com/reference/android/app/AlarmManager
                 alarmManager.setExact(
