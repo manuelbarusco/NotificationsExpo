@@ -15,18 +15,16 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
+import androidx.core.content.getSystemService
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.android.notificationexpo.database.NotificationExpoRepository
 import com.android.notificationexpo.database.dao.ChatDAO
 import com.android.notificationexpo.receivers.AlarmManagerReceiver
 import com.android.notificationexpo.receivers.AlarmManagerReceiverAlwaysOn
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 /*Questa Activity mostra la lista delle chat disponibili con un RecyclerView. Se un elemento viene toccato ed il dispositivo
 * usato è uno smartphone l'Activity ItemDetailActivity verrà visualizzata a tutto schermo invece se il dispositivo utilizzato
@@ -37,7 +35,7 @@ class ItemListActivity : AppCompatActivity() {
     private var twoPane: Boolean = false //true -> sono su tablet
     private lateinit var repository: NotificationExpoRepository
     private var nChat: Int =0
-    private var notReadChat = ArrayList<Long>()
+    private var notReadChat = listOf<Long>()
     private var clickedChat: View?=null
     private var indexClickedChat : Int?=null
     private lateinit var preferences: SharedPreferences
@@ -45,10 +43,11 @@ class ItemListActivity : AppCompatActivity() {
 
     companion object{
         //costanti per il salvataggio di alcune SharedPreferences
+        const val NOT_READ="ChatNotRead"
         const val SELECTED_CHAT="ChatSelected"
+        const val UTENTE_PREDEFINITO="Alberto"
         const val KEY_USER= "UtenteAPP"
         const val FIRST_TIME_RUNNING= "FirstTimeRunning"
-        const val NOT_READ="ChatNotRead"
 
         //Constanti per i channel ID
         const val MULTIPLE = "MultipleNotification"
@@ -92,18 +91,14 @@ class ItemListActivity : AppCompatActivity() {
 
         //imposto l'utente dell'app, in questo caso è Alberto in maniera predefinita
         preferences= getSharedPreferences("Preferences", Context.MODE_PRIVATE)
-        preferences.edit().putString(KEY_USER, "Alberto").apply()
-        //recupero la lista di chat non lette e se non esiste la creo vuota
+        preferences.edit().putString(KEY_USER, UTENTE_PREDEFINITO).apply()
 
-        val gson = Gson()
-        val jsonChat: String? = preferences.getString(NOT_READ, "")
-        if(jsonChat=="") {
-            val json = gson.toJson(notReadChat)
-            preferences.edit().putString(NOT_READ, json).apply()
-        } else {
-            val type = object : TypeToken<List<Long?>?>() {}.type
-            notReadChat= gson.fromJson(jsonChat, type)
-        }
+        //recupero la lista di chat non lette e se non esiste la creo vuota
+        val string_list = preferences.getString(NOT_READ, null)
+        if(string_list==null)
+            preferences.edit().putString(NOT_READ, "").apply()
+        else
+            notReadChat = StringParser.parseString(string_list)
 
         //recupero la posizione nella recycler view della chat precedentemente selezionata prima del ripristino dell'applicazione
         // (in seguito ad una rotazione ad esempio)
@@ -145,6 +140,25 @@ class ItemListActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
+        //rimuovo tutte le notifiche una volta aperta l'activity
+        val notificationManager: NotificationManager? = getSystemService()
+        if (notificationManager != null) {
+            notificationManager.cancelAll()
+        }
+
+        //aggiorno il fragment dopo un'eventuale apertura da notifica (in tal caso sarà presente un intent)
+        //e solo in caso di dispositivo tablet
+        Log.d("test", intent.getLongExtra(ItemDetailFragment.CHAT_ID,-1).toString())
+        Log.d("test", intent.getStringExtra(ItemDetailFragment.CHAT_NAME).toString())
+        Log.d("test", intent.getIntExtra(ItemDetailFragment.CHAT_IMG,-1).toString())
+        Log.d("test", intent.getStringExtra(ItemDetailFragment.NOTIFICATION).toString())
+        if(intent.getIntExtra(ItemDetailFragment.CHAT_IMG,-1) != -1 && twoPane) {
+            Log.d("test", "Aggiorno ")
+            updateDetailFragment(intent, this)
+            indexClickedChat=0
+            intent.removeExtra(ItemDetailFragment.CHAT_IMG)
+        }
+
         //ottengo una reference alla repository
         repository= NotificationExpoRepository.get(this)
 
@@ -173,11 +187,9 @@ class ItemListActivity : AppCompatActivity() {
     //funzione che aggiorna la lista delle chat non appena la query al database è finita e i LiveData associati sono stati aggiornati
     private fun updateUI(chat: List<ChatDAO.ChatUtente> = this.chat_list){
         //recupero la lista aggiornata delle chat non lette
-        val gson=Gson()
         val preferences= getSharedPreferences("Preferences", Context.MODE_PRIVATE)
-        val jsonChat: String? = preferences?.getString(NOT_READ, "")
-        val type = object : TypeToken<List<Long?>?>() {}.type
-        notReadChat= gson.fromJson(jsonChat, type)
+        val string_list = preferences.getString(NOT_READ, null)
+        notReadChat= StringParser.parseString(string_list as String)
         val recyclerView:RecyclerView= findViewById(R.id.item_list)
         recyclerView.adapter = ChatAdapter(this, chat, twoPane)
     }
@@ -276,7 +288,7 @@ class ItemListActivity : AppCompatActivity() {
             channel = NotificationChannel(BUBBLES, getString(R.string.c_name_bubbles), NotificationManager.IMPORTANCE_HIGH).apply { description = getString(R.string.c_descr_bubbles) }
             notificationManager.createNotificationChannel(channel)
 
-            channel = NotificationChannel(SERVICE, getString(R.string.c_name_service), NotificationManager.IMPORTANCE_HIGH).apply { description = getString(R.string.c_descr_service) }
+            channel = NotificationChannel(SERVICE, getString(R.string.c_name_service), NotificationManager.IMPORTANCE_LOW).apply { description = getString(R.string.c_descr_service) }
             notificationManager.createNotificationChannel(channel)
 
             channel = NotificationChannel(CUSTOM, getString(R.string.c_name_custom), NotificationManager.IMPORTANCE_HIGH).apply { description = getString(R.string.c_descr_custom) }

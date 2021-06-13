@@ -10,6 +10,7 @@ import android.content.pm.ShortcutManager
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.Icon
+import android.util.Log
 import android.widget.RemoteViews
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
@@ -48,22 +49,16 @@ class NotificationLauncher(
     }
 
     //metodo che aggiorna le chat che contengono messaggi non letti dopo che è stata inviata la notifica
-    private fun updateNotReadChat(){
-        val gson = Gson()
-        val notReadChat:ArrayList<Long>
+    private fun updateNotReadChat() {
 
         //recupero la lista delle chat
-        val jsonChat: String? = preferences.getString(ItemListActivity.NOT_READ, "")
-        val type = object : TypeToken<List<Long?>?>() {}.type
-        notReadChat= gson.fromJson(jsonChat, type)
+        val chats: String? = preferences.getString(ItemListActivity.NOT_READ, "")
+        val notReadChat = StringParser.parseString(chats as String)
 
         //aggiungo l'id della chat alla lista se non è già presente
-        if(chat_id !in notReadChat)
-            notReadChat.add(chat_id)
-
-        //aggiorno la lista
-        val json = gson.toJson(notReadChat)
-        preferences.edit().putString(ItemListActivity.NOT_READ, json).apply()
+        if (chat_id !in notReadChat)
+            preferences.edit()
+                .putString(ItemListActivity.NOT_READ, StringParser.addLong(chats, chat_id)).apply()
     }
 
     //tutti i metodi di seguito hanno come parametro il notification_id il quale specifica l'id da usare nel lancio della notifica
@@ -444,7 +439,7 @@ class NotificationLauncher(
         notificationLayoutExpanded.setOnClickPendingIntent(R.id.b_invia,biPendingIntent)
         notificationLayoutExpanded.setOnClickPendingIntent(R.id.b_annulla,baPendingIntent)
 
-        //Inten per tocco su notifica differenziato se si è su smartphone o tablet
+        //Intent per tocco su notifica differenziato se si è su smartphone o tablet
         val target: Intent
         val pendingIntent: PendingIntent
         if(!twopane) {

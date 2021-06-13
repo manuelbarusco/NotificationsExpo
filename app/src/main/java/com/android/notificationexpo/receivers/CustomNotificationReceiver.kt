@@ -235,7 +235,7 @@ class CustomNotificationReceiver : BroadcastReceiver() {
         }
 
         val notification = NotificationCompat.Builder(context, ItemListActivity.CUSTOM)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)  //TODO: mettere icona migliore
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setCustomContentView(notificationLayout)
                 .setCustomBigContentView(notificationLayoutExpanded)
                 .setStyle(NotificationCompat.DecoratedCustomViewStyle()) //aggiunge icona, nome app e tempo come quelle normali

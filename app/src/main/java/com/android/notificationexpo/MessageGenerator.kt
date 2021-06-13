@@ -116,7 +116,7 @@ class MessageGenerator(
         val utenti:List<Utente> = repository.getChatUtenti(chat_id, user)
 
         //genero il messaggio e lo aggiungo al database
-        val mex1= Messaggio(testo= "Ti invio una foto della giornata di oggi", chat = chat_id, media = null , mittente = utenti[0].nickname)
+        val mex1= Messaggio(testo= "Ti invio una foto", chat = chat_id, media = null , mittente = utenti[0].nickname)
         repository.addMessage(mex1)
 
         //aggiungo la coppia Mittente-Messaggio alla lista dei messaggi di cui bisogna lanciare la notifica

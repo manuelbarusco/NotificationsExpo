@@ -18,8 +18,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.notificationexpo.database.NotificationExpoRepository
 import com.android.notificationexpo.database.entities.Messaggio
 import com.android.notificationexpo.receivers.AlarmManagerReceiver
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 
 /* Un Fragment che rappresenta il dettaglio di una chat. Questo Fragment è contento in ItemListActivity (per tablet)
 * oppure in ItemDetailActivity (per smartphone)*/
@@ -61,6 +59,21 @@ class ItemDetailFragment : Fragment() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        //accedo alle preferences
+        val preferences= context?.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+
+        //recupero la lista delle chat
+        val chats: String? = preferences?.getString(ItemListActivity.NOT_READ, "")
+
+        //aggiorno la lista
+        if (preferences != null) {
+            preferences.edit().putString(ItemListActivity.NOT_READ, //rimuovo l'id della chat alla lista
+                StringParser.removeLong(chats as String,chatId)).apply()
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.chat_detail, container, false)
 
@@ -80,25 +93,6 @@ class ItemDetailFragment : Fragment() {
         //ottengo una reference alla repository
         if(context!=null)
             repository= NotificationExpoRepository.get(context as Context)
-
-        //accedo alle preferences
-        val preferences= context?.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
-        val gson = Gson()
-        val notReadChat:ArrayList<Long>
-
-        //recupero la lista delle chat
-        val jsonChat: String? = preferences?.getString(ItemListActivity.NOT_READ, "")
-        val type = object : TypeToken<List<Long?>?>() {}.type
-        notReadChat= gson.fromJson(jsonChat, type)
-
-        //rimuovo l'id della chat alla lista
-        notReadChat.remove(chatId)
-
-        //aggiorno la lista
-        val json = gson.toJson(notReadChat)
-        if (preferences != null) {
-            preferences.edit().putString(ItemListActivity.NOT_READ, json).apply()
-        }
 
         //recupero il tipo di chat dalla lista dei partecipanti alla chat:
         //se il numero di partecipanti alla chat (escluso l'utente che sta usando la app) è > 1 allora la chat è di gruppo
@@ -122,49 +116,58 @@ class ItemDetailFragment : Fragment() {
         val sendButton: Button= rootView.findViewById(R.id.button_chat_send)
 
         sendButton.setOnClickListener {
-            //creo un messaggio col testo inserito per inserirlo poi nel Database e aggiornare la RecyclerView
-            val mex=Messaggio(testo = userText.text.toString(), mittente = user, media = null, chat=chatId)
+            if(userText.text.toString()!="") {
+                //creo un messaggio col testo inserito per inserirlo poi nel Database e aggiornare la RecyclerView
+                val mex = Messaggio(
+                    testo = userText.text.toString(),
+                    mittente = user,
+                    media = null,
+                    chat = chatId
+                )
 
-            repository.addMessage(mex)
-            messaggi.add(mex)
+                repository.addMessage(mex)
+                messaggi.add(mex)
 
-            //aggiorno la recycler view dei messaggi e aggiorno l'indice dell'elemento selezionato dato che ora la chat data si trova in
-            //cima alla lista delle chat nella ItemListActitivy
-            recyclerView.adapter?.notifyItemInserted(messaggi.size)
-            if(twopane)
-                (activity as ItemListActivity).setIndexClickedChat(0)
-            userText.text.clear()
+                //aggiorno la recycler view dei messaggi e aggiorno l'indice dell'elemento selezionato dato che ora la chat data si trova in
+                //cima alla lista delle chat nella ItemListActitivy
+                recyclerView.adapter?.notifyItemInserted(messaggi.size)
+                if (twopane)
+                    (activity as ItemListActivity).setIndexClickedChat(0)
+                userText.text.clear()
 
-            // Impostiamo il timer e dopo un certo tempo verrà inviato un broadcast esplicito ad
-            // AlarmMangerReceiver
-            val alarmManager: AlarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            val alarmIntent = Intent(context, AlarmManagerReceiver::class.java) // intent esplicito
-            alarmIntent.putExtra(NOTIFICATION,notificaChat)
-            alarmIntent.putExtra(CHAT_ID,chatId)
-            alarmIntent.putExtra(CHAT_NAME,nomeChat)
-            alarmIntent.putExtra(CHAT_IMG,imgChat)
-            alarmIntent.putExtra(TWO_PANE,twopane)
+                // Impostiamo il timer e dopo un certo tempo verrà inviato un broadcast esplicito ad
+                // AlarmMangerReceiver
+                val alarmManager: AlarmManager =
+                    context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                val alarmIntent =
+                    Intent(context, AlarmManagerReceiver::class.java) // intent esplicito
+                alarmIntent.putExtra(NOTIFICATION, notificaChat)
+                alarmIntent.putExtra(CHAT_ID, chatId)
+                alarmIntent.putExtra(CHAT_NAME, nomeChat)
+                alarmIntent.putExtra(CHAT_IMG, imgChat)
+                alarmIntent.putExtra(TWO_PANE, twopane)
 
-            // Genero un id da assegnare al broadcast per generare broadcast sempre diversi
-            // Se non lo faccio e genero più broadcast prima dello scadere del tempo non li vedrò
-            val boradcastId:Int = System.currentTimeMillis().toInt()
-            val pendingIntent = PendingIntent.getBroadcast(context, boradcastId, alarmIntent, 0)
+                // Genero un id da assegnare al broadcast per generare broadcast sempre diversi
+                // Se non lo faccio e genero più broadcast prima dello scadere del tempo non li vedrò
+                val boradcastId: Int = System.currentTimeMillis().toInt()
+                val pendingIntent = PendingIntent.getBroadcast(context, boradcastId, alarmIntent, 0)
 
-            //Prelevo dalle SharedPreferences i secondi di attesa per la risposta automatica (impostabili nella Settings Activity)
-            time = preferences?.getInt(SettingsActivity.SECONDS,2) as Int
-            Log.d("seconds", time.toString())
-            // Nota: Sostituito con alarmManager?.set con alarmManager?.setExact per avere più precisione
-            // https://developer.android.com/reference/android/app/AlarmManager
-            alarmManager.setExact(
+                //Prelevo dalle SharedPreferences i secondi di attesa per la risposta automatica (impostabili nella Settings Activity)
+                time = preferences?.getInt(SettingsActivity.SECONDS, 2) as Int
+                Log.d("seconds", time.toString())
+                // Nota: Sostituito con alarmManager?.set con alarmManager?.setExact per avere più precisione
+                // https://developer.android.com/reference/android/app/AlarmManager
+                alarmManager.setExact(
                     AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     SystemClock.elapsedRealtime() + time * 1000,
-                    pendingIntent)
-            // Note sulla sicurezza:
-            // 1) Essendo broadcast espliciti ho la certezza che non verrranno recapitati ad altri
-            // 2) Poichè AlarmManagerReceiver è dichiarato nel manifest con exported=false, esso
-            //    riceverà solo gli intent provenienti da questa app
-            // https://developer.android.com/guide/components/broadcasts#security-and-best-practices
-
+                    pendingIntent
+                )
+                // Note sulla sicurezza:
+                // 1) Essendo broadcast espliciti ho la certezza che non verrranno recapitati ad altri
+                // 2) Poichè AlarmManagerReceiver è dichiarato nel manifest con exported=false, esso
+                //    riceverà solo gli intent provenienti da questa app
+                // https://developer.android.com/guide/components/broadcasts#security-and-best-practices
+            }
         }
 
         return rootView

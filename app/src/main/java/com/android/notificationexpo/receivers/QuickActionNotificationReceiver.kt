@@ -157,7 +157,7 @@ class QuickActionNotificationReceiver: BroadcastReceiver() {
 
 
         val notification = Notification.Builder(context, ItemListActivity.CUSTOM)
-                .setSmallIcon(R.drawable.ic_launcher_foreground) //TODO: mettere immagine migliore
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setStyle(messagingStyle)
                 .addAction(action)
                 .setContentIntent(pendingIntent)

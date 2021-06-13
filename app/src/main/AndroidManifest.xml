@@ -34,10 +34,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MasterDetailFlow">
+        <!-- TODO ho cambiato in standard-->
         <activity
             android:name="com.android.notificationexpo.ItemListActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTop"
+            android:launchMode="standard"
             android:theme="@style/Theme.MasterDetailFlow.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -67,10 +68,6 @@
             android:launchMode="singleTop"
             android:parentActivityName="com.android.notificationexpo.ItemListActivity"
             android:theme="@style/Theme.MasterDetailFlow.NoActionBar">
-            <!-- Serve per pulsante che torna indietro nella toolbar TODO: Eliminare?-->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.android.notificationexpo.ItemListActivity" />
         </activity>
         <activity
             android:name="com.android.notificationexpo.BubbleActivity"
