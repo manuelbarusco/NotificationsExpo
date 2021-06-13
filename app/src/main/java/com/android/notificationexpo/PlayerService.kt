@@ -229,7 +229,7 @@ class PlayerService : Service()
         // Creo la notifica
         val notification2 = Notification.Builder(this@PlayerService, CHANNEL_ID)
                 .setStyle(mediaStyle)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .addAction(Notification.Action.Builder(
                     Icon.createWithResource(this, R.drawable.ic_pause_filled),
                     "Pause",
@@ -293,7 +293,7 @@ class PlayerService : Service()
 
             val notification2 = Notification.Builder(this@PlayerService, CHANNEL_ID)
                     .setStyle(mediaStyle)
-                    .setSmallIcon(R.drawable.ic_launcher_foreground)
+                    .setSmallIcon(R.drawable.ic_stat_name)
                     .addAction(Notification.Action.Builder(
                             Icon.createWithResource(this, R.drawable.ic_play_filled),
                             "Pause",
