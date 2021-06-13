@@ -83,6 +83,21 @@ class ItemListActivity : AppCompatActivity() {
         }
     }
 
+    //callback chiamata quando all'activity viene associato un nuovo intent dato che l'activity è di tipo singleTop
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        //imposto il nuovo intent
+        setIntent(intent)
+        //Aggiorno il fragment se sono su tablet e nell'intent (che viene creato in ogni notifica se twopane = true) è
+        // specificato che è necessario farlo
+        // potrei metterlo in onResume ma non si ha la certezza che l'aggiornamento dell'intent venga effettuato
+        // prima dell'onResume
+        if (twoPane && intent?.getBooleanExtra(AlarmManagerReceiverAlwaysOn.UPDATE_FRAGMENT,false) as Boolean){
+            updateDetailFragment(intent, this)
+            indexClickedChat=0
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -124,8 +139,10 @@ class ItemListActivity : AppCompatActivity() {
 
         //Aggiorno il fragment se sono su tablet e nell'intent (che viene creato in ogni notifica se twopane = true) è
         // specificato che è necessario farlo
-        if (twoPane && intent.getBooleanExtra(AlarmManagerReceiverAlwaysOn.UPDATE_FRAGMENT,false))
+        if (twoPane && intent.getBooleanExtra(AlarmManagerReceiverAlwaysOn.UPDATE_FRAGMENT,false)){
             updateDetailFragment(intent, this)
+            indexClickedChat=0
+        }
 
 
         // Determino se l'app è stata eseguita per la prima volta
@@ -139,25 +156,6 @@ class ItemListActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
-        //rimuovo tutte le notifiche una volta aperta l'activity
-        val notificationManager: NotificationManager? = getSystemService()
-        if (notificationManager != null) {
-            notificationManager.cancelAll()
-        }
-
-        //aggiorno il fragment dopo un'eventuale apertura da notifica (in tal caso sarà presente un intent)
-        //e solo in caso di dispositivo tablet
-        Log.d("test", intent.getLongExtra(ItemDetailFragment.CHAT_ID,-1).toString())
-        Log.d("test", intent.getStringExtra(ItemDetailFragment.CHAT_NAME).toString())
-        Log.d("test", intent.getIntExtra(ItemDetailFragment.CHAT_IMG,-1).toString())
-        Log.d("test", intent.getStringExtra(ItemDetailFragment.NOTIFICATION).toString())
-        if(intent.getIntExtra(ItemDetailFragment.CHAT_IMG,-1) != -1 && twoPane) {
-            Log.d("test", "Aggiorno ")
-            updateDetailFragment(intent, this)
-            indexClickedChat=0
-            intent.removeExtra(ItemDetailFragment.CHAT_IMG)
-        }
 
         //ottengo una reference alla repository
         repository= NotificationExpoRepository.get(this)

@@ -10,7 +10,6 @@ import android.content.pm.ShortcutManager
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.Icon
-import android.util.Log
 import android.widget.RemoteViews
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
@@ -18,8 +17,6 @@ import androidx.core.content.getSystemService
 import com.android.notificationexpo.receivers.AlarmManagerReceiverAlwaysOn
 import com.android.notificationexpo.receivers.CustomNotificationReceiver
 import com.android.notificationexpo.receivers.QuickActionNotificationReceiver
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 
 //TODO modifica del badge
 
@@ -129,7 +126,7 @@ class NotificationLauncher(
                     .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                     .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
 
-            pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+            pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_UPDATE_CURRENT)
         }
         else{
             target = Intent(context, ItemListActivity::class.java)
@@ -138,7 +135,7 @@ class NotificationLauncher(
                     .putExtra(ItemDetailFragment.CHAT_IMG, chat_img)
                     .putExtra(ItemDetailFragment.NOTIFICATION, notificationType)
                     .putExtra(AlarmManagerReceiverAlwaysOn.UPDATE_FRAGMENT,true)
-            pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_CANCEL_CURRENT)
+            pendingIntent = PendingIntent.getActivity(context, 0, target, PendingIntent.FLAG_UPDATE_CURRENT)
         }
 
         val notificationManager: NotificationManager? = context.getSystemService()

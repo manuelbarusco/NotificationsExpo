@@ -1,7 +1,7 @@
 package com.android.notificationexpo
 
-import android.util.Log
-
+//oggetto che serve a definire una serie di metodi per la formattazione e il
+//parsing di Stringhe, servirà a salvare dati leggermente strutturati nelle SharedPreferences
 class StringParser {
     companion object{
 
@@ -17,12 +17,16 @@ class StringParser {
             return longlist
         }
 
+        //funzione che riceve una stringa formattata nel tipo Long:Long:Long
+        //e ritorna la stessa stringa aggiungendo il long specificato nei parametri
         fun addLong(s:String, l:Long):String{
             if(s=="")
                 return s+l.toString()
             return s+":"+l.toString()
         }
 
+        //funzione che riceve una stringa formattata nel tipo Long:Long:Long
+        //e ritorna la stessa stringa senza il long specificato nei parametri
         fun removeLong(s:String, l:Long):String{
             if(s=="")
                 return ""
@@ -34,6 +38,8 @@ class StringParser {
             return string.dropLast(1)
         }
 
+        //funzione che riceve una stringa formattata nel tipo Long:Long:Long
+        //e ritorna un booleno che indica se il long specificato è contenuto nella stringa
         fun isIn(s:String, l: Long):Boolean{
             if(s=="")
                 return false
