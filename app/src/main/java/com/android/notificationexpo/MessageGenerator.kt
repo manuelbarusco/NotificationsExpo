@@ -1,6 +1,7 @@
 package com.android.notificationexpo
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.android.notificationexpo.database.NotificationExpoRepository
 import com.android.notificationexpo.database.entities.Messaggio
 import com.android.notificationexpo.database.entities.Utente
@@ -12,9 +13,22 @@ class MessageGenerator(
         private val user:String,
         private val chat_id: Long,
         private val messagesToSend: MutableList<AlarmManagerReceiverAlwaysOn.MittenteMessaggio>,
-        private val context: Context
+        private val context: Context,
+        private val preferences: SharedPreferences = context.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
     ) {
 
+    //metodo che aggiorna le chat che contengono messaggi non letti dopo che è stata inviata la notifica
+    private fun updateNotReadChat() {
+
+        //recupero la lista delle chat
+        val chats: String? = preferences.getString(ItemListActivity.NOT_READ, "")
+        val notReadChat = StringParser.parseString(chats as String)
+
+        //aggiungo l'id della chat alla lista se non è già presente
+        if (chat_id !in notReadChat)
+            preferences.edit()
+                    .putString(ItemListActivity.NOT_READ, StringParser.addLong(chats, chat_id)).apply()
+    }
     private var repository: NotificationExpoRepository = NotificationExpoRepository.get(context)
 
     //funzione che genera e aggiugne al DB un messaggio contenente un'immagine che dovrà essere inviato in una chat con notifica immagine
@@ -29,6 +43,8 @@ class MessageGenerator(
         //aggiungo la coppia Mittente-Messaggio alla lista dei messaggi di cui bisogna lanciare la notifica
         val mittenteMessaggio= AlarmManagerReceiverAlwaysOn.MittenteMessaggio(utenti[0], mex1)
         messagesToSend.add(mittenteMessaggio)
+
+        updateNotReadChat()
     }
 
     //funzione che genera e aggiugne al DB più messaggi che dovranno essere inviati in una chat di gruppo (con notifiche multiple)
@@ -68,6 +84,8 @@ class MessageGenerator(
         messagesToSend.add(mittenteMessaggio)
         mittenteMessaggio= AlarmManagerReceiverAlwaysOn.MittenteMessaggio(utenti[u4], mex4)
         messagesToSend.add(mittenteMessaggio)
+
+        updateNotReadChat()
     }
 
     //funzione che genera e aggiugne al DB un singolo messaggio, il parametro long indica se il messaggio da generare deve essere lungo o corto
@@ -94,6 +112,8 @@ class MessageGenerator(
         //aggiungo la coppia Mittente-Messaggio alla lista dei messaggi di cui bisogna lanciare la notifica
         val mittenteMessaggio= AlarmManagerReceiverAlwaysOn.MittenteMessaggio(utenti[0], mex)
         messagesToSend.add(mittenteMessaggio)
+
+        updateNotReadChat()
     }
 
     //funzione che genera e aggiunge al DB un messaggio che dovrà essere inviato in una chat con notifica media control
@@ -108,6 +128,8 @@ class MessageGenerator(
         //aggiungo la coppia Mittente-Messaggio alla lista dei messaggi di cui bisogna lanciare la notifica
         val mittenteMessaggio= AlarmManagerReceiverAlwaysOn.MittenteMessaggio(utenti[0], mex1)
         messagesToSend.add(mittenteMessaggio)
+
+        updateNotReadChat()
     }
 
     //funzione che genera e aggiunge al DB un messaggio che dovrà essere inviato in una chat con notifica di processo in background
@@ -122,5 +144,7 @@ class MessageGenerator(
         //aggiungo la coppia Mittente-Messaggio alla lista dei messaggi di cui bisogna lanciare la notifica
         val mittenteMessaggio= AlarmManagerReceiverAlwaysOn.MittenteMessaggio(utenti[0], mex1)
         messagesToSend.add(mittenteMessaggio)
+
+        updateNotReadChat()
     }
 }

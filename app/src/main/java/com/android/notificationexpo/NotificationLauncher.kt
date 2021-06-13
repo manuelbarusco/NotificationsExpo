@@ -28,7 +28,6 @@ class NotificationLauncher(
         private val notificationType: String,
         private val twopane: Boolean,
         private val context: Context,
-        private val preferences: SharedPreferences = context.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
 
 ){
     //oggetto che permette di ottenere un ID sempre diverso per le notifiche
@@ -44,18 +43,6 @@ class NotificationLauncher(
         const val ACTION_SHORTCUT = "com.android.NotificationsExpo.SHORTCUT"
     }
 
-    //metodo che aggiorna le chat che contengono messaggi non letti dopo che è stata inviata la notifica
-    private fun updateNotReadChat() {
-
-        //recupero la lista delle chat
-        val chats: String? = preferences.getString(ItemListActivity.NOT_READ, "")
-        val notReadChat = StringParser.parseString(chats as String)
-
-        //aggiungo l'id della chat alla lista se non è già presente
-        if (chat_id !in notReadChat)
-            preferences.edit()
-                .putString(ItemListActivity.NOT_READ, StringParser.addLong(chats, chat_id)).apply()
-    }
 
     //tutti i metodi di seguito hanno come parametro il notification_id il quale specifica l'id da usare nel lancio della notifica
 
@@ -183,7 +170,6 @@ class NotificationLauncher(
                 .setAutoCancel(true)
                 .build()
 
-        updateNotReadChat()
 
         notificationManager?.notify(notification_id,notification)
     }
@@ -223,8 +209,6 @@ class NotificationLauncher(
                 .setCategory(Notification.CATEGORY_MESSAGE)
                 .setAutoCancel(true)
                 .build()
-
-        updateNotReadChat()
 
         notificationManager?.notify(notification_id,notification)
     }
@@ -313,8 +297,6 @@ class NotificationLauncher(
                 .setCategory(Notification.CATEGORY_MESSAGE)
                 .setAutoCancel(true)
                 .build()
-
-        updateNotReadChat()
 
         val notificationManager: NotificationManager? = context.getSystemService()
 
@@ -432,8 +414,6 @@ class NotificationLauncher(
 
         val notificationManager: NotificationManager? = context.getSystemService()
 
-        updateNotReadChat()
-
         notificationManager?.notify(notification_id,notification)
     }
 
@@ -530,7 +510,6 @@ class NotificationLauncher(
 
         val notificationManager: NotificationManager? = context.getSystemService()
 
-        updateNotReadChat()
 
         notificationManager?.notify(notification_id,notification.build())
 
@@ -616,7 +595,6 @@ class NotificationLauncher(
                 .setAutoCancel(true)
                 .build()
 
-        updateNotReadChat()
 
         notificationManager?.notify(notification_id,notification)
 
@@ -667,8 +645,6 @@ class NotificationLauncher(
                 .setContentIntent(pendingIntent)
                 .setCategory(Notification.CATEGORY_MESSAGE)
                 .build()
-
-        updateNotReadChat()
 
         notificationManager?.notify(notification_id,notification)
     }
@@ -748,8 +724,6 @@ class NotificationLauncher(
                 .setColor(Color.GREEN)
                 .setAutoCancel(true)
                 .build()
-
-        updateNotReadChat()
 
         val notificationManager: NotificationManager? = context.getSystemService()
         notificationManager?.notify(notification_id,notification)
